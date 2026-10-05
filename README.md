@@ -35,3 +35,13 @@ python3 -m unittest discover -s briefing/tests
 ## 経緯
 
 PR #1（`analysis/`）・PR #2（`home_visit_demand/`）・PR #3（`home_care_target/`）の3ブランチをこのブランチに統合した。`home_visit_demand/` は新しい PR #2 版を採用している。
+
+## 面談資料（機密）の生成
+
+```bash
+python3 briefing/build_all.py
+python3 briefing/deck/export_deck_data.py
+NODE_PATH=<pptxgenjs の node_modules> node briefing/deck/build_deck.js   # → analysis/confidential/briefing/*.pptx
+python3 briefing/deck/build_summary.py                                   # → A4要旨PDF（playwright＋Chromium）
+```
+出力はすべて `analysis/confidential/briefing/`（Git管理外）。

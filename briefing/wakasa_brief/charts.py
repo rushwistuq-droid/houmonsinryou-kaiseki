@@ -30,6 +30,12 @@ GRID = "#e6e5e1"
 S1, S2 = "#2a78d6", "#eb6834"  # 青, 橙
 BLUE_RAMP = ["#e8f1fd", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 SEQ = LinearSegmentedColormap.from_list("seq_blue", BLUE_RAMP)
+# スライドに貼る版はスライド側にタイトルがあるため、図のタイトル・副題を省いて余白を詰める
+SHOW_TITLES = True
+
+
+def _top(default: float) -> float:
+    return default if SHOW_TITLES else 0.95
 
 
 def _style(ax, grid_axis="y"):
@@ -45,6 +51,8 @@ def _style(ax, grid_axis="y"):
 
 
 def _title(fig, title, subtitle=None):
+    if not SHOW_TITLES:
+        return
     fig.text(0.02, 0.97, title, fontsize=15, color=TEXT, ha="left", va="top", weight="bold")
     if subtitle:
         fig.text(0.02, 0.925, subtitle, fontsize=9.5, color=TEXT2, ha="left", va="top")
@@ -80,7 +88,7 @@ def _clinics(ax, clinics, label=True):
 
 def map_underserved(grid: pd.DataFrame, clinics, path: Path):
     fig, ax = plt.subplots(figsize=(10, 7.2))
-    fig.subplots_adjust(left=0.02, right=0.9, top=0.88, bottom=0.05)
+    fig.subplots_adjust(left=0.02, right=0.9, top=_top(0.88), bottom=0.05)
     sc = _map_base(ax, grid, grid.underserved_ratio, 1.0, 2.6)
     _clinics(ax, clinics)
     cb = fig.colorbar(sc, ax=ax, shrink=0.6, pad=0.01)
@@ -95,7 +103,7 @@ def map_underserved(grid: pd.DataFrame, clinics, path: Path):
 
 def map_site_score(grid: pd.DataFrame, top: pd.DataFrame, clinics, path: Path):
     fig = plt.figure(figsize=(12.6, 7.2))
-    ax = fig.add_axes([0.01, 0.05, 0.6, 0.8])
+    ax = fig.add_axes([0.01, 0.05, 0.6, _top(0.85) - 0.05])
     sc = _map_base(ax, grid, grid.score, 0, 100)
     _clinics(ax, clinics, label=False)
     for i, r in top.iterrows():
@@ -107,7 +115,7 @@ def map_site_score(grid: pd.DataFrame, top: pd.DataFrame, clinics, path: Path):
     cb.outline.set_visible(False)
     cb.ax.tick_params(colors=TEXT2, labelsize=8)
     # 右側の順位表
-    x0, y0 = 0.67, 0.83
+    x0, y0 = 0.67, _top(0.83) - 0.02
     for dx, lab, ha in ((0, "順位", "left"), (0.03, "地域", "left"), (0.19, "未充足度", "right"), (0.25, "3年後予測*", "right"), (0.3, "到達目安", "right")):
         fig.text(x0 + dx, y0, lab, fontsize=8.5, color=TEXT2, va="top", ha=ha)
     for i, r in top.iterrows():
@@ -130,7 +138,7 @@ def map_site_score(grid: pd.DataFrame, top: pd.DataFrame, clinics, path: Path):
 def model_fit(diag: pd.DataFrame, model, path: Path):
     d = diag[diag.months_open >= 6]
     fig, ax = plt.subplots(figsize=(8.6, 6.4))
-    fig.subplots_adjust(left=0.1, right=0.97, top=0.84, bottom=0.12)
+    fig.subplots_adjust(left=0.1, right=0.97, top=_top(0.84), bottom=0.12)
     _style(ax, grid_axis="both")
     lo, hi = 40, 700
     xs = np.geomspace(lo, hi, 50)
@@ -164,7 +172,7 @@ def model_fit(diag: pd.DataFrame, model, path: Path):
 def saturation_bars(diag: pd.DataFrame, path: Path):
     d = diag[(diag.index != "honin") & (diag.months_open >= 12)].sort_values("penetration_of_target")
     fig, ax = plt.subplots(figsize=(9.6, 6.2))
-    fig.subplots_adjust(left=0.13, right=0.92, top=0.8, bottom=0.11)
+    fig.subplots_adjust(left=0.13, right=0.92, top=_top(0.8), bottom=0.11)
     _style(ax, grid_axis="x")
     y = np.arange(len(d))
     ax.barh(y, d.reach_target, height=0.62, color="#cde2fb", label="到達目安（本院並みの浸透・競合補正）")
@@ -190,7 +198,7 @@ LABEL_OFFSETS = {"西日暮里": (6, 6), "高円寺": (6, -12), "府中": (8, -6
 def growth_curves(diag: pd.DataFrame, model, path: Path, ramps: pd.DataFrame | None = None):
     """転換期型（居宅重視）で立ち上げた場合の基準カーブ。新規院の進捗管理に使う。"""
     fig, ax = plt.subplots(figsize=(9.6, 6.2))
-    fig.subplots_adjust(left=0.09, right=0.97, top=0.84, bottom=0.11)
+    fig.subplots_adjust(left=0.09, right=0.97, top=_top(0.84), bottom=0.11)
     _style(ax, grid_axis="y")
     t = np.arange(1, 61)
     curves = ((1.0, S1, "東京都内（未充足度1.0）"), (1.5, "#1baf7a", "県境・神奈川（1.5）"), (2.0, S2, "埼玉・千葉の郊外（2.0）"))

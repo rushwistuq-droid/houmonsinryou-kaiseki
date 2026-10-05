@@ -133,7 +133,17 @@ def main() -> None:
     charts.model_fit(diag, model, figs / "fig_model_fit.png")
     charts.saturation_bars(diag, figs / "fig_saturation.png")
     charts.growth_curves(diag, model, figs / "fig_growth_curves.png", ramps=ramps)
-    print(f"図表: {PUB}/fig_*.png, {figs}/fig_*.png")
+    # スライド貼り付け用（タイトルなし）
+    slide = figs / "slide"
+    slide.mkdir(exist_ok=True)
+    charts.SHOW_TITLES = False
+    charts.map_underserved(grid, E.clinics, slide / "fig_map_underserved.png")
+    charts.map_site_score(grid, top.head(10), E.clinics, slide / "fig_map_site_score.png")
+    charts.model_fit(diag, model, slide / "fig_model_fit.png")
+    charts.saturation_bars(diag, slide / "fig_saturation.png")
+    charts.growth_curves(diag, model, slide / "fig_growth_curves.png", ramps=ramps)
+    charts.SHOW_TITLES = True
+    print(f"図表: {PUB}/fig_*.png, {figs}/fig_*.png, {slide}/fig_*.png")
 
 
 if __name__ == "__main__":
