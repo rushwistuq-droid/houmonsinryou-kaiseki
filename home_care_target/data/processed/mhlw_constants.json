@@ -1,0 +1,142 @@
+{
+  "sources": {
+    "medical_facility_survey_r5": {
+      "name": "厚生労働省 令和5年医療施設（静態・動態）調査",
+      "as_of": "2023-10-01",
+      "tables": [
+        "全国編第167/168表",
+        "都道府県編第108表",
+        "二次医療圏編第24表"
+      ]
+    },
+    "facility_standard_notifications": {
+      "name": "厚生労働省保険局 主な施設基準の届出状況（中医協資料）",
+      "as_of": "2023-07-01",
+      "note": "在支病は医療施設調査に専用集計表がなく、届出状況を用いる"
+    },
+    "ndb_home_share": {
+      "name": "NDBオープンデータ 在宅患者訪問診療料（同一建物/以外）",
+      "note": "居宅≒同一建物以外シェア。並行エージェントの集計と整合する既定値"
+    },
+    "overview_r5_visit_volume": {
+      "name": "令和5年医療施設調査・病院報告の概況 表18",
+      "note": "訪問診療実施施設の月間実施件数"
+    }
+  },
+  "national": {
+    "general_clinics": 104894,
+    "home_support_clinics": 14725,
+    "home_support_clinic_patients_managed": 967975,
+    "avg_patients_per_home_support_clinic": 65.74,
+    "home_support_hospitals_2023_07": 2021,
+    "home_support_hospitals_enhanced_2023_07": 782,
+    "home_support_clinics_notification_2023_07": 14755,
+    "home_support_clinics_enhanced_2023_07": 4120,
+    "bedded_home_support_clinics": 1330
+  },
+  "capacity_benchmarks": {
+    "method": "T108平均 + T168患者数階級（不詳除外）",
+    "t108_mean_patients": 65.74,
+    "t168_known_facilities": 9872,
+    "t168_unknown_facilities": 4853,
+    "t168_weighted_mean_patients": 57.67,
+    "t168_classes": [
+      {
+        "label": "0-19",
+        "midpoint": 9.5,
+        "facilities": 4450
+      },
+      {
+        "label": "20-39",
+        "midpoint": 29.5,
+        "facilities": 1492
+      },
+      {
+        "label": "40-59",
+        "midpoint": 49.5,
+        "facilities": 897
+      },
+      {
+        "label": "60-79",
+        "midpoint": 69.5,
+        "facilities": 586
+      },
+      {
+        "label": "80-99",
+        "midpoint": 89.5,
+        "facilities": 389
+      },
+      {
+        "label": "100-149",
+        "midpoint": 124.5,
+        "facilities": 643
+      },
+      {
+        "label": "150+",
+        "midpoint": 200.0,
+        "facilities": 1415
+      }
+    ],
+    "approx_median_patients": 29.5,
+    "approx_p75_patients": 69.5,
+    "active_mean_patients_ge20": 97.2,
+    "enhanced_proxy_patients": 200.0
+  },
+  "mix": {
+    "home_share_of_visit_patients": 0.4035,
+    "facility_share_of_visit_patients": 0.547,
+    "other_share": 0.032,
+    "visits_per_patient_per_month": 1.9,
+    "note": "全国居宅シェアは都道府県NDB再集計。地域別は prefecture_home_shares.json"
+  },
+  "competitor_activity": {
+    "enhanced_clinic_rate": 1.0,
+    "standard_clinic_rate": 0.35,
+    "active_competitor_rate_fallback": 0.45,
+    "non_zaitaku_visit_extra_per_clinic": 0.08,
+    "note": "機能強化型は実効1.0、従来型はT168活動層を踏まえ0.35。在支診以外の訪問実施診は在支診1件あたり0.08ユニットを軽加算"
+  },
+  "growth_kpi": {
+    "annual_home_increment_default": 24,
+    "annual_home_increment_stretch": 36,
+    "max_shift_increment": 48,
+    "note": "成熟院は実績+年次増分を本命。能力/FTEで上限"
+  },
+  "home_mix_targets": {
+    "target_share": 0.40,
+    "stretch_share": 0.50,
+    "peer_benchmark_share": 0.55,
+    "note": "施設偏重院の居宅シフト目標。ピアは調布・市川・津田沼・西日暮里帯を目安"
+  },
+  "new_clinics_ignore_priority": [
+    "わかさクリニック浦和"
+  ],
+  "supply_weights": {
+    "home_support_clinic": 1.0,
+    "home_support_hospital": 1.0,
+    "visit_clinic_non_support": 0.35
+  },
+  "demand_fallback": {
+    "elderly65_visit_rate": 0.045,
+    "note": "本モジュールでは需要は外部入力を優先。未指定時のみフォールバック"
+  },
+  "capacity_tiers": {
+    "standard_mean_total": 65.74,
+    "active_mean_total": 97.2,
+    "enhanced_proxy_total": 200.0,
+    "specialty_p90_total": 150.0,
+    "specialty_top_total": 200.0,
+    "strategic_home_ratio_default": 0.6,
+    "physician_home_per_fte": 100.0,
+    "note": "standard/active=一般在支診, specialty=訪問特化・150人超階級"
+  },
+  "overlap": {
+    "method": "inverse_distance_soft_assignment",
+    "group_overlap_radius_km": 16.0,
+    "note": "同一グループ院が2R以内にある場合、需要を距離逆数で按分"
+  },
+  "catchment": {
+    "weight_method": "circle_intersection",
+    "note": "市区町村を等面積円で近似し、半径円との交差面積比を重みとする"
+  }
+}

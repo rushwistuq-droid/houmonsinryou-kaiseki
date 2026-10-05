@@ -1,0 +1,630 @@
+{
+  "source": "令和5年医療施設調査 第68/107表",
+  "as_of": "2023-09",
+  "prefectures": {
+    "三重県": {
+      "hospital": {
+        "visit_facilities": 32.0,
+        "visit_claims_month": 2213.0,
+        "claims_per_facility": 69.15625
+      },
+      "clinic": {
+        "visit_facilities": 304.0,
+        "visit_claims_month": 16528.0,
+        "claims_per_facility": 54.36842105263158
+      },
+      "hospital_weight_vs_clinic": 1.272
+    },
+    "京都府": {
+      "hospital": {
+        "visit_facilities": 65.0,
+        "visit_claims_month": 6366.0,
+        "claims_per_facility": 97.93846153846154
+      },
+      "clinic": {
+        "visit_facilities": 563.0,
+        "visit_claims_month": 25969.0,
+        "claims_per_facility": 46.12611012433393
+      },
+      "hospital_weight_vs_clinic": 2.123
+    },
+    "佐賀県": {
+      "hospital": {
+        "visit_facilities": 40.0,
+        "visit_claims_month": 3102.0,
+        "claims_per_facility": 77.55
+      },
+      "clinic": {
+        "visit_facilities": 156.0,
+        "visit_claims_month": 10124.0,
+        "claims_per_facility": 64.8974358974359
+      },
+      "hospital_weight_vs_clinic": 1.195
+    },
+    "全国": {
+      "hospital": {
+        "visit_facilities": 2904.0,
+        "visit_claims_month": 237601.0,
+        "claims_per_facility": 81.8185261707989
+      },
+      "clinic": {
+        "visit_facilities": 18906.0,
+        "visit_claims_month": 1498229.0,
+        "claims_per_facility": 79.24621813181001
+      },
+      "hospital_weight_vs_clinic": 1.032
+    },
+    "兵庫県": {
+      "hospital": {
+        "visit_facilities": 137.0,
+        "visit_claims_month": 7269.0,
+        "claims_per_facility": 53.058394160583944
+      },
+      "clinic": {
+        "visit_facilities": 1188.0,
+        "visit_claims_month": 65521.0,
+        "claims_per_facility": 55.1523569023569
+      },
+      "hospital_weight_vs_clinic": 0.962
+    },
+    "北海道": {
+      "hospital": {
+        "visit_facilities": 169.0,
+        "visit_claims_month": 17084.0,
+        "claims_per_facility": 101.08875739644971
+      },
+      "clinic": {
+        "visit_facilities": 446.0,
+        "visit_claims_month": 55083.0,
+        "claims_per_facility": 123.50448430493273
+      },
+      "hospital_weight_vs_clinic": 0.819
+    },
+    "千葉県": {
+      "hospital": {
+        "visit_facilities": 96.0,
+        "visit_claims_month": 7029.0,
+        "claims_per_facility": 73.21875
+      },
+      "clinic": {
+        "visit_facilities": 484.0,
+        "visit_claims_month": 73129.0,
+        "claims_per_facility": 151.09297520661158
+      },
+      "hospital_weight_vs_clinic": 0.485
+    },
+    "和歌山県": {
+      "hospital": {
+        "visit_facilities": 31.0,
+        "visit_claims_month": 2658.0,
+        "claims_per_facility": 85.74193548387096
+      },
+      "clinic": {
+        "visit_facilities": 338.0,
+        "visit_claims_month": 14195.0,
+        "claims_per_facility": 41.99704142011834
+      },
+      "hospital_weight_vs_clinic": 2.042
+    },
+    "埼玉県": {
+      "hospital": {
+        "visit_facilities": 100.0,
+        "visit_claims_month": 9987.0,
+        "claims_per_facility": 99.87
+      },
+      "clinic": {
+        "visit_facilities": 562.0,
+        "visit_claims_month": 81048.0,
+        "claims_per_facility": 144.2135231316726
+      },
+      "hospital_weight_vs_clinic": 0.693
+    },
+    "大分県": {
+      "hospital": {
+        "visit_facilities": 63.0,
+        "visit_claims_month": 5670.0,
+        "claims_per_facility": 90.0
+      },
+      "clinic": {
+        "visit_facilities": 219.0,
+        "visit_claims_month": 12913.0,
+        "claims_per_facility": 58.9634703196347
+      },
+      "hospital_weight_vs_clinic": 1.526
+    },
+    "大阪府": {
+      "hospital": {
+        "visit_facilities": 184.0,
+        "visit_claims_month": 20538.0,
+        "claims_per_facility": 111.6195652173913
+      },
+      "clinic": {
+        "visit_facilities": 1978.0,
+        "visit_claims_month": 160414.0,
+        "claims_per_facility": 81.09908998988878
+      },
+      "hospital_weight_vs_clinic": 1.376
+    },
+    "奈良県": {
+      "hospital": {
+        "visit_facilities": 30.0,
+        "visit_claims_month": 2422.0,
+        "claims_per_facility": 80.73333333333333
+      },
+      "clinic": {
+        "visit_facilities": 244.0,
+        "visit_claims_month": 13568.0,
+        "claims_per_facility": 55.60655737704918
+      },
+      "hospital_weight_vs_clinic": 1.452
+    },
+    "宮城県": {
+      "hospital": {
+        "visit_facilities": 40.0,
+        "visit_claims_month": 3743.0,
+        "claims_per_facility": 93.575
+      },
+      "clinic": {
+        "visit_facilities": 168.0,
+        "visit_claims_month": 16489.0,
+        "claims_per_facility": 98.14880952380952
+      },
+      "hospital_weight_vs_clinic": 0.953
+    },
+    "宮崎県": {
+      "hospital": {
+        "visit_facilities": 38.0,
+        "visit_claims_month": 1714.0,
+        "claims_per_facility": 45.10526315789474
+      },
+      "clinic": {
+        "visit_facilities": 135.0,
+        "visit_claims_month": 11221.0,
+        "claims_per_facility": 83.11851851851851
+      },
+      "hospital_weight_vs_clinic": 0.543
+    },
+    "富山県": {
+      "hospital": {
+        "visit_facilities": 37.0,
+        "visit_claims_month": 1311.0,
+        "claims_per_facility": 35.432432432432435
+      },
+      "clinic": {
+        "visit_facilities": 182.0,
+        "visit_claims_month": 8325.0,
+        "claims_per_facility": 45.74175824175824
+      },
+      "hospital_weight_vs_clinic": 0.775
+    },
+    "山口県": {
+      "hospital": {
+        "visit_facilities": 50.0,
+        "visit_claims_month": 2477.0,
+        "claims_per_facility": 49.54
+      },
+      "clinic": {
+        "visit_facilities": 266.0,
+        "visit_claims_month": 12995.0,
+        "claims_per_facility": 48.85338345864662
+      },
+      "hospital_weight_vs_clinic": 1.014
+    },
+    "山形県": {
+      "hospital": {
+        "visit_facilities": 25.0,
+        "visit_claims_month": 683.0,
+        "claims_per_facility": 27.32
+      },
+      "clinic": {
+        "visit_facilities": 187.0,
+        "visit_claims_month": 10373.0,
+        "claims_per_facility": 55.470588235294116
+      },
+      "hospital_weight_vs_clinic": 0.493
+    },
+    "山梨県": {
+      "hospital": {
+        "visit_facilities": 18.0,
+        "visit_claims_month": 980.0,
+        "claims_per_facility": 54.44444444444444
+      },
+      "clinic": {
+        "visit_facilities": 95.0,
+        "visit_claims_month": 4055.0,
+        "claims_per_facility": 42.68421052631579
+      },
+      "hospital_weight_vs_clinic": 1.276
+    },
+    "岐阜県": {
+      "hospital": {
+        "visit_facilities": 36.0,
+        "visit_claims_month": 2509.0,
+        "claims_per_facility": 69.69444444444444
+      },
+      "clinic": {
+        "visit_facilities": 450.0,
+        "visit_claims_month": 27281.0,
+        "claims_per_facility": 60.62444444444444
+      },
+      "hospital_weight_vs_clinic": 1.15
+    },
+    "岡山県": {
+      "hospital": {
+        "visit_facilities": 73.0,
+        "visit_claims_month": 4825.0,
+        "claims_per_facility": 66.0958904109589
+      },
+      "clinic": {
+        "visit_facilities": 379.0,
+        "visit_claims_month": 20211.0,
+        "claims_per_facility": 53.32717678100264
+      },
+      "hospital_weight_vs_clinic": 1.239
+    },
+    "岩手県": {
+      "hospital": {
+        "visit_facilities": 41.0,
+        "visit_claims_month": 2676.0,
+        "claims_per_facility": 65.26829268292683
+      },
+      "clinic": {
+        "visit_facilities": 102.0,
+        "visit_claims_month": 5338.0,
+        "claims_per_facility": 52.333333333333336
+      },
+      "hospital_weight_vs_clinic": 1.247
+    },
+    "島根県": {
+      "hospital": {
+        "visit_facilities": 22.0,
+        "visit_claims_month": 1217.0,
+        "claims_per_facility": 55.31818181818182
+      },
+      "clinic": {
+        "visit_facilities": 219.0,
+        "visit_claims_month": 8510.0,
+        "claims_per_facility": 38.858447488584474
+      },
+      "hospital_weight_vs_clinic": 1.424
+    },
+    "広島県": {
+      "hospital": {
+        "visit_facilities": 70.0,
+        "visit_claims_month": 4153.0,
+        "claims_per_facility": 59.32857142857143
+      },
+      "clinic": {
+        "visit_facilities": 623.0,
+        "visit_claims_month": 30241.0,
+        "claims_per_facility": 48.54093097913323
+      },
+      "hospital_weight_vs_clinic": 1.222
+    },
+    "徳島県": {
+      "hospital": {
+        "visit_facilities": 46.0,
+        "visit_claims_month": 3589.0,
+        "claims_per_facility": 78.02173913043478
+      },
+      "clinic": {
+        "visit_facilities": 158.0,
+        "visit_claims_month": 6391.0,
+        "claims_per_facility": 40.449367088607595
+      },
+      "hospital_weight_vs_clinic": 1.929
+    },
+    "愛媛県": {
+      "hospital": {
+        "visit_facilities": 59.0,
+        "visit_claims_month": 3525.0,
+        "claims_per_facility": 59.74576271186441
+      },
+      "clinic": {
+        "visit_facilities": 261.0,
+        "visit_claims_month": 19914.0,
+        "claims_per_facility": 76.29885057471265
+      },
+      "hospital_weight_vs_clinic": 0.783
+    },
+    "愛知県": {
+      "hospital": {
+        "visit_facilities": 92.0,
+        "visit_claims_month": 19331.0,
+        "claims_per_facility": 210.1195652173913
+      },
+      "clinic": {
+        "visit_facilities": 1055.0,
+        "visit_claims_month": 92011.0,
+        "claims_per_facility": 87.21421800947867
+      },
+      "hospital_weight_vs_clinic": 2.409
+    },
+    "新潟県": {
+      "hospital": {
+        "visit_facilities": 45.0,
+        "visit_claims_month": 1203.0,
+        "claims_per_facility": 26.733333333333334
+      },
+      "clinic": {
+        "visit_facilities": 342.0,
+        "visit_claims_month": 12193.0,
+        "claims_per_facility": 35.65204678362573
+      },
+      "hospital_weight_vs_clinic": 0.75
+    },
+    "東京都": {
+      "hospital": {
+        "visit_facilities": 160.0,
+        "visit_claims_month": 25723.0,
+        "claims_per_facility": 160.76875
+      },
+      "clinic": {
+        "visit_facilities": 1675.0,
+        "visit_claims_month": 223456.0,
+        "claims_per_facility": 133.4065671641791
+      },
+      "hospital_weight_vs_clinic": 1.205
+    },
+    "栃木県": {
+      "hospital": {
+        "visit_facilities": 24.0,
+        "visit_claims_month": 1017.0,
+        "claims_per_facility": 42.375
+      },
+      "clinic": {
+        "visit_facilities": 208.0,
+        "visit_claims_month": 13318.0,
+        "claims_per_facility": 64.02884615384616
+      },
+      "hospital_weight_vs_clinic": 0.662
+    },
+    "沖縄県": {
+      "hospital": {
+        "visit_facilities": 34.0,
+        "visit_claims_month": 1924.0,
+        "claims_per_facility": 56.588235294117645
+      },
+      "clinic": {
+        "visit_facilities": 121.0,
+        "visit_claims_month": 12956.0,
+        "claims_per_facility": 107.07438016528926
+      },
+      "hospital_weight_vs_clinic": 0.528
+    },
+    "滋賀県": {
+      "hospital": {
+        "visit_facilities": 28.0,
+        "visit_claims_month": 1418.0,
+        "claims_per_facility": 50.642857142857146
+      },
+      "clinic": {
+        "visit_facilities": 272.0,
+        "visit_claims_month": 9858.0,
+        "claims_per_facility": 36.24264705882353
+      },
+      "hospital_weight_vs_clinic": 1.397
+    },
+    "熊本県": {
+      "hospital": {
+        "visit_facilities": 80.0,
+        "visit_claims_month": 3405.0,
+        "claims_per_facility": 42.5625
+      },
+      "clinic": {
+        "visit_facilities": 338.0,
+        "visit_claims_month": 16760.0,
+        "claims_per_facility": 49.585798816568044
+      },
+      "hospital_weight_vs_clinic": 0.858
+    },
+    "石川県": {
+      "hospital": {
+        "visit_facilities": 39.0,
+        "visit_claims_month": 2905.0,
+        "claims_per_facility": 74.48717948717949
+      },
+      "clinic": {
+        "visit_facilities": 196.0,
+        "visit_claims_month": 11462.0,
+        "claims_per_facility": 58.47959183673469
+      },
+      "hospital_weight_vs_clinic": 1.274
+    },
+    "神奈川県": {
+      "hospital": {
+        "visit_facilities": 103.0,
+        "visit_claims_month": 13679.0,
+        "claims_per_facility": 132.80582524271844
+      },
+      "clinic": {
+        "visit_facilities": 946.0,
+        "visit_claims_month": 152476.0,
+        "claims_per_facility": 161.17970401691332
+      },
+      "hospital_weight_vs_clinic": 0.824
+    },
+    "福井県": {
+      "hospital": {
+        "visit_facilities": 33.0,
+        "visit_claims_month": 1280.0,
+        "claims_per_facility": 38.78787878787879
+      },
+      "clinic": {
+        "visit_facilities": 148.0,
+        "visit_claims_month": 3936.0,
+        "claims_per_facility": 26.594594594594593
+      },
+      "hospital_weight_vs_clinic": 1.458
+    },
+    "福岡県": {
+      "hospital": {
+        "visit_facilities": 164.0,
+        "visit_claims_month": 11833.0,
+        "claims_per_facility": 72.15243902439025
+      },
+      "clinic": {
+        "visit_facilities": 938.0,
+        "visit_claims_month": 63080.0,
+        "claims_per_facility": 67.24946695095949
+      },
+      "hospital_weight_vs_clinic": 1.073
+    },
+    "福島県": {
+      "hospital": {
+        "visit_facilities": 49.0,
+        "visit_claims_month": 3356.0,
+        "claims_per_facility": 68.48979591836735
+      },
+      "clinic": {
+        "visit_facilities": 254.0,
+        "visit_claims_month": 11472.0,
+        "claims_per_facility": 45.16535433070866
+      },
+      "hospital_weight_vs_clinic": 1.516
+    },
+    "秋田県": {
+      "hospital": {
+        "visit_facilities": 25.0,
+        "visit_claims_month": 1002.0,
+        "claims_per_facility": 40.08
+      },
+      "clinic": {
+        "visit_facilities": 154.0,
+        "visit_claims_month": 3918.0,
+        "claims_per_facility": 25.441558441558442
+      },
+      "hospital_weight_vs_clinic": 1.575
+    },
+    "群馬県": {
+      "hospital": {
+        "visit_facilities": 44.0,
+        "visit_claims_month": 2994.0,
+        "claims_per_facility": 68.04545454545455
+      },
+      "clinic": {
+        "visit_facilities": 331.0,
+        "visit_claims_month": 23271.0,
+        "claims_per_facility": 70.30513595166163
+      },
+      "hospital_weight_vs_clinic": 0.968
+    },
+    "茨城県": {
+      "hospital": {
+        "visit_facilities": 56.0,
+        "visit_claims_month": 3556.0,
+        "claims_per_facility": 63.5
+      },
+      "clinic": {
+        "visit_facilities": 238.0,
+        "visit_claims_month": 24183.0,
+        "claims_per_facility": 101.60924369747899
+      },
+      "hospital_weight_vs_clinic": 0.625
+    },
+    "長崎県": {
+      "hospital": {
+        "visit_facilities": 60.0,
+        "visit_claims_month": 2385.0,
+        "claims_per_facility": 39.75
+      },
+      "clinic": {
+        "visit_facilities": 306.0,
+        "visit_claims_month": 14218.0,
+        "claims_per_facility": 46.4640522875817
+      },
+      "hospital_weight_vs_clinic": 0.856
+    },
+    "長野県": {
+      "hospital": {
+        "visit_facilities": 67.0,
+        "visit_claims_month": 4778.0,
+        "claims_per_facility": 71.31343283582089
+      },
+      "clinic": {
+        "visit_facilities": 401.0,
+        "visit_claims_month": 11971.0,
+        "claims_per_facility": 29.85286783042394
+      },
+      "hospital_weight_vs_clinic": 2.389
+    },
+    "青森県": {
+      "hospital": {
+        "visit_facilities": 39.0,
+        "visit_claims_month": 2099.0,
+        "claims_per_facility": 53.82051282051282
+      },
+      "clinic": {
+        "visit_facilities": 113.0,
+        "visit_claims_month": 8184.0,
+        "claims_per_facility": 72.42477876106194
+      },
+      "hospital_weight_vs_clinic": 0.743
+    },
+    "静岡県": {
+      "hospital": {
+        "visit_facilities": 46.0,
+        "visit_claims_month": 4961.0,
+        "claims_per_facility": 107.84782608695652
+      },
+      "clinic": {
+        "visit_facilities": 441.0,
+        "visit_claims_month": 35858.0,
+        "claims_per_facility": 81.31065759637188
+      },
+      "hospital_weight_vs_clinic": 1.326
+    },
+    "香川県": {
+      "hospital": {
+        "visit_facilities": 36.0,
+        "visit_claims_month": 2053.0,
+        "claims_per_facility": 57.02777777777778
+      },
+      "clinic": {
+        "visit_facilities": 176.0,
+        "visit_claims_month": 11017.0,
+        "claims_per_facility": 62.59659090909091
+      },
+      "hospital_weight_vs_clinic": 0.911
+    },
+    "高知県": {
+      "hospital": {
+        "visit_facilities": 43.0,
+        "visit_claims_month": 2582.0,
+        "claims_per_facility": 60.04651162790697
+      },
+      "clinic": {
+        "visit_facilities": 86.0,
+        "visit_claims_month": 4519.0,
+        "claims_per_facility": 52.54651162790697
+      },
+      "hospital_weight_vs_clinic": 1.143
+    },
+    "鳥取県": {
+      "hospital": {
+        "visit_facilities": 20.0,
+        "visit_claims_month": 499.0,
+        "claims_per_facility": 24.95
+      },
+      "clinic": {
+        "visit_facilities": 137.0,
+        "visit_claims_month": 7056.0,
+        "claims_per_facility": 51.503649635036496
+      },
+      "hospital_weight_vs_clinic": 0.484
+    },
+    "鹿児島県": {
+      "hospital": {
+        "visit_facilities": 115.0,
+        "visit_claims_month": 5878.0,
+        "claims_per_facility": 51.11304347826087
+      },
+      "clinic": {
+        "visit_facilities": 323.0,
+        "visit_claims_month": 21220.0,
+        "claims_per_facility": 65.69659442724458
+      },
+      "hospital_weight_vs_clinic": 0.778
+    }
+  }
+}

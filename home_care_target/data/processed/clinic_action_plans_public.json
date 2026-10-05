@@ -1,0 +1,423 @@
+{
+  "months": 12,
+  "plans": [
+    {
+      "priority": 1,
+      "clinic": "わかさクリニック本院",
+      "alias": "本院",
+      "status": "居宅シフト要",
+      "ignore_for_priority": false,
+      "competition_label": "高",
+      "operational_kpi": 509,
+      "fair_share_kpi": 36,
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 154,
+      "monthly_new_to_operational": 12.83,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "自院外来・施設転換",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 6.0,
+        "hospital": 3.0,
+        "visit_nursing": 1.0,
+        "other": 3.0
+      },
+      "actions": [
+        "居宅比を目標まで上げるため、12ヶ月で月平均12.8人の居宅純増",
+        "施設偏重の紹介元を見直し、居宅CM比率を引き上げる",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 6.0 / 病院退院調整 3.0 / 訪問看護 1.0 / その他・自院転換 3.0",
+        "16km圏の自グループ院と退院調整・CMエリアを分担"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 2,
+      "clinic": "わかさクリニック所沢",
+      "alias": "所沢",
+      "status": "居宅シフト要",
+      "ignore_for_priority": false,
+      "competition_label": "高",
+      "operational_kpi": 205,
+      "fair_share_kpi": 40,
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 121,
+      "monthly_new_to_operational": 10.08,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "自院外来・施設転換",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 5.0,
+        "hospital": 2.0,
+        "visit_nursing": 1.0,
+        "other": 3.0
+      },
+      "actions": [
+        "居宅比を目標まで上げるため、12ヶ月で月平均10.1人の居宅純増",
+        "施設偏重の紹介元を見直し、居宅CM比率を引き上げる",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 5.0 / 病院退院調整 2.0 / 訪問看護 1.0 / その他・自院転換 3.0",
+        "16km圏の自グループ院と退院調整・CMエリアを分担"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 3,
+      "clinic": "わかさクリニックひばりが丘",
+      "alias": "ひばりが丘",
+      "status": "居宅シフト要",
+      "ignore_for_priority": false,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 122,
+      "fair_share_kpi": 26,
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 84,
+      "monthly_new_to_operational": 7.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "自院外来・施設転換",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 3.0,
+        "hospital": 1.0,
+        "visit_nursing": 1.0,
+        "other": 2.0
+      },
+      "actions": [
+        "居宅比を目標まで上げるため、12ヶ月で月平均7.0人の居宅純増",
+        "施設偏重の紹介元を見直し、居宅CM比率を引き上げる",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 3.0 / 病院退院調整 1.0 / 訪問看護 1.0 / その他・自院転換 2.0"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 4,
+      "clinic": "わかさクリニック石神井公園",
+      "alias": "石神井公園",
+      "status": "居宅シフト要",
+      "ignore_for_priority": false,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 103,
+      "fair_share_kpi": 25,
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 62,
+      "monthly_new_to_operational": 5.17,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "自院外来・施設転換",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 2.0,
+        "hospital": 1.0,
+        "visit_nursing": 1.0,
+        "other": 1.0
+      },
+      "actions": [
+        "居宅比を目標まで上げるため、12ヶ月で月平均5.2人の居宅純増",
+        "施設偏重の紹介元を見直し、居宅CM比率を引き上げる",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 2.0 / 病院退院調整 1.0 / 訪問看護 1.0 / その他・自院転換 1.0"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 5,
+      "clinic": "わかさクリニック三鷹",
+      "alias": "三鷹",
+      "status": "居宅シフト要",
+      "ignore_for_priority": false,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 90,
+      "fair_share_kpi": 22,
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 24,
+      "monthly_new_to_operational": 2.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "自院外来・施設転換",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 1.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "居宅比を目標まで上げるため、12ヶ月で月平均2.0人の居宅純増",
+        "施設偏重の紹介元を見直し、居宅CM比率を引き上げる",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 1.0"
+      ],
+      "gap_sign": "under"
+    },
+    {
+      "priority": 6,
+      "clinic": "わかさクリニック高円寺",
+      "alias": "高円寺",
+      "status": "居宅シフト要",
+      "ignore_for_priority": false,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 90,
+      "fair_share_kpi": 27,
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 21,
+      "monthly_new_to_operational": 1.75,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "自院外来・施設転換",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 1.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "居宅比を目標まで上げるため、12ヶ月で月平均1.8人の居宅純増",
+        "施設偏重の紹介元を見直し、居宅CM比率を引き上げる",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 1.0"
+      ],
+      "gap_sign": "under"
+    },
+    {
+      "priority": 7,
+      "clinic": "わかさクリニックリーフシティ市川",
+      "alias": "市川",
+      "status": "実務KPI未達",
+      "ignore_for_priority": false,
+      "competition_label": "中",
+      "operational_kpi": 83,
+      "fair_share_kpi": 58,
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "monthly_new_to_operational": 2.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 1.0,
+        "hospital": 1.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "実務KPI 83 まで月平均2.0人の居宅新規",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "月次チャネル割当: 居宅介護支援（CM） 1.0 / 病院退院調整 1.0"
+      ],
+      "gap_sign": "under"
+    },
+    {
+      "priority": 8,
+      "clinic": "わかさクリニック府中",
+      "alias": "府中",
+      "status": "伸長以上（維持・質）",
+      "ignore_for_priority": false,
+      "competition_label": "中",
+      "operational_kpi": 162,
+      "fair_share_kpi": 47,
+      "home_mix_band": "標準",
+      "home_shift_gap": 15,
+      "monthly_new_to_operational": 0.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 0.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "伸長超過。維持とグループ内重複整理",
+        "紹介実績未登録のためプレイブック比率で月次割当"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 9,
+      "clinic": "わかさクリニック調布",
+      "alias": "調布",
+      "status": "伸長以上（維持・質）",
+      "ignore_for_priority": false,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 176,
+      "fair_share_kpi": 23,
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "monthly_new_to_operational": 0.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護",
+        "自院外来・施設転換"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 0.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "伸長超過。維持とグループ内重複整理",
+        "紹介実績未登録のためプレイブック比率で月次割当"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 10,
+      "clinic": "わかさクリニック三軒茶屋",
+      "alias": "三軒茶屋",
+      "status": "伸長以上（維持・質）",
+      "ignore_for_priority": false,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 124,
+      "fair_share_kpi": 24,
+      "home_mix_band": "標準",
+      "home_shift_gap": 1,
+      "monthly_new_to_operational": 0.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護",
+        "自院外来・施設転換"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 0.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "伸長超過。維持とグループ内重複整理",
+        "紹介実績未登録のためプレイブック比率で月次割当"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 11,
+      "clinic": "わかさクリニック津田沼",
+      "alias": "津田沼",
+      "status": "伸長以上（維持・質）",
+      "ignore_for_priority": false,
+      "competition_label": "高",
+      "operational_kpi": 335,
+      "fair_share_kpi": 38,
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "monthly_new_to_operational": 0.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護",
+        "自院外来・施設転換"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 0.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "伸長超過。維持とグループ内重複整理",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "16km圏の自グループ院と退院調整・CMエリアを分担"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 12,
+      "clinic": "わかさクリニック西日暮里",
+      "alias": "西日暮里",
+      "status": "実務KPI達成（伸長任意）",
+      "ignore_for_priority": false,
+      "competition_label": "高",
+      "operational_kpi": 95,
+      "fair_share_kpi": 36,
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "monthly_new_to_operational": 0.67,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護",
+        "自院外来・施設転換"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 0.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "実務KPI達成。伸長は任意、紹介元の質を優先",
+        "紹介実績未登録のためプレイブック比率で月次割当",
+        "16km圏の自グループ院と退院調整・CMエリアを分担"
+      ],
+      "gap_sign": "at"
+    },
+    {
+      "priority": 13,
+      "clinic": "わかさクリニック浦和",
+      "alias": "浦和",
+      "status": "開院初期（優先対象外）",
+      "ignore_for_priority": true,
+      "competition_label": "非常に高（シェア拡大が難しい）",
+      "operational_kpi": 38,
+      "fair_share_kpi": 28,
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "monthly_new_to_operational": 0.0,
+      "referral_source": "estimated",
+      "referral_channels": [
+        "居宅介護支援（CM）",
+        "病院退院調整",
+        "訪問看護",
+        "自院外来・施設転換"
+      ],
+      "referral_monthly_by_channel": {
+        "cm": 0.0,
+        "hospital": 0.0,
+        "visit_nursing": 0.0,
+        "other": 0.0
+      },
+      "actions": [
+        "開院初期のため優先リスト対象外（モニタリングのみ）",
+        "紹介実績未登録のためプレイブック比率で月次割当"
+      ],
+      "gap_sign": "under"
+    }
+  ]
+}

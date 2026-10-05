@@ -1,0 +1,75 @@
+# 各院開院時期（公式HP・沿革ページ・プレスリリースベース。公開情報）
+# 出典: https://www.wakasaclinic-group.com/about/history/ ほか各院公式サイト
+
+本院:
+  開設: 2000-01
+  在宅医療部門: 2014
+  備考: わかさクリニック公式「開設2000年1月」
+  出典: https://wakasaclinic.com/about/clinic/
+
+所沢:
+  開設: 2021
+  備考: 沿革「2021年開設」。2021年9月時点で稼働（グループ紹介記事）
+  出典: https://www.wakasaclinic-group.com/about/history/
+
+石神井公園:
+  開設: 2022-02-07
+  出典: https://wakasaclinic.com/news/wakasaclinicshakujiikouenopen/
+
+ひばりが丘:
+  開設: 2022-08-01
+  出典: https://wakasaclinic.com/news/wakasaclinichibarigaoka-wakasaclinicmitaka/
+
+三鷹:
+  開設: 2022-08-01
+  出典: 同上
+
+府中:
+  開設: 2023-04-01
+  備考: 在宅医療中心・同日調布と開院。令和5年度診療報酬改定（2023年4月）と同月
+  出典: https://prtimes.jp/main/html/rd/p/000000003.000113392.html
+
+調布:
+  開設: 2023-04-01
+  出典: 同上
+
+三軒茶屋:
+  開設: 2023-08-01
+  備考: ながしまクリニックから事業譲渡（グループ初）。施設訪問の継承あり
+  出典: https://prtimes.jp/story/detail/xGzqpliK94B
+
+津田沼:
+  開設: 2024-04-01
+  出典: https://www.wakasaclinic-group.com/news/20240401/
+
+WA_CLINIC:
+  開設: 2025-01-29
+  備考: 美容専門・訪問診療対象外
+  出典: グループ沿革・PR TIMES
+
+西日暮里:
+  開設: 2025-04-01
+  出典: https://www.wakasaclinic-group.com/news/20250401/
+
+高円寺:
+  開設: 2025-04-01
+  出典: 同上
+
+リーフシティ市川:
+  開設: 2025-11-01
+  備考: オウカス・シニアレジデンス併設
+  出典: https://wakasaclinic.com/news/20251104/
+
+浦和針ヶ谷:
+  開設: 2026-04-01
+  備考: オウカス浦和針ヶ谷併設。開院3ヶ月（2026年7月時点）
+  出典: https://wakasaclinic.com/news/20260401/
+
+# 戦略世代ラベル（分析用）
+strategic_eras:
+  施設重視期:
+    description: 患者数拡大・施設契約優先の立ち上げモデル
+    branches: [本院, 所沢, 石神井公園, ひばりが丘, 三鷹]
+  転換期:
+    description: 2023年4月府中・調布開院以降、居宅患者重視へ（診療報酬改定・グループ方針転換）
+    branches: [府中, 調布, 三軒茶屋, 津田沼, 西日暮里, 高円寺, リーフシティ市川, 浦和針ヶ谷]

@@ -1,0 +1,666 @@
+{
+  "東京都の区部": {
+    "general_clinics": 11628,
+    "home_support_clinics": 1281,
+    "linked_facilities": 3595,
+    "patients_managed": 126215,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "札幌市": {
+    "general_clinics": 1433,
+    "home_support_clinics": 155,
+    "linked_facilities": 529,
+    "patients_managed": 21166,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "仙台市": {
+    "general_clinics": 950,
+    "home_support_clinics": 72,
+    "linked_facilities": 211,
+    "patients_managed": 5351,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "さいたま市": {
+    "general_clinics": 1028,
+    "home_support_clinics": 154,
+    "linked_facilities": 371,
+    "patients_managed": 19501,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "千葉市": {
+    "general_clinics": 717,
+    "home_support_clinics": 75,
+    "linked_facilities": 218,
+    "patients_managed": 11661,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "横浜市": {
+    "general_clinics": 3201,
+    "home_support_clinics": 366,
+    "linked_facilities": 967,
+    "patients_managed": 59104,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "川崎市": {
+    "general_clinics": 1060,
+    "home_support_clinics": 131,
+    "linked_facilities": 371,
+    "patients_managed": 21945,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "相模原市": {
+    "general_clinics": 453,
+    "home_support_clinics": 48,
+    "linked_facilities": 125,
+    "patients_managed": 5995,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "新潟市": {
+    "general_clinics": 651,
+    "home_support_clinics": 51,
+    "linked_facilities": 169,
+    "patients_managed": 3028,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "静岡市": {
+    "general_clinics": 555,
+    "home_support_clinics": 103,
+    "linked_facilities": 1622,
+    "patients_managed": 7710,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "浜松市": {
+    "general_clinics": 650,
+    "home_support_clinics": 79,
+    "linked_facilities": 210,
+    "patients_managed": 4227,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "名古屋市": {
+    "general_clinics": 2272,
+    "home_support_clinics": 345,
+    "linked_facilities": 923,
+    "patients_managed": 28302,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "京都市": {
+    "general_clinics": 1622,
+    "home_support_clinics": 218,
+    "linked_facilities": 463,
+    "patients_managed": 11288,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "大阪市": {
+    "general_clinics": 3734,
+    "home_support_clinics": 715,
+    "linked_facilities": 2022,
+    "patients_managed": 35263,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "堺市": {
+    "general_clinics": 744,
+    "home_support_clinics": 169,
+    "linked_facilities": 419,
+    "patients_managed": 10822,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "神戸市": {
+    "general_clinics": 1643,
+    "home_support_clinics": 305,
+    "linked_facilities": 754,
+    "patients_managed": 15492,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "岡山市": {
+    "general_clinics": 625,
+    "home_support_clinics": 138,
+    "linked_facilities": 363,
+    "patients_managed": 4636,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "広島市": {
+    "general_clinics": 1206,
+    "home_support_clinics": 249,
+    "linked_facilities": 596,
+    "patients_managed": 7425,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "北九州市": {
+    "general_clinics": 941,
+    "home_support_clinics": 169,
+    "linked_facilities": 425,
+    "patients_managed": 7298,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "福岡市": {
+    "general_clinics": 1693,
+    "home_support_clinics": 228,
+    "linked_facilities": 684,
+    "patients_managed": 17444,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "熊本市": {
+    "general_clinics": 654,
+    "home_support_clinics": 97,
+    "linked_facilities": 254,
+    "patients_managed": 4592,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "旭川市": {
+    "general_clinics": 225,
+    "home_support_clinics": 24,
+    "linked_facilities": 56,
+    "patients_managed": 2147,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "函館市": {
+    "general_clinics": 197,
+    "home_support_clinics": 21,
+    "linked_facilities": 31,
+    "patients_managed": 1422,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "青森市": {
+    "general_clinics": 206,
+    "home_support_clinics": 24,
+    "linked_facilities": 41,
+    "patients_managed": 1308,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "八戸市": {
+    "general_clinics": 167,
+    "home_support_clinics": 15,
+    "linked_facilities": 28,
+    "patients_managed": 1127,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "盛岡市": {
+    "general_clinics": 258,
+    "home_support_clinics": 31,
+    "linked_facilities": 76,
+    "patients_managed": 2319,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "秋田市": {
+    "general_clinics": 290,
+    "home_support_clinics": 22,
+    "linked_facilities": 40,
+    "patients_managed": 562,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "山形市": {
+    "general_clinics": 247,
+    "home_support_clinics": 15,
+    "linked_facilities": 109,
+    "patients_managed": 1538,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "郡山市": {
+    "general_clinics": 233,
+    "home_support_clinics": 32,
+    "linked_facilities": 73,
+    "patients_managed": 1603,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "いわき市": {
+    "general_clinics": 242,
+    "home_support_clinics": 22,
+    "linked_facilities": 59,
+    "patients_managed": 2837,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "福島市": {
+    "general_clinics": 249,
+    "home_support_clinics": 36,
+    "linked_facilities": 140,
+    "patients_managed": 1736,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "水戸市": {
+    "general_clinics": 242,
+    "home_support_clinics": 25,
+    "linked_facilities": 58,
+    "patients_managed": 1321,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "宇都宮市": {
+    "general_clinics": 438,
+    "home_support_clinics": 36,
+    "linked_facilities": 87,
+    "patients_managed": 3190,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "前橋市": {
+    "general_clinics": 340,
+    "home_support_clinics": 82,
+    "linked_facilities": 253,
+    "patients_managed": 6651,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "高崎市": {
+    "general_clinics": 353,
+    "home_support_clinics": 58,
+    "linked_facilities": 112,
+    "patients_managed": 2007,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "川越市": {
+    "general_clinics": 220,
+    "home_support_clinics": 18,
+    "linked_facilities": 64,
+    "patients_managed": 3290,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "越谷市": {
+    "general_clinics": 200,
+    "home_support_clinics": 19,
+    "linked_facilities": 70,
+    "patients_managed": 5877,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "川口市": {
+    "general_clinics": 339,
+    "home_support_clinics": 35,
+    "linked_facilities": 86,
+    "patients_managed": 7709,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "船橋市": {
+    "general_clinics": 380,
+    "home_support_clinics": 43,
+    "linked_facilities": 122,
+    "patients_managed": 4030,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "柏市": {
+    "general_clinics": 270,
+    "home_support_clinics": 35,
+    "linked_facilities": 91,
+    "patients_managed": 3837,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "八王子市": {
+    "general_clinics": 392,
+    "home_support_clinics": 39,
+    "linked_facilities": 148,
+    "patients_managed": 4897,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "横須賀市": {
+    "general_clinics": 304,
+    "home_support_clinics": 43,
+    "linked_facilities": 113,
+    "patients_managed": 4871,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "富山市": {
+    "general_clinics": 337,
+    "home_support_clinics": 37,
+    "linked_facilities": 122,
+    "patients_managed": 2741,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "金沢市": {
+    "general_clinics": 419,
+    "home_support_clinics": 63,
+    "linked_facilities": 186,
+    "patients_managed": 3421,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "福井市": {
+    "general_clinics": 253,
+    "home_support_clinics": 24,
+    "linked_facilities": 63,
+    "patients_managed": 895,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "甲府市": {
+    "general_clinics": 219,
+    "home_support_clinics": 22,
+    "linked_facilities": 48,
+    "patients_managed": 568,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "長野市": {
+    "general_clinics": 297,
+    "home_support_clinics": 32,
+    "linked_facilities": 82,
+    "patients_managed": 1315,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "松本市": {
+    "general_clinics": 231,
+    "home_support_clinics": 30,
+    "linked_facilities": 90,
+    "patients_managed": 1123,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "岐阜市": {
+    "general_clinics": 398,
+    "home_support_clinics": 74,
+    "linked_facilities": 292,
+    "patients_managed": 4583,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "豊橋市": {
+    "general_clinics": 252,
+    "home_support_clinics": 28,
+    "linked_facilities": 83,
+    "patients_managed": 2055,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "豊田市": {
+    "general_clinics": 244,
+    "home_support_clinics": 33,
+    "linked_facilities": 119,
+    "patients_managed": 1360,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "岡崎市": {
+    "general_clinics": 234,
+    "home_support_clinics": 23,
+    "linked_facilities": 48,
+    "patients_managed": 1605,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "一宮市": {
+    "general_clinics": 257,
+    "home_support_clinics": 53,
+    "linked_facilities": 209,
+    "patients_managed": 3695,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "大津市": {
+    "general_clinics": 304,
+    "home_support_clinics": 60,
+    "linked_facilities": 151,
+    "patients_managed": 2892,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "高槻市": {
+    "general_clinics": 297,
+    "home_support_clinics": 82,
+    "linked_facilities": 239,
+    "patients_managed": 2551,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "東大阪市": {
+    "general_clinics": 397,
+    "home_support_clinics": 86,
+    "linked_facilities": 210,
+    "patients_managed": 3169,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "豊中市": {
+    "general_clinics": 430,
+    "home_support_clinics": 85,
+    "linked_facilities": 176,
+    "patients_managed": 7012,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "枚方市": {
+    "general_clinics": 284,
+    "home_support_clinics": 44,
+    "linked_facilities": 109,
+    "patients_managed": 4870,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "八尾市": {
+    "general_clinics": 212,
+    "home_support_clinics": 46,
+    "linked_facilities": 94,
+    "patients_managed": 2370,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "寝屋川市": {
+    "general_clinics": 182,
+    "home_support_clinics": 29,
+    "linked_facilities": 64,
+    "patients_managed": 1503,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "吹田市": {
+    "general_clinics": 373,
+    "home_support_clinics": 62,
+    "linked_facilities": 148,
+    "patients_managed": 2992,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "姫路市": {
+    "general_clinics": 418,
+    "home_support_clinics": 62,
+    "linked_facilities": 152,
+    "patients_managed": 4596,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "西宮市": {
+    "general_clinics": 553,
+    "home_support_clinics": 101,
+    "linked_facilities": 330,
+    "patients_managed": 5131,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "尼崎市": {
+    "general_clinics": 490,
+    "home_support_clinics": 106,
+    "linked_facilities": 234,
+    "patients_managed": 5320,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "明石市": {
+    "general_clinics": 248,
+    "home_support_clinics": 41,
+    "linked_facilities": 110,
+    "patients_managed": 1405,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "奈良市": {
+    "general_clinics": 400,
+    "home_support_clinics": 50,
+    "linked_facilities": 114,
+    "patients_managed": 2880,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "和歌山市": {
+    "general_clinics": 416,
+    "home_support_clinics": 91,
+    "linked_facilities": 298,
+    "patients_managed": 3710,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "鳥取市": {
+    "general_clinics": 149,
+    "home_support_clinics": 24,
+    "linked_facilities": 76,
+    "patients_managed": 984,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "松江市": {
+    "general_clinics": 220,
+    "home_support_clinics": 41,
+    "linked_facilities": 89,
+    "patients_managed": 1172,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "倉敷市": {
+    "general_clinics": 345,
+    "home_support_clinics": 55,
+    "linked_facilities": 119,
+    "patients_managed": 2507,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "福山市": {
+    "general_clinics": 344,
+    "home_support_clinics": 76,
+    "linked_facilities": 161,
+    "patients_managed": 2360,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "呉市": {
+    "general_clinics": 209,
+    "home_support_clinics": 36,
+    "linked_facilities": 81,
+    "patients_managed": 1323,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "下関市": {
+    "general_clinics": 260,
+    "home_support_clinics": 29,
+    "linked_facilities": 51,
+    "patients_managed": 1188,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "高松市": {
+    "general_clinics": 404,
+    "home_support_clinics": 65,
+    "linked_facilities": 136,
+    "patients_managed": 2354,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "松山市": {
+    "general_clinics": 475,
+    "home_support_clinics": 87,
+    "linked_facilities": 240,
+    "patients_managed": 5315,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "高知市": {
+    "general_clinics": 243,
+    "home_support_clinics": 19,
+    "linked_facilities": 87,
+    "patients_managed": 1609,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "久留米市": {
+    "general_clinics": 303,
+    "home_support_clinics": 56,
+    "linked_facilities": 124,
+    "patients_managed": 890,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "長崎市": {
+    "general_clinics": 499,
+    "home_support_clinics": 116,
+    "linked_facilities": 315,
+    "patients_managed": 3103,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "佐世保市": {
+    "general_clinics": 215,
+    "home_support_clinics": 35,
+    "linked_facilities": 108,
+    "patients_managed": 1537,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "大分市": {
+    "general_clinics": 392,
+    "home_support_clinics": 83,
+    "linked_facilities": 251,
+    "patients_managed": 3375,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "宮崎市": {
+    "general_clinics": 396,
+    "home_support_clinics": 60,
+    "linked_facilities": 211,
+    "patients_managed": 5313,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "鹿児島市": {
+    "general_clinics": 538,
+    "home_support_clinics": 86,
+    "linked_facilities": 274,
+    "patients_managed": 8965,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  },
+  "那覇市": {
+    "general_clinics": 263,
+    "home_support_clinics": 27,
+    "linked_facilities": 113,
+    "patients_managed": 2454,
+    "source": "e-Stat 令和5年医療施設調査 都道府県編 第108表",
+    "as_of": "2023-10-01"
+  }
+}

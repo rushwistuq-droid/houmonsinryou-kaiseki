@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "home-care-target"
+version = "0.1.0"
+description = "在宅支援診療所・病院の精密集計と居宅患者目標計算"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+home-care-target = "home_care_target.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

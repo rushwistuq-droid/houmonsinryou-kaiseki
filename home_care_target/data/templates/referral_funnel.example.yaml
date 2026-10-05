@@ -1,0 +1,12 @@
+# 紹介経路実績の記入テンプレ（リポジトリ公開用）
+# コピー先: analysis/confidential/referral_funnel.yaml
+as_of: "YYYY-MM"
+default_window_months: 3
+clinics:
+  - alias: ひばりが丘
+    window_months: 3
+    new_home_by_channel:
+      cm: 12          # 居宅介護支援からの新規居宅
+      hospital: 6     # 病院退院調整
+      visit_nursing: 4
+      other: 2        # 自院転換・その他

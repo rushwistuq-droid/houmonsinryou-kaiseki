@@ -1,0 +1,246 @@
+{
+  "source": "第10回NDBオープンデータ C在宅医療 都道府県別算定回数（在宅患者訪問診療料）",
+  "as_of": "2023-04〜2024-03",
+  "national": {
+    "home_claims": 11113110.0,
+    "facility_claims": 16429751.0,
+    "home_share": 0.40348422772783116
+  },
+  "prefectures": {
+    "北海道": {
+      "home_claims": 309693.0,
+      "facility_claims": 740833.0,
+      "home_share": 0.29479803450842723
+    },
+    "青森県": {
+      "home_claims": 40082.0,
+      "facility_claims": 110551.0,
+      "home_share": 0.26609043171151076
+    },
+    "岩手県": {
+      "home_claims": 41515.0,
+      "facility_claims": 66676.0,
+      "home_share": 0.3837195330480354
+    },
+    "宮城県": {
+      "home_claims": 132833.0,
+      "facility_claims": 187535.0,
+      "home_share": 0.41462630474953804
+    },
+    "秋田県": {
+      "home_claims": 32996.0,
+      "facility_claims": 44554.0,
+      "home_share": 0.4254803352675693
+    },
+    "山形県": {
+      "home_claims": 59142.0,
+      "facility_claims": 76390.0,
+      "home_share": 0.43636927072573267
+    },
+    "福島県": {
+      "home_claims": 91166.0,
+      "facility_claims": 111696.0,
+      "home_share": 0.4493990988948152
+    },
+    "茨城県": {
+      "home_claims": 140205.0,
+      "facility_claims": 257901.0,
+      "home_share": 0.35218007264396917
+    },
+    "栃木県": {
+      "home_claims": 94316.0,
+      "facility_claims": 136305.0,
+      "home_share": 0.4089653587487696
+    },
+    "群馬県": {
+      "home_claims": 98951.0,
+      "facility_claims": 330059.0,
+      "home_share": 0.23064963520663853
+    },
+    "埼玉県": {
+      "home_claims": 512700.0,
+      "facility_claims": 1071681.0,
+      "home_share": 0.32359640768224307
+    },
+    "千葉県": {
+      "home_claims": 501665.0,
+      "facility_claims": 817911.0,
+      "home_share": 0.380171358072593
+    },
+    "東京都": {
+      "home_claims": 2163435.0,
+      "facility_claims": 1770414.0,
+      "home_share": 0.5499537475891931
+    },
+    "神奈川県": {
+      "home_claims": 1131486.0,
+      "facility_claims": 1540843.0,
+      "home_share": 0.42340819562261983
+    },
+    "新潟県": {
+      "home_claims": 89675.0,
+      "facility_claims": 100961.0,
+      "home_share": 0.4703990851675444
+    },
+    "富山県": {
+      "home_claims": 66538.0,
+      "facility_claims": 77286.0,
+      "home_share": 0.462634887084214
+    },
+    "石川県": {
+      "home_claims": 69784.0,
+      "facility_claims": 150469.0,
+      "home_share": 0.3168356390151326
+    },
+    "福井県": {
+      "home_claims": 39626.0,
+      "facility_claims": 22225.0,
+      "home_share": 0.6406687038204718
+    },
+    "山梨県": {
+      "home_claims": 33185.0,
+      "facility_claims": 41026.0,
+      "home_share": 0.44717090458287856
+    },
+    "長野県": {
+      "home_claims": 114266.0,
+      "facility_claims": 137464.0,
+      "home_share": 0.4539228538513487
+    },
+    "岐阜県": {
+      "home_claims": 187113.0,
+      "facility_claims": 248060.0,
+      "home_share": 0.4299738265011846
+    },
+    "静岡県": {
+      "home_claims": 204601.0,
+      "facility_claims": 408093.0,
+      "home_share": 0.33393667964758916
+    },
+    "愛知県": {
+      "home_claims": 588432.0,
+      "facility_claims": 1170822.0,
+      "home_share": 0.33447813675569305
+    },
+    "三重県": {
+      "home_claims": 105140.0,
+      "facility_claims": 192148.0,
+      "home_share": 0.35366378730389386
+    },
+    "滋賀県": {
+      "home_claims": 85249.0,
+      "facility_claims": 76808.0,
+      "home_share": 0.5260433057504458
+    },
+    "京都府": {
+      "home_claims": 315608.0,
+      "facility_claims": 254628.0,
+      "home_share": 0.5534690899908108
+    },
+    "大阪府": {
+      "home_claims": 1065315.0,
+      "facility_claims": 2027388.0,
+      "home_share": 0.34446081631504866
+    },
+    "兵庫県": {
+      "home_claims": 560498.0,
+      "facility_claims": 683762.0,
+      "home_share": 0.4504669442078022
+    },
+    "奈良県": {
+      "home_claims": 107278.0,
+      "facility_claims": 178904.0,
+      "home_share": 0.37485935523547953
+    },
+    "和歌山県": {
+      "home_claims": 119361.0,
+      "facility_claims": 126966.0,
+      "home_share": 0.4845632025721906
+    },
+    "鳥取県": {
+      "home_claims": 50406.0,
+      "facility_claims": 60225.0,
+      "home_share": 0.4556227458849689
+    },
+    "島根県": {
+      "home_claims": 63512.0,
+      "facility_claims": 78689.0,
+      "home_share": 0.44663539637555294
+    },
+    "岡山県": {
+      "home_claims": 146112.0,
+      "facility_claims": 220757.0,
+      "home_share": 0.39826750147872947
+    },
+    "広島県": {
+      "home_claims": 251795.0,
+      "facility_claims": 412669.0,
+      "home_share": 0.3789445327361603
+    },
+    "山口県": {
+      "home_claims": 66741.0,
+      "facility_claims": 174981.0,
+      "home_share": 0.27610643631940823
+    },
+    "徳島県": {
+      "home_claims": 60223.0,
+      "facility_claims": 112806.0,
+      "home_share": 0.34805148269943187
+    },
+    "香川県": {
+      "home_claims": 56363.0,
+      "facility_claims": 150484.0,
+      "home_share": 0.27248642716597293
+    },
+    "愛媛県": {
+      "home_claims": 133084.0,
+      "facility_claims": 202568.0,
+      "home_share": 0.3964939878207191
+    },
+    "高知県": {
+      "home_claims": 35441.0,
+      "facility_claims": 63144.0,
+      "home_share": 0.3594968808642288
+    },
+    "福岡県": {
+      "home_claims": 446650.0,
+      "facility_claims": 707036.0,
+      "home_share": 0.3871504031426229
+    },
+    "佐賀県": {
+      "home_claims": 72461.0,
+      "facility_claims": 129228.0,
+      "home_share": 0.3592709567700767
+    },
+    "長崎県": {
+      "home_claims": 111938.0,
+      "facility_claims": 142191.0,
+      "home_share": 0.4404770805378371
+    },
+    "熊本県": {
+      "home_claims": 93807.0,
+      "facility_claims": 187658.0,
+      "home_share": 0.3332812250190965
+    },
+    "大分県": {
+      "home_claims": 83422.0,
+      "facility_claims": 182840.0,
+      "home_share": 0.31330794480624347
+    },
+    "宮崎県": {
+      "home_claims": 68122.0,
+      "facility_claims": 140503.0,
+      "home_share": 0.3265284601557819
+    },
+    "鹿児島県": {
+      "home_claims": 181439.0,
+      "facility_claims": 199379.0,
+      "home_share": 0.4764454411293584
+    },
+    "沖縄県": {
+      "home_claims": 89740.0,
+      "facility_claims": 104203.0,
+      "home_share": 0.46271327142510943
+    }
+  }
+}

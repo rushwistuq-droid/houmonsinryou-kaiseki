@@ -1,0 +1,169 @@
+{
+  "metric": "home_patients_vs_operational_kpi",
+  "n_clinics": 13,
+  "band_counts": {
+    "開院初期（優先対象外）": 1,
+    "居宅シフト要": 6,
+    "実務KPI未達": 1,
+    "実務KPI達成": 1,
+    "伸長以上": 4
+  },
+  "clinics": [
+    {
+      "clinic": "わかさクリニック本院",
+      "status": "居宅シフト要",
+      "operational_kpi": 509,
+      "fair_share_kpi": 36,
+      "growth_mode": "mature",
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 154,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "高"
+    },
+    {
+      "clinic": "わかさクリニック所沢",
+      "status": "居宅シフト要",
+      "operational_kpi": 205,
+      "fair_share_kpi": 40,
+      "growth_mode": "mature",
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 121,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "高"
+    },
+    {
+      "clinic": "わかさクリニックひばりが丘",
+      "status": "居宅シフト要",
+      "operational_kpi": 122,
+      "fair_share_kpi": 26,
+      "growth_mode": "mature",
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 84,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    },
+    {
+      "clinic": "わかさクリニック石神井公園",
+      "status": "居宅シフト要",
+      "operational_kpi": 103,
+      "fair_share_kpi": 25,
+      "growth_mode": "mature",
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 62,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    },
+    {
+      "clinic": "わかさクリニック三鷹",
+      "status": "居宅シフト要",
+      "operational_kpi": 90,
+      "fair_share_kpi": 22,
+      "growth_mode": "mature",
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 24,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "under",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    },
+    {
+      "clinic": "わかさクリニック府中",
+      "status": "伸長以上",
+      "operational_kpi": 162,
+      "fair_share_kpi": 47,
+      "growth_mode": "mature",
+      "home_mix_band": "標準",
+      "home_shift_gap": 15,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "中"
+    },
+    {
+      "clinic": "わかさクリニック調布",
+      "status": "伸長以上",
+      "operational_kpi": 176,
+      "fair_share_kpi": 23,
+      "growth_mode": "mature",
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    },
+    {
+      "clinic": "わかさクリニック三軒茶屋",
+      "status": "伸長以上",
+      "operational_kpi": 124,
+      "fair_share_kpi": 24,
+      "growth_mode": "mature",
+      "home_mix_band": "標準",
+      "home_shift_gap": 1,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    },
+    {
+      "clinic": "わかさクリニック津田沼",
+      "status": "伸長以上",
+      "operational_kpi": 335,
+      "fair_share_kpi": 38,
+      "growth_mode": "mature",
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "高"
+    },
+    {
+      "clinic": "わかさクリニック西日暮里",
+      "status": "実務KPI達成",
+      "operational_kpi": 95,
+      "fair_share_kpi": 36,
+      "growth_mode": "mature",
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "at",
+      "competition_label": "高"
+    },
+    {
+      "clinic": "わかさクリニック高円寺",
+      "status": "居宅シフト要",
+      "operational_kpi": 90,
+      "fair_share_kpi": 27,
+      "growth_mode": "mature",
+      "home_mix_band": "施設偏重",
+      "home_shift_gap": 21,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "under",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    },
+    {
+      "clinic": "わかさクリニックリーフシティ市川",
+      "status": "実務KPI未達",
+      "operational_kpi": 83,
+      "fair_share_kpi": 58,
+      "growth_mode": "mature",
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "ignore_for_priority": false,
+      "gap_vs_operational_sign": "under",
+      "competition_label": "中"
+    },
+    {
+      "clinic": "わかさクリニック浦和",
+      "status": "開院初期（優先対象外）",
+      "operational_kpi": 38,
+      "fair_share_kpi": 28,
+      "growth_mode": "early",
+      "home_mix_band": "居宅寄り",
+      "home_shift_gap": 0,
+      "ignore_for_priority": true,
+      "gap_vs_operational_sign": "under",
+      "competition_label": "非常に高（シェア拡大が難しい）"
+    }
+  ]
+}
