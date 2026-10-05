@@ -5,7 +5,7 @@
   ② 到達目安 … 本院並みの浸透率 × 競合密度補正 × 「新院が最寄りになる」潜在居宅需要
 さらに、既存院との重複を除いた「グループ純増」も出す。
 
-総合スコア(0-100) = ①グループ純増 と ②到達目安 の順位（パーセンタイル）の平均。
+総合スコア(0-100) = ①グループ純増 40% ＋ ②到達目安 40% ＋ ③85歳以上の伸び（2025→2035）20% の順位（パーセンタイル）の加重平均。
 """
 
 from __future__ import annotations
@@ -84,7 +84,11 @@ class SiteScorer:
 
 def add_scores(df: pd.DataFrame, engine: Engine) -> pd.DataFrame:
     df = df.copy()
-    df["score"] = 100 * (df.pred_home_36m_group_net.rank(pct=True) + df.reach_target.rank(pct=True)) / 2
+    # 3年後の純増 40% + 到達目安 40% + 10年後の需要の伸び（85歳以上 2025→2035）20%
+    growth = df.e85_growth_25_35.rank(pct=True) if "e85_growth_25_35" in df else 0.5
+    df["score"] = 100 * (
+        0.4 * df.pred_home_36m_group_net.rank(pct=True) + 0.4 * df.reach_target.rank(pct=True) + 0.2 * growth
+    )
     mu = engine.munis
     names = []
     for la, lo in zip(df.lat, df.lon):

@@ -27,6 +27,7 @@ from briefing.wakasa_brief.clinics_table import add_performance, build_environme
 from briefing.wakasa_brief.engine import Engine  # noqa: E402
 from briefing.wakasa_brief.model import benchmark_share, diagnose, fit_growth_model, screen_indices  # noqa: E402
 from briefing.wakasa_brief.monthly import analyze_monthly, load_monthly, ramp_table  # noqa: E402
+from briefing.wakasa_brief.sales_lists import write_sales_lists  # noqa: E402
 from briefing.wakasa_brief.site_score import SiteScorer, add_scores, top_sites  # noqa: E402
 
 PUB = ROOT / "briefing/output"
@@ -40,12 +41,16 @@ ENV_COLS = [
     "competitors_n", "competitors_enhanced_n", "competitor_units", "competition_density",
     "exclusive_ratio", "exclusive_market_home", "exclusive_latent_home",
     "siblings_8km", "siblings_16km", "e75_growth_20_25",
+    "cm_offices_n", "cm_per_10k75", "nursing_n", "nursing_per_10k75",
+    "e75_growth_25_35", "e85_growth_25_35", "e85_growth_25_40", "latent_home_2035",
 ]
 SITE_COLS = [
     "area", "lat", "lon", "score", "pred_home_36m", "pred_home_36m_group_net", "reach_target",
     "elderly_65", "elderly_75", "market_home", "latent_home", "underserved_ratio",
     "competitor_units", "competition_density", "facility_residents", "exclusive_ratio_new",
-    "e75_growth_20_25", "nearest_clinic", "nearest_clinic_km", "underserved_extrapolated",
+    "e75_growth_20_25", "e85_growth_25_35", "e85_growth_25_40", "cm_offices_n", "cm_per_10k75",
+    "nursing_n", "nursing_per_10k75", "latent_home_2035",
+    "nearest_clinic", "nearest_clinic_km", "underserved_extrapolated",
 ]
 
 
@@ -59,6 +64,10 @@ def main() -> None:
     env = build_environment(E)
     env[ENV_COLS].round(4).to_csv(PUB / "clinic_environment.csv", encoding="utf-8-sig")
     print(f"院別 地域指数: {PUB / 'clinic_environment.csv'}")
+    if len(E.cm_offices):
+        sales = write_sales_lists(E, PUB / "sales_lists")
+        print(f"院別 営業先リスト（CM・訪看）: {PUB / 'sales_lists'}")
+        print(sales.pivot(index="clinic", columns="kind", values="件数").to_string())
 
     actuals = load_actuals()
     if actuals is None:

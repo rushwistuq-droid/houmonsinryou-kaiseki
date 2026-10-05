@@ -27,6 +27,7 @@ from scipy.spatial import cKDTree
 ROOT = Path(__file__).resolve().parents[2]
 HVD = ROOT / "home_visit_demand"
 HCT = ROOT / "home_care_target"
+PROCESSED = ROOT / "briefing/data/processed"
 sys.path.insert(0, str(HVD / "src"))
 
 from home_visit_demand.precision import MESH_HALF_DIAG_KM  # noqa: E402
@@ -173,7 +174,9 @@ class Engine:
     @cached_property
     def competitors(self) -> pd.DataFrame:
         """在支診・在支病（厚生局名簿 2026-06）。座標は医療情報ネット突合＋JMAP点データで補完。"""
-        z = pd.read_csv(HVD / "data/processed/zaishishin.csv.gz")
+        latest = PROCESSED / "zaishishin_latest.csv.gz"  # update_zaishishin.py が作る最新版
+        z = pd.read_csv(latest if latest.exists() else HVD / "data/processed/zaishishin.csv.gz")
+        z["medical_code"] = pd.to_numeric(z.medical_code, errors="coerce").astype("Int64").astype(str)
         fp = pd.DataFrame(
             json.loads((HCT / "data/processed/facility_points.json").read_text(encoding="utf-8"))["facilities"]
         )
@@ -192,6 +195,15 @@ class Engine:
             if hit is not None:
                 z.at[i, "lat"], z.at[i, "lon"] = hit.lat, hit.lon
                 z.at[i, "coord_source"] = "JMAP突合"
+        # それでも無い分は国土地理院 住所検索の結果（build_extra_datasets.py が作るキャッシュ）
+        gsi_path = PROCESSED / "zaishishin_gsi.json"
+        if gsi_path.exists():
+            gsi = json.loads(gsi_path.read_text(encoding="utf-8"))
+            for i, r in z[z.lat.isna()].iterrows():
+                hit = gsi.get(str(r.medical_code) + "|" + str(r.address))
+                if hit:
+                    z.at[i, "lat"], z.at[i, "lon"] = hit["lat"], hit["lon"]
+                    z.at[i, "coord_source"] = "国土地理院"
         z["pref"] = z.pref_code.astype(str).str.zfill(2)
         z["own_group"] = z.name.str.contains(OWN_GROUP_PATTERN)
         cls = z.zaishi_class.fillna("").map(lambda x: unicodedata.normalize("NFKC", x))  # 名簿は全角数字
@@ -218,6 +230,52 @@ class Engine:
     @cached_property
     def comp_tree(self) -> cKDTree:
         return cKDTree(_project(self.comp_geo.lat.values, self.comp_geo.lon.values))
+
+    def _points(self, name: str) -> pd.DataFrame:
+        path = PROCESSED / name
+        if not path.exists():
+            return pd.DataFrame(columns=["name", "corp", "address", "lat", "lon"])
+        df = pd.read_csv(path, dtype={"office_no": str})
+        return df[~df.name.str.contains(OWN_GROUP_PATTERN, na=False)].reset_index(drop=True)
+
+    @cached_property
+    def cm_offices(self) -> pd.DataFrame:
+        """居宅介護支援事業所（CM）。介護サービス情報公表 オープンデータ。"""
+        return self._points("cm_offices.csv.gz")
+
+    @cached_property
+    def nursing(self) -> pd.DataFrame:
+        """訪問看護ステーション。同上。"""
+        return self._points("nursing_stations.csv.gz")
+
+    @cached_property
+    def cm_tree(self) -> cKDTree | None:
+        c = self.cm_offices
+        return cKDTree(_project(c.lat.values, c.lon.values)) if len(c) else None
+
+    @cached_property
+    def nursing_tree(self) -> cKDTree | None:
+        c = self.nursing
+        return cKDTree(_project(c.lat.values, c.lon.values)) if len(c) else None
+
+    @cached_property
+    def future(self) -> pd.DataFrame | None:
+        """市区町村別 65/75/85歳以上の将来推計（2020〜2050、社人研 令和5年推計）＋代表座標。"""
+        path = PROCESSED / "future_pop.csv.gz"
+        if not path.exists():
+            return None
+        f = pd.read_csv(path, dtype={"code": str})
+        wide = f.pivot_table(index="code", columns="year", values=["e65", "e75", "e85"])
+        wide.columns = [f"{a}_{b}" for a, b in wide.columns]
+        coords = self.munis.set_index("code")[["lat", "lon"]]
+        return wide.join(coords, how="inner").reset_index()
+
+    def _count_in_radius(self, tree, df, lat, lon, radius_km) -> pd.DataFrame:
+        if tree is None:
+            return df.iloc[0:0]
+        idx = tree.query_ball_point(_project([lat], [lon])[0], radius_km + 0.5)
+        sub = df.iloc[idx]
+        return sub[haversine_km(lat, lon, sub.lat.values, sub.lon.values) <= radius_km]
 
     # --------------------------------------------------------------- metrics
     @cached_property
@@ -334,6 +392,23 @@ class Engine:
         mm = mu[haversine_km(lat, lon, mu.lat.values, mu.lon.values) <= radius_km]
         g75 = float(mm.e75_2025.sum() / mm.e75_2020.sum()) if len(mm) and mm.e75_2020.sum() else float("nan")
 
+        cms = self._count_in_radius(self.cm_tree, self.cm_offices, lat, lon, radius_km)
+        nss = self._count_in_radius(self.nursing_tree, self.nursing, lat, lon, radius_km)
+        e75 = dem["elderly_75"]
+        fut = {}
+        fu = self.future
+        if fu is not None:
+            fm = fu[haversine_km(lat, lon, fu.lat.values, fu.lon.values) <= radius_km]
+            if len(fm) == 0:  # 圏内に代表点が無い場合は最寄りの市区町村
+                fm = fu.iloc[[int(np.argmin(haversine_km(lat, lon, fu.lat.values, fu.lon.values)))]]
+            for col, base, tgt in (
+                ("e75_growth_25_35", "e75_2025", "e75_2035"),
+                ("e75_growth_25_40", "e75_2025", "e75_2040"),
+                ("e85_growth_25_35", "e85_2025", "e85_2035"),
+                ("e85_growth_25_40", "e85_2025", "e85_2040"),
+            ):
+                fut[col] = float(fm[tgt].sum() / fm[base].sum()) if fm[base].sum() else float("nan")
+
         return {
             "lat": lat,
             "lon": lon,
@@ -359,6 +434,13 @@ class Engine:
             "market_per_competitor": dem["home"] / comp_units if comp_units else float("nan"),
             "latent_per_competitor": latent["home"] / comp_units if comp_units else float("nan"),
             "e75_growth_20_25": g75,
+            "cm_offices_n": int(len(cms)),
+            "cm_per_10k75": len(cms) / e75 * 1e4 if e75 else float("nan"),
+            "nursing_n": int(len(nss)),
+            "nursing_per_10k75": len(nss) / e75 * 1e4 if e75 else float("nan"),
+            **fut,
+            # 2035年の潜在居宅需要（85歳以上の伸びで延長。居宅需要の大半は85歳以上のため）
+            "latent_home_2035": latent["home"] * fut.get("e85_growth_25_35", 1.0),
         }
 
     # ------------------------------------------------------------ group overlap

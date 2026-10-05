@@ -78,4 +78,6 @@ def add_performance(env: pd.DataFrame, actuals: pd.DataFrame) -> pd.DataFrame:
     df["fair_share_ratio"] = df.home / df.fair_share_home
     df["facility_penetration"] = df.facility / df.facility_residents
     df["home_per_month"] = df.home / df.months_open.clip(lower=1)
+    # 自院が最寄りのエリアにあるCM事業所1か所あたりの居宅患者（営業の深さ）
+    df["home_per_cm"] = df.home / (df.cm_offices_n * df.exclusive_ratio)
     return df

@@ -170,10 +170,14 @@ SCREEN_CANDIDATES = {
     "月数＋競合あたり居宅需要": ["market_per_competitor"],
     "月数＋入居系施設の入居者数": ["facility_residents"],
     "月数＋排他率(グループ重複の少なさ)": ["exclusive_ratio"],
+    "月数＋CM事業所密度": ["cm_per_10k75"],
+    "月数＋訪問看護密度": ["nursing_per_10k75"],
     "月数＋未充足度": ["underserved_ratio"],
     "月数＋未充足度＋競合密度": ["underserved_ratio", "competition_density"],
     "月数＋未充足度＋排他率": ["underserved_ratio", "exclusive_ratio"],
     "月数＋未充足度＋開院時期【採用】": ["underserved_ratio", "facility_era"],
+    "月数＋未充足度＋開院時期＋CM事業所密度": ["underserved_ratio", "facility_era", "cm_per_10k75"],
+    "月数＋未充足度＋開院時期＋訪問看護密度": ["underserved_ratio", "facility_era", "nursing_per_10k75"],
 }
 
 
