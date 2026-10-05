@@ -37,10 +37,19 @@ for cid, r in diag.iterrows():
             "underserved": round(float(r.underserved_ratio), 2),
             "competition_density": round(float(r.competition_density), 2),
             "exclusive_ratio": round(float(r.exclusive_ratio), 2),
+            "home_per_cm": round(float(r.home_per_cm), 2),
+            "cm_n": int(r.cm_offices_n),
+            "e85_growth_25_35": round(float(r.e85_growth_25_35), 2),
             "verdict": r.verdict,
             "notes": r.verdict_notes if isinstance(r.verdict_notes, str) else "",
         }
     )
+sales = pd.read_csv(PUB / "sales_lists/_集計.csv")
+cm = sales[sales.kind.str.startswith("居宅介護支援")].set_index("clinic")
+for c in clinics:
+    if c["name"] in cm.index:
+        c["cm_assigned"] = int(cm.loc[c["name"], "件数"])
+        c["cm_contested_share"] = round(float(cm.loc[c["name"], "うち係争"] / cm.loc[c["name"], "件数"]), 2)
 out = {
     "as_of": "2026-07",
     "model": model,

@@ -115,12 +115,12 @@ def map_site_score(grid: pd.DataFrame, top: pd.DataFrame, clinics, path: Path):
     cb.outline.set_visible(False)
     cb.ax.tick_params(colors=TEXT2, labelsize=8)
     # 右側の順位表
-    x0, y0 = 0.67, _top(0.83) - 0.02
+    x0, y0 = 0.69, _top(0.83) - 0.02
     for dx, lab, ha in ((0, "順位", "left"), (0.03, "地域", "left"), (0.19, "未充足度", "right"), (0.25, "3年後予測*", "right"), (0.3, "到達目安", "right")):
         fig.text(x0 + dx, y0, lab, fontsize=8.5, color=TEXT2, va="top", ha=ha)
     for i, r in top.iterrows():
         y = y0 - 0.045 * (i + 1)
-        area = r.area.replace("神奈川県", "神奈川 ").replace("埼玉県", "埼玉 ").replace("千葉県", "千葉 ").replace("東京都", "東京 ")
+        area = r.area.replace("茨城県", "茨城 ").replace("神奈川県", "神奈川 ").replace("埼玉県", "埼玉 ").replace("千葉県", "千葉 ").replace("東京都", "東京 ")
         fig.text(x0, y, f"{i + 1:>2}", fontsize=10, color=TEXT, va="top")
         fig.text(x0 + 0.03, y, area, fontsize=10, color=TEXT, va="top")
         fig.text(x0 + 0.19, y, f"{r.underserved_ratio:.1f}", fontsize=10, color=TEXT, va="top", ha="right")

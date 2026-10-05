@@ -146,14 +146,14 @@ pres.addSection({ title: "要旨" });
 }
 
 // ---------------------------------------------------------------- 3. データ
-sectionSlide("1. 現在保有しているデータ", "公的統計9種＋院内データ。信頼度と、まだ無いデータも合わせて整理しました");
+sectionSlide("1. 現在保有しているデータ", "公的統計11種＋院内データ。信頼度と、まだ無いデータも合わせて整理しました");
 {
-  const s = content("保有データの全体像：公的統計で「需要」と「競合」を、院内実績で「成果」を測っている");
+  const s = content("保有データの全体像：公的統計で「需要」「競合」「連携先」を、院内実績で「成果」を測っている");
   const cols = [
-    ["需要（どれだけ患者が生まれるか）", C.accent1, ["国勢調査 250mメッシュ人口（2020）", "社人研 将来推計人口（2025）", "NDB 在宅医療の受療率（年齢・県別）", "NDB 居宅/施設の比率", "総務省 人口推計"]],
-    ["競合・施設（誰と取り合うか）", C.accent1, ["厚生局 在支診・在支病名簿（2026-06）", "JMAP 在支診点データ（機能強化型）", "医療施設調査（2023）", "介護施設 7,790か所・定員40万人"]],
-    ["院内（機密）", C.accent2, ["院別 居宅・施設患者数（2026-07）", "院別 医師FTE", "開院日・立ち上げ時期", "浦和の立ち上げ推移", "【今後】院別の月次患者数"]],
-    ["まだ無いデータ", C.accent5, ["居宅介護支援事業所（CM）の所在地", "訪問看護ステーションの所在地", "将来推計人口 2030〜2050年", "紹介元別の新規患者数", "施設の契約リスト"]],
+    ["需要（どれだけ患者が生まれるか）", C.accent1, ["国勢調査 250mメッシュ人口（2020）", "社人研 将来推計人口（〜2050）", "NDB 在宅医療の受療率（年齢・県別）", "NDB 居宅/施設の比率", "総務省 人口推計"]],
+    ["競合・連携先（誰と取り合い、誰と組むか）", C.accent1, ["厚生局 在支診・在支病名簿（2026-08）全件の位置", "医療施設調査（2023）", "介護施設 7,790か所・定員40万人", "CM事業所 10,601か所", "訪問看護 5,208か所"]],
+    ["院内（機密）", C.accent2, ["院別 居宅・施設患者数（2026-07）", "院別 医師FTE", "開院日・立ち上げ時期", "浦和の立ち上げ推移"]],
+    ["まだ無いデータ（院内）", C.accent5, ["院別の月次患者数（受け口は用意済み）", "紹介元別の新規患者数", "施設の契約リスト"]],
   ];
   const cw = (W - 2 * MX - 3 * 0.3) / 4;
   cols.forEach(([head, col, items], i) => {
@@ -183,20 +183,21 @@ sectionSlide("1. 現在保有しているデータ", "公的統計9種＋院内�
   txt(s, "定義と判断理由は付録「02 指数辞書」", { x: MX, y: 6.45, w: W - 2 * MX, h: 0.4, fontSize: 12, color: C.accent5 });
 }
 {
-  const s = content("検証の過程で過去の分析の誤りを5点見つけ、すべて修正しました");
+  const s = content("検証の過程で過去の分析の誤りを6点見つけ、すべて修正しました");
   const rows = [
     ["自治体データ（手入力）の誤り", "57件中20件が公式推計と10〜15%超ずれ（入間市の人口が半分など）", "公的原典ベースに一本化"],
     ["院の位置のずれ", "本院3.8km・三鷹2.4km・所沢1.3km・市川1.2km", "国土地理院の住所検索に差し替え"],
     ["機能強化型の判定漏れ", "名簿の全角数字を読めず、全件「従来型」扱い", "判定を修正し自動テストを追加"],
     ["県境での需要のずれ", "圏全体に1県の受療率を適用（本院・所沢・市川で±20〜60%）", "メッシュごとに所在県の率を適用"],
-    ["競合の座標欠落", "在支診の36%に位置情報なし", "名簿突合で79%まで回復＋県別補正"],
+    ["競合の座標欠落", "在支診の36%に位置情報なし", "名簿突合＋国土地理院で100%に"],
+    ["CM営業の深さの誤読", "ひばりが丘のCMあたり居宅は府中・調布の半分とされていた", "自院担当エリアで比べると同水準"],
   ];
   const head = ["問題", "影響", "対応"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 } } }));
   s.addTable([head, ...rows.map((r) => r.map((t) => ({ text: t })))], {
     x: MX, y: 1.55, w: W - 2 * MX, colW: [3.0, 5.6, 3.53], fontSize: 14, color: HEX.dk1,
-    border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.62, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
+    border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.58, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
   });
-  txt(s, "結果として、院ごとの市場規模や獲得率の数字は過去資料から変わっています。今後は本資料の数値を基準とします", { x: MX, y: 5.6, w: W - 2 * MX, h: 0.6, fontSize: 15, color: C.text2, bold: true });
+  txt(s, "結果として、院ごとの市場規模や獲得率の数字は過去資料から変わっています。今後は本資料の数値を基準とします", { x: MX, y: 5.95, w: W - 2 * MX, h: 0.6, fontSize: 15, color: C.text2, bold: true });
 }
 
 // ---------------------------------------------------------------- 4. 予測指数
@@ -340,6 +341,28 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 
+{
+  const s = content("CM営業の深さは、自院担当エリアで比べると多摩3院（ひばりが丘・府中・調布）は同水準");
+  const sorted = clinics.filter((c) => c.months >= 12).slice().sort((a, b) => b.home_per_cm - a.home_per_cm);
+  s.addChart(pres.charts.BAR, [{ name: "CM1か所あたり居宅", labels: sorted.map((c) => c.name), values: sorted.map((c) => c.home_per_cm) }], {
+    x: MX, y: 1.4, w: 7.8, h: 5.4, barDir: "bar", chartColors: sorted.map((c) => (["hibarigaoka", "fuchu", "chofu"].includes(c.id) ? HEX.accent2 : HEX.accent1)),
+    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00", dataLabelFontSize: 11, dataLabelColor: HEX.dk1, dataLabelFontFace: "+mn-lt",
+    catAxisLabelFontSize: 12, valAxisLabelFontSize: 10, catAxisLabelColor: HEX.dk1, valAxisLabelColor: HEX.accent5,
+    catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", catAxisOrientation: "maxMin",
+    valGridLine: { color: "E6E5E1", size: 0.75 }, catGridLine: { style: "none" }, valAxisMinVal: 0,
+    showLegend: false, showTitle: true, title: "自院が最寄りのCM事業所1か所あたりの居宅患者（開院12か月以上）", titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt", barGapWidthPct: 40,
+  });
+  const x = 8.8;
+  card(s, x, 1.5, W - MX - x, 5.25, "CM営業の示唆");
+  txt(s, "示唆", { x: x + 0.3, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+  const hb = byId.hibarigaoka, mt = byId.mitaka, kj = byId.koenji;
+  s.addText(bullets([
+    "8km圏のCM全体で割ると、ひばりが丘は府中の約半分に見える。しかし圏内CMの多くは他のわかさ院のほうが近い",
+    `担当CMのうち他院と重なる割合：ひばりが丘${pct(hb.cm_contested_share)}・三鷹${pct(mt.cm_contested_share)}・高円寺${pct(kj.cm_contested_share)}`,
+    "院別の営業先リスト（CM・訪問看護、係争の印つき）を作成済み",
+  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+}
+
 // ---------------------------------------------------------------- 6. 出店
 sectionSlide("4. 出店と立ち上げ", "どこに出すと伸びるか、出した後に順調かをどう判定するか");
 {
@@ -347,7 +370,27 @@ sectionSlide("4. 出店と立ち上げ", "どこに出すと伸びるか、出�
   img(s, path.join(CONF, "figures/slide/fig_map_underserved.png"), MX + 0.4, 1.25, W - 2 * MX - 0.8, 5.7, 2000, 1440, "未充足度マップ");
 }
 {
-  const s = content("出店候補：上位は埼玉東部〜千葉北西部、いずれも既存院から16km以上離れ食い合いがない");
+  const s = content("10年後の需要：郊外ほど高齢化が速く、85歳以上は本院・津田沼周辺で約1.5倍に");
+  const sorted = clinics.slice().sort((a, b) => b.e85_growth_25_35 - a.e85_growth_25_35);
+  s.addChart(pres.charts.BAR, [{ name: "85歳以上の伸び", labels: sorted.map((c) => c.name), values: sorted.map((c) => Math.round((c.e85_growth_25_35 - 1) * 100)) }], {
+    x: MX, y: 1.4, w: 7.8, h: 5.4, barDir: "bar", chartColors: sorted.map((c) => (c.pref === "東京都" ? HEX.accent1 : HEX.accent2)),
+    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: '"+"0"%"', dataLabelFontSize: 11, dataLabelColor: HEX.dk1, dataLabelFontFace: "+mn-lt",
+    catAxisLabelFontSize: 12, valAxisLabelFontSize: 10, catAxisLabelColor: HEX.dk1, valAxisLabelColor: HEX.accent5,
+    catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", catAxisOrientation: "maxMin",
+    valGridLine: { color: "E6E5E1", size: 0.75 }, catGridLine: { style: "none" }, valAxisMinVal: 0, valAxisMaxVal: 70,
+    showLegend: false, showTitle: true, title: "8km圏の85歳以上人口の増加率 2025→2035（青＝東京都、橙＝埼玉・千葉）", titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt", barGapWidthPct: 40,
+  });
+  const x = 8.8;
+  card(s, x, 1.5, W - MX - x, 5.25, "将来需要の示唆");
+  txt(s, "示唆", { x: x + 0.3, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+  s.addText(bullets([
+    "居宅需要の中心は85歳以上。どの院の圏域も10年で2〜6割増える",
+    "埼玉・千葉の院は平均+48%、都内の院は平均+29%と、郊外ほど速く増える",
+    "出店スコアにも「10年後の伸び」を2割反映した",
+  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+}
+{
+  const s = content("出店候補：上位は埼玉東部〜千葉北西部、既存院から16km以上離れ、10年で需要も大きく伸びる");
   img(s, path.join(CONF, "figures/slide/fig_map_site_score.png"), MX, 1.25, W - 2 * MX, 5.75, 2520, 1440, "立地スコアマップ");
 }
 {
@@ -375,13 +418,13 @@ sectionSlide("5. 活用のご提案", "データを意思決定の道具とし�
     ["多摩の役割分担", "最寄り院の地図で営業エリアを決める"],
     ["居宅への構成転換", "施設偏重院は新規居宅を月次目標に"],
     ["紹介経路の診断", "紹介元別の新規データで弱い経路を特定（要データ）"],
-    ["10年後の需要", "将来推計人口で院ごとの増減を先読み（要データ）"],
+    ["10年後の需要", "85歳以上の将来推計で院ごとの需要増を先読み"],
   ];
   const cw = (W - 2 * MX - 3 * 0.3) / 4, ch = 2.35;
   items.forEach(([head, body], i) => {
     const x = MX + (i % 4) * (cw + 0.3), y = 1.45 + Math.floor(i / 4) * (ch + 0.3);
     card(s, x, y, cw, ch, `活用${i + 1}`);
-    s.addShape(pres.shapes.OVAL, { x: x + 0.3, y: y + 0.3, w: 0.5, h: 0.5, fill: { color: i < 6 ? C.accent1 : C.accent5 }, line: { type: "none" }, objectName: `活用番号${i + 1}` });
+    s.addShape(pres.shapes.OVAL, { x: x + 0.3, y: y + 0.3, w: 0.5, h: 0.5, fill: { color: i !== 6 ? C.accent1 : C.accent5 }, line: { type: "none" }, objectName: `活用番号${i + 1}` });
     txt(s, String(i + 1), { x: x + 0.3, y: y + 0.3, w: 0.5, h: 0.5, fontSize: 16, bold: true, color: C.background1, align: "center", valign: "middle" });
     txt(s, head, { x: x + 0.95, y: y + 0.3, w: cw - 1.2, h: 0.5, fontSize: 16, bold: true, color: C.text2, valign: "middle" });
     txt(s, body, { x: x + 0.3, y: y + 1.0, w: cw - 0.6, h: ch - 1.2, fontSize: 14 });
