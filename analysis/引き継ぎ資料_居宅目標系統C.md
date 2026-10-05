@@ -392,15 +392,15 @@ PYTHONPATH=home_visit_demand/src \
 as_of: "2026-07"
 clinics:
   - alias: 本院
-    facility_patients: 1148
-    home_patients: 509
+    facility: 1148
+    home: 509
   - alias: 所沢
-    facility_patients: 611
-    home_patients: 205
+    facility: 611
+    home: 205
   # ... 以下13院（上記 §5.1 参照）
   - alias: 浦和
-    facility_patients: 0
-    home_patients: 14
+    facility: 0
+    home: 14
 ```
 
 ### 10.2 `referral_funnel.yaml`（任意・未入力）
