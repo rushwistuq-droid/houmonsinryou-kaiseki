@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT))
 from briefing.wakasa_brief import charts  # noqa: E402
 from briefing.wakasa_brief.clinics_table import add_performance, build_environment, load_actuals  # noqa: E402
 from briefing.wakasa_brief.engine import Engine  # noqa: E402
-from briefing.wakasa_brief.model import benchmark_share, diagnose, fit_growth_model  # noqa: E402
+from briefing.wakasa_brief.model import benchmark_share, diagnose, fit_growth_model, screen_indices  # noqa: E402
 from briefing.wakasa_brief.monthly import analyze_monthly, load_monthly, ramp_table  # noqa: E402
 from briefing.wakasa_brief.site_score import SiteScorer, add_scores, top_sites  # noqa: E402
 
@@ -77,14 +77,18 @@ def main() -> None:
         "loo_error_pct": round(100 * model.loo_pct, 1),
         "n": model.n,
         "underserved_range": [round(x, 3) for x in model.underserved_range],
-        "benchmark_penetration": round(bench_pen, 4),
-        "benchmark_competition_density": round(bench_cd, 3),
+        # 公開ファイルのため丸める（本院の患者数を逆算できないように）
+        "benchmark_penetration": round(bench_pen, 2),
+        "benchmark_competition_density": round(bench_cd, 1),
     }
     # モデル係数は実績を集約したものだが個別院の数値は復元できないため公開側にも置く
     (PUB / "growth_model.json").write_text(json.dumps(model_info, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"獲得予測モデル: R2={model.r2:.2f}  LOO誤差±{100 * model.loo_pct:.0f}%")
 
     diag.round(4).to_csv(CONF / "clinic_diagnosis.csv", encoding="utf-8-sig")
+    screen = screen_indices(df)
+    screen.to_csv(PUB / "index_screening.csv", index=False, encoding="utf-8-sig")
+    print(screen.to_string(index=False))
 
     # 出店候補
     grid_csv = PUB / "site_scores_grid.csv"
@@ -116,6 +120,7 @@ def main() -> None:
         env[ENV_COLS].round(4).to_excel(xw, sheet_name="院別_地域指数")
         top[SITE_COLS].round(3).to_excel(xw, sheet_name="出店候補_上位30", index=False)
         pd.DataFrame([model_info]).T.to_excel(xw, sheet_name="予測モデル")
+        screen.to_excel(xw, sheet_name="指数の比較", index=False)
         if curves is not None:
             curves.to_excel(xw, sheet_name="月次_成長曲線", index=False)
     print(f"Excel: {CONF / 'wakasa_briefing_data.xlsx'}")

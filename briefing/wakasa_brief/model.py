@@ -157,3 +157,50 @@ def _verdict(cid: str, r: pd.Series) -> tuple[str, str]:
     else:
         v = "成長中"
     return f"{v}（{pace}）", " / ".join(notes)
+
+
+# 候補指数の比較（どの指数が居宅患者数を説明するか）。結果は集計値のみで個別院の実績は含まない。
+SCREEN_CANDIDATES = {
+    "月数のみ": [],
+    "月数＋高齢者数(75歳以上)": ["elderly_75"],
+    "月数＋顕在居宅需要": ["market_home"],
+    "月数＋潜在居宅需要": ["latent_home"],
+    "月数＋実効競合ユニット": ["competitor_units"],
+    "月数＋競合密度": ["competition_density"],
+    "月数＋競合あたり居宅需要": ["market_per_competitor"],
+    "月数＋入居系施設の入居者数": ["facility_residents"],
+    "月数＋排他率(グループ重複の少なさ)": ["exclusive_ratio"],
+    "月数＋未充足度": ["underserved_ratio"],
+    "月数＋未充足度＋競合密度": ["underserved_ratio", "competition_density"],
+    "月数＋未充足度＋排他率": ["underserved_ratio", "exclusive_ratio"],
+    "月数＋未充足度＋開院時期【採用】": ["underserved_ratio", "facility_era"],
+}
+
+
+def screen_indices(df: pd.DataFrame) -> pd.DataFrame:
+    d = df[df.months_open >= MIN_MONTHS_FOR_FIT].copy()
+    d["facility_era"] = (d.era == "施設重視期").astype(float)
+    y = np.log(d.home.values)
+    rows = []
+    for label, vs in SCREEN_CANDIDATES.items():
+        cols = [np.ones(len(d)), np.log(d.months_open.values)] + [
+            d[v].values if v == "facility_era" else np.log(d[v].values) for v in vs
+        ]
+        X = np.column_stack(cols)
+        coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+        r2 = 1 - ((y - X @ coef) ** 2).sum() / ((y - y.mean()) ** 2).sum()
+        errs = []
+        for i in range(len(d)):
+            m = np.arange(len(d)) != i
+            c, *_ = np.linalg.lstsq(X[m], y[m], rcond=None)
+            errs.append(y[i] - X[i] @ c)
+        loo = float(np.exp(np.sqrt(np.mean(np.square(errs)))) - 1)
+        rows.append(
+            {
+                "モデル": label,
+                "R2": round(float(r2), 2),
+                "予測誤差(LOO)": round(loo, 2),
+                "追加指数の係数": ", ".join(f"{v}={c:+.2f}" for v, c in zip(vs, coef[2:])),
+            }
+        )
+    return pd.DataFrame(rows)

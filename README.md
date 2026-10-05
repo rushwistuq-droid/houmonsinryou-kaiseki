@@ -1,54 +1,37 @@
-# homemedical-quality-and-score
+# わかさクリニックグループ 訪問診療 地域・実績分析
 
-わかさクリニックグループ向けの **訪問診療・地域需要推計** と、今後の **品質・スコアリング** 拡張を行うリポジトリです。
+理事長面談（2026年秋）に向けて、過去3系統の分析を統合したリポジトリです。
 
-## 含まれるもの
+## まず読むもの
+
+| 資料 | 内容 |
+|------|------|
+| [`briefing/01_データカタログ.md`](briefing/01_データカタログ.md) | 取得済みデータの一覧・信頼度・未取得データ |
+| [`briefing/02_指数辞書.md`](briefing/02_指数辞書.md) | これまでの指数と公式採用／廃止の判断 |
+| [`briefing/03_分析結果.md`](briefing/03_分析結果.md) | 予測指数の選定・既存院の診断方法・出店候補 |
+| [`briefing/04_活用提案.md`](briefing/04_活用提案.md) | 経営での使い方・データ運用の提案 |
+
+## 再計算
+
+```bash
+pip install pandas numpy scipy openpyxl pyyaml matplotlib
+python3 briefing/build_all.py                 # 全指数・図表・Excel（約40秒）
+python3 briefing/site_check.py --lat 35.89 --lon 139.79 --name 候補地   # 出店候補地の評価
+python3 -m unittest discover -s briefing/tests
+```
+
+機密データ（院別の患者数・医師数・月次推移）は `analysis/confidential/` と `home_visit_demand/data/confidential/` に置き、**コミットしない**（`.gitignore` 済み）。復元方法は `analysis/引き継ぎ資料.md` §4。月次データのテンプレートは `briefing/templates/monthly_patients.example.csv`。
+
+## ディレクトリ
 
 | パス | 内容 |
 |------|------|
-| [`home_visit_demand/`](home_visit_demand/) | 半径 8km 圏の居宅市場規模推計・本部分析パイプライン（メイン） |
-| [`home_visit_demand/docs/HANDOVER.md`](home_visit_demand/docs/HANDOVER.md) | **引き継ぎ資料**（新エージェントはここから） |
-| [`home_visit_demand/docs/HQ_BRIEFING_2026-07.md`](home_visit_demand/docs/HQ_BRIEFING_2026-07.md) | 本部向け成果サマリー |
-| [`docs/MIGRATION.md`](docs/MIGRATION.md) | 旧リポジトリからの移行手順 |
+| `briefing/` | **統合版**: 指数エンジン・予測モデル・飽和度診断・出店スコア・面談資料 |
+| `briefing/output/` | 公開データのみの成果（地域指数、出店候補、地図） |
+| `home_visit_demand/` | 系統B: メッシュ人口×NDBの需要推計（データ本体もここ） |
+| `home_care_target/` | 系統C: 在支診点データ・居宅目標KPI |
+| `analysis/` | 系統A: 初期の地域比較（自治体データに誤りがあるため参考扱い）と引き継ぎ資料 |
 
-## クイックスタート
+## 経緯
 
-```bash
-cd home_visit_demand
-pip install -r requirements.txt
-
-# 機密実績の復元（初回のみ）
-mkdir -p data/confidential
-cp data/templates/actuals_2026-07.example.yaml data/confidential/actuals_2026-07.yaml
-cp data/templates/urawa_ramp.example.yaml data/confidential/urawa_ramp.yaml
-
-# 全成果一括生成
-PYTHONPATH=src python3 scripts/run_hq_pipeline.py
-```
-
-## 旧リポジトリから移行した場合
-
-移行元: `rushwistuq-droid/---`（ブランチ `cursor/home-visit-patient-estimation-28cb`）
-
-手順: [`docs/MIGRATION.md`](docs/MIGRATION.md)
-
-## 一括ダウンロード（zip）
-
-Git 操作なしで全ファイルを取得する場合:
-
-1. **Cursor エージェント実行画面**の Artifacts / 添付から  
-   `homemedical-quality-and-score-handover.zip`（約 14MB）をダウンロード
-2. またはリポジトリ clone 後に生成:
-
-```bash
-bash scripts/create_handover_zip.sh
-# → homemedical-quality-and-score-handover.zip がルートに作成される
-```
-
-zip を展開したら `DOWNLOAD_README.txt` と `home_visit_demand/docs/HANDOVER.md` を参照。
-
-詳細: [`docs/DOWNLOAD.md`](docs/DOWNLOAD.md)
-
-## リポジトリ
-
-https://github.com/rushwistuq-droid/homemedical-quality-and-score
+PR #1（`analysis/`）・PR #2（`home_visit_demand/`）・PR #3（`home_care_target/`）の3ブランチをこのブランチに統合した。`home_visit_demand/` は新しい PR #2 版を採用している。
