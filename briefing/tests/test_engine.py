@@ -1,0 +1,41 @@
+"""エンジンが系統Bの公表値を再現できるか（旧座標・単一県モードで比較）。"""
+
+import json
+import sys
+import unittest
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+from briefing.wakasa_brief.engine import Engine  # noqa: E402
+
+
+class TestReproducesSystemB(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.E = Engine()
+        cls.B = {c["id"]: c for c in json.loads((ROOT / "home_visit_demand/examples/wakasa_hq_pipeline.json").read_text())["clinics"]}
+        tpl = yaml.safe_load((ROOT / "home_visit_demand/data/templates/actuals_2026-07.example.yaml").read_text())
+        cls.old = {c["id"]: (c["lat"], c["lon"]) for c in tpl["clinics"]}
+
+    def test_market_home_within_half_percent(self):
+        for cid, (lat, lon) in self.old.items():
+            p = self.E.point(lat, lon, single_pref=True)
+            b = self.B[cid]
+            self.assertAlmostEqual(p["elderly_65"], b["elderly_65"], delta=1.0, msg=cid)
+            self.assertLess(abs(p["market_home"] / b["market_home"] - 1), 0.005, msg=cid)
+
+    def test_latent_equals_market_in_tokyo_core(self):
+        p = self.E.point(35.6812, 139.7671)  # 東京駅（8km圏はほぼ東京都）
+        self.assertLess(abs(p["underserved_ratio"] - 1), 0.02)
+
+    def test_saitama_is_underserved(self):
+        p = self.E.point(35.8617, 139.6455)  # さいたま市浦和区
+        self.assertGreater(p["underserved_ratio"], 1.5)
+
+
+if __name__ == "__main__":
+    unittest.main()

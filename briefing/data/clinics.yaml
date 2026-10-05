@@ -1,0 +1,22 @@
+# わかさクリニックグループ 院マスタ（公開情報のみ。患者数・医師数は confidential 側）
+# 座標: 国土地理院 住所検索APIで住所から取得（home_care_target/data/processed/geocode_cache.json）。
+#   旧マスタ（系統B/C）の座標は概算で、本院3.8km・三鷹2.4km・所沢1.3km・市川1.2kmずれていたため差し替え。
+#   浦和は系統Cの拡張時に取得した値。
+# 開院日: analysis/clinic_opening_dates.yaml
+# home_start: 在宅（訪問診療）を開始した月。開院後月数の起点に使う。
+#   本院は開設2000-01だが在宅医療部門は2014年開始 → 2014-04 とみなす（月不明）。
+#   所沢は「2021年開設・2021年9月時点で稼働」→ 2021-06 とみなす（月不明）。
+clinics:
+  - {id: honin,        name: 本院,       lat: 35.804432, lon: 139.413467,    pref: 埼玉県, home_start: "2014-04", era: 施設重視期, start_approx: true}
+  - {id: tokorozawa,   name: 所沢,       lat: 35.787647, lon: 139.476318,    pref: 埼玉県, home_start: "2021-06", era: 施設重視期, start_approx: true}
+  - {id: shakujii,     name: 石神井公園, lat: 35.742931, lon: 139.605743,    pref: 東京都, home_start: "2022-02", era: 施設重視期}
+  - {id: hibarigaoka,  name: ひばりが丘, lat: 35.75201, lon: 139.544785,    pref: 東京都, home_start: "2022-08", era: 施設重視期}
+  - {id: mitaka,       name: 三鷹,       lat: 35.705048, lon: 139.559586,    pref: 東京都, home_start: "2022-08", era: 施設重視期}
+  - {id: fuchu,        name: 府中,       lat: 35.669685, lon: 139.474915,    pref: 東京都, home_start: "2023-04", era: 転換期}
+  - {id: chofu,        name: 調布,       lat: 35.648739, lon: 139.541916,    pref: 東京都, home_start: "2023-04", era: 転換期}
+  - {id: sangenjaya,   name: 三軒茶屋,   lat: 35.652111, lon: 139.671555,    pref: 東京都, home_start: "2023-08", era: 転換期, note: 事業譲渡で施設患者を継承}
+  - {id: tsudanuma,    name: 津田沼,     lat: 35.689152, lon: 140.024323,    pref: 千葉県, home_start: "2024-04", era: 転換期}
+  - {id: nishinippori, name: 西日暮里,   lat: 35.734489, lon: 139.771301,    pref: 東京都, home_start: "2025-04", era: 転換期}
+  - {id: koenji,       name: 高円寺,     lat: 35.697876, lon: 139.652618,    pref: 東京都, home_start: "2025-04", era: 転換期}
+  - {id: ichikawa,     name: 市川,       lat: 35.724792, lon: 139.903305,    pref: 千葉県, home_start: "2025-11", era: 転換期, note: シニアレジデンス併設}
+  - {id: urawa,        name: 浦和,       lat: 35.880526, lon: 139.641896, pref: 埼玉県, home_start: "2026-04", era: 転換期, note: シニアレジデンス併設}
