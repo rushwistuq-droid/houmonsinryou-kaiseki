@@ -1,0 +1,28 @@
+{
+  "radius_km": 8.0,
+  "exclusive_elderly": {
+    "shakujii": 241074.9,
+    "hibarigaoka": 234193.5,
+    "mitaka": 126277.7,
+    "chofu": 214913.3,
+    "fuchu": 247077.0,
+    "koenji": 476965.2
+  },
+  "exclusive_home_market": {
+    "shakujii": 5122.2,
+    "hibarigaoka": 4821.1,
+    "mitaka": 2859.4,
+    "chofu": 3254.4,
+    "fuchu": 5012.8,
+    "koenji": 10324.4
+  },
+  "contested_elderly": 941261.4,
+  "clinic_ids": [
+    "shakujii",
+    "hibarigaoka",
+    "mitaka",
+    "chofu",
+    "fuchu",
+    "koenji"
+  ]
+}

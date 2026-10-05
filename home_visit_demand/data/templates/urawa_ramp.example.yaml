@@ -1,0 +1,22 @@
+# 浦和院 立ち上がりトラッキング — 月次実績
+# 使い方:
+#   cp data/templates/urawa_ramp.example.yaml data/confidential/urawa_ramp.yaml
+#   毎月 months に行を追加して run_hq_pipeline.py を再実行
+
+meta:
+  clinic_id: urawa
+  clinic_name: 浦和
+  opened: "2026-06"  # 開院月（参考）
+  notes: "短期KPIは5km獲得率。8kmは監視指標。帯到達前に施設偏重へ寄せない。"
+
+months:
+  - month: "2026-07"
+    actual_home_patients: 14
+    actual_facility_patients: 0
+    notes: "初期実績（ユーザー提供）"
+
+  # 以降、毎月追加:
+  # - month: "2026-08"
+  #   actual_home_patients: 25
+  #   actual_facility_patients: 0
+  #   notes: ""

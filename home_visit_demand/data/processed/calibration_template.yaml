@@ -1,0 +1,20 @@
+# 実績キャリブレーション用テンプレート
+# 各クリニックの居宅・施設患者数実績を入れると、推計との比で補正係数を算出します。
+#
+# estimated_home = model_home * calibration_factor
+# calibration_factor は実績がある院の (actual_home / model_home) の縮小推定平均
+
+meta:
+  as_of: "2026-07"
+  notes: "本部検証用。実績は機密のため本ファイルは gitignore 推奨。"
+
+clinics: []
+# 例:
+# - id: "tokorozawa"
+#   name: "わかさクリニック所沢"
+#   address: "埼玉県所沢市くすのき台3-4-4"
+#   lat: 35.799
+#   lon: 139.472
+#   actual_home_patients: 120
+#   actual_facility_patients: 80
+#   physicians_fte: 2.0

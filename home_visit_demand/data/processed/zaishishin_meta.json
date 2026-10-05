@@ -1,0 +1,17 @@
+{
+  "source": "関東信越厚生局 保険医療機関の施設基準 届出受理医療機関名簿（医科）",
+  "source_url": "https://kouseikyoku.mhlw.go.jp/kantoshinetsu/chousa/kijyun.html",
+  "as_of": "2026-06-01",
+  "prefs": [
+    "11",
+    "12",
+    "13",
+    "14"
+  ],
+  "total": 4360,
+  "zaishishin_clinics": 3943,
+  "zaishishin_hospitals": 417,
+  "with_coords": 2810,
+  "coord_match_rate": 0.644,
+  "note": "座標は医療情報ネット公開診療所との名称・住所突合。未突合は半径集計から除外。"
+}

@@ -1,0 +1,225 @@
+{
+  "source": {
+    "ndb": "第10回NDBオープンデータ（2022年度）C在宅医療",
+    "population": "総務省 人口推計 2022年10月1日",
+    "claims_per_patient_month": 1.9
+  },
+  "national_totals": {
+    "estimated_monthly_patients_total": 963022,
+    "estimated_monthly_patients_home": 405757
+  },
+  "age_bands": {
+    "0-4": {
+      "population": 4247000,
+      "patient_rate_total": 0.0003229524246217144,
+      "patient_rate_home": 0.0003223431193949083,
+      "patient_rate_facility": 6.093052268061253e-07,
+      "home_share_of_claims": 0.9981133282169353,
+      "annual_claims_total": 31272,
+      "annual_claims_home": 31213,
+      "annual_claims_facility": 59
+    },
+    "5-9": {
+      "population": 4948000,
+      "patient_rate_total": 0.00025311485058645,
+      "patient_rate_home": 0.0002526627806379328,
+      "patient_rate_facility": 4.5206994851721057e-07,
+      "home_share_of_claims": 0.9982139730344949,
+      "annual_claims_total": 28555,
+      "annual_claims_home": 28504,
+      "annual_claims_facility": 51
+    },
+    "10-14": {
+      "population": 5307000,
+      "patient_rate_total": 0.00017619066509310776,
+      "patient_rate_home": 0.00017320718415598068,
+      "patient_rate_facility": 2.983480937127065e-06,
+      "home_share_of_claims": 0.9830667479712932,
+      "annual_claims_total": 21319,
+      "annual_claims_home": 20958,
+      "annual_claims_facility": 361
+    },
+    "15-19": {
+      "population": 5512000,
+      "patient_rate_total": 0.00019268167697909506,
+      "patient_rate_home": 0.00018114385201028699,
+      "patient_rate_facility": 1.1537824968808088e-05,
+      "home_share_of_claims": 0.9401197604790419,
+      "annual_claims_total": 24215,
+      "annual_claims_home": 22765,
+      "annual_claims_facility": 1450
+    },
+    "20-24": {
+      "population": 6264000,
+      "patient_rate_total": 0.00027111200734915194,
+      "patient_rate_home": 0.00023253876229526566,
+      "patient_rate_facility": 3.857324505388631e-05,
+      "home_share_of_claims": 0.8577221074380166,
+      "annual_claims_total": 38720,
+      "annual_claims_home": 33211,
+      "annual_claims_facility": 5509
+    },
+    "25-29": {
+      "population": 6413000,
+      "patient_rate_total": 0.0002857750566967864,
+      "patient_rate_home": 0.00023801023688177253,
+      "patient_rate_facility": 4.7764819815013915e-05,
+      "home_share_of_claims": 0.8328586813449802,
+      "annual_claims_total": 41785,
+      "annual_claims_home": 34801,
+      "annual_claims_facility": 6984
+    },
+    "30-34": {
+      "population": 6445000,
+      "patient_rate_total": 0.00030724892137247694,
+      "patient_rate_home": 0.00025252813958869246,
+      "patient_rate_facility": 5.472078178378453e-05,
+      "home_share_of_claims": 0.8219008172938492,
+      "annual_claims_total": 45149,
+      "annual_claims_home": 37108,
+      "annual_claims_facility": 8041
+    },
+    "35-39": {
+      "population": 7211000,
+      "patient_rate_total": 0.00032970461794480654,
+      "patient_rate_home": 0.00026608349329849376,
+      "patient_rate_facility": 6.362112464631278e-05,
+      "home_share_of_claims": 0.8070359916615936,
+      "annual_claims_total": 54207,
+      "annual_claims_home": 43747,
+      "annual_claims_facility": 10460
+    },
+    "40-44": {
+      "population": 7946000,
+      "patient_rate_total": 0.0003652726076454666,
+      "patient_rate_home": 0.0002907178277937481,
+      "patient_rate_facility": 7.45547798517184e-05,
+      "home_share_of_claims": 0.7958927707930368,
+      "annual_claims_total": 66176,
+      "annual_claims_home": 52669,
+      "annual_claims_facility": 13507
+    },
+    "45-49": {
+      "population": 9463000,
+      "patient_rate_total": 0.0004617707748182673,
+      "patient_rate_home": 0.0003540891486880575,
+      "patient_rate_facility": 0.00010768162613020981,
+      "home_share_of_claims": 0.7668071865903844,
+      "annual_claims_total": 99630,
+      "annual_claims_home": 76397,
+      "annual_claims_facility": 23233
+    },
+    "50-54": {
+      "population": 9436000,
+      "patient_rate_total": 0.0006631238705071283,
+      "patient_rate_home": 0.0004879316243130081,
+      "patient_rate_facility": 0.0001751922461941203,
+      "home_share_of_claims": 0.7358076613044545,
+      "annual_claims_total": 142665,
+      "annual_claims_home": 104974,
+      "annual_claims_facility": 37691
+    },
+    "55-59": {
+      "population": 8074000,
+      "patient_rate_total": 0.0009660313155939142,
+      "patient_rate_home": 0.0006728930637219753,
+      "patient_rate_facility": 0.00029313825187193897,
+      "home_share_of_claims": 0.6965540897691105,
+      "annual_claims_total": 177834,
+      "annual_claims_home": 123871,
+      "annual_claims_facility": 53963
+    },
+    "60-64": {
+      "population": 7445000,
+      "patient_rate_total": 0.0015139502550870123,
+      "patient_rate_home": 0.0009988276601510492,
+      "patient_rate_facility": 0.0005151225949359633,
+      "home_share_of_claims": 0.659749325841385,
+      "annual_claims_total": 256987,
+      "annual_claims_home": 169547,
+      "annual_claims_facility": 87440
+    },
+    "65-69": {
+      "population": 7535000,
+      "patient_rate_total": 0.0026073644629157505,
+      "patient_rate_home": 0.0015810544942315978,
+      "patient_rate_facility": 0.0010263099686841524,
+      "home_share_of_claims": 0.6063803187926955,
+      "annual_claims_total": 447940,
+      "annual_claims_home": 271622,
+      "annual_claims_facility": 176318
+    },
+    "70-74": {
+      "population": 9337000,
+      "patient_rate_total": 0.004986090990569495,
+      "patient_rate_home": 0.0028242147351886194,
+      "patient_rate_facility": 0.002161876255380875,
+      "home_share_of_claims": 0.5664186113992371,
+      "annual_claims_total": 1061457,
+      "annual_claims_home": 601229,
+      "annual_claims_facility": 460228
+    },
+    "75-79": {
+      "population": 7030000,
+      "patient_rate_total": 0.01074083501784333,
+      "patient_rate_home": 0.0055181864690174946,
+      "patient_rate_facility": 0.0052226485488258345,
+      "home_share_of_claims": 0.5137576789747117,
+      "annual_claims_total": 1721584,
+      "annual_claims_home": 884477,
+      "annual_claims_facility": 837107
+    },
+    "80-84": {
+      "population": 5743000,
+      "patient_rate_total": 0.025223674282345253,
+      "patient_rate_home": 0.011043528200616465,
+      "patient_rate_facility": 0.014180146081728788,
+      "home_share_of_claims": 0.4378239298921702,
+      "annual_claims_total": 3302798,
+      "annual_claims_home": 1446044,
+      "annual_claims_facility": 1856754
+    },
+    "85-89": {
+      "population": 3955000,
+      "patient_rate_total": 0.06190679131456961,
+      "patient_rate_home": 0.023039213076940138,
+      "patient_rate_facility": 0.03886757823762948,
+      "home_share_of_claims": 0.37215970312320024,
+      "annual_claims_total": 5582383,
+      "annual_claims_home": 2077538,
+      "annual_claims_facility": 3504845
+    },
+    "90+": {
+      "population": 2549000,
+      "patient_rate_total": 0.15162836475260338,
+      "patient_rate_home": 0.05489910043842442,
+      "patient_rate_facility": 0.09672926431417894,
+      "home_share_of_claims": 0.36206352635931754,
+      "annual_claims_total": 8812216,
+      "annual_claims_home": 3190582,
+      "annual_claims_facility": 5621634
+    }
+  },
+  "mesh_band_rates": {
+    "65-74": {
+      "patient_rate_total": 0.003923756686048931,
+      "patient_rate_home": 0.002269021965178475,
+      "patient_rate_facility": 0.001654734720870455
+    },
+    "75-84": {
+      "patient_rate_total": 0.017252613448598405,
+      "patient_rate_home": 0.00800249223622746,
+      "patient_rate_facility": 0.009250121212370942
+    },
+    "85-94": {
+      "patient_rate_total": 0.08250934074307847,
+      "patient_rate_home": 0.0301966805852269,
+      "patient_rate_facility": 0.05231266015785159
+    },
+    "95+": {
+      "patient_rate_total": 0.17437261946549387,
+      "patient_rate_home": 0.06313396550418808,
+      "patient_rate_facility": 0.11123865396130578
+    }
+  }
+}

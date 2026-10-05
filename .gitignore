@@ -3,3 +3,25 @@ analysis/confidential/
 **/confidential/**
 *.secret
 *.secret.*
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+.DS_Store
+dist/
+
+# 引き継ぎ zip（ローカル生成物）
+homemedical-quality-and-score-handover.zip
+wakasa-home-visit-demand-handover.zip
+
+# home_visit_demand 機密・再生成用
+home_visit_demand/data/processed/calibration.yaml
+home_visit_demand/data/confidential/
+home_visit_demand/data/mesh_zips/
+home_visit_demand/data/facilities_raw/
+home_visit_demand/data/ipss_age_raw/
+home_visit_demand/data/clinics_raw/
+home_visit_demand/data/zaishishin_raw/

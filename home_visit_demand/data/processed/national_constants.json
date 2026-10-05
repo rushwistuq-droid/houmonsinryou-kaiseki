@@ -1,0 +1,32 @@
+{
+  "source": {
+    "mesh": "令和2年国勢調査 地域メッシュ統計 T001102（e-Stat）",
+    "ipss": "社人研 地域別将来推計人口（令和5年推計）市区町村5歳階級",
+    "ndb": "第10回NDBオープンデータ C在宅医療",
+    "facilities": "厚労省 介護サービス情報公表システム オープンデータ"
+  },
+  "facility_residents_national_est": 1507898,
+  "facility_visit_rate_among_residents": 0.36956414621971423,
+  "same_building_facility_fraction": 0.9,
+  "apartment_same_building_fraction": 0.09999999999999998,
+  "claims_per_patient_month": 1.9,
+  "mesh_year": 2020,
+  "population_projection_year": 2025,
+  "social_medical_stats_patients_2023_06": 1001102,
+  "facility_residents_per_elderly_65": 0.041713405626711664,
+  "national_elderly_65_2022": 36149000,
+  "national_elderly_75_2022": 19277000,
+  "share_within_65_74": {
+    "65-69": 0.44659791370317686,
+    "70-74": 0.5534020862968232
+  },
+  "share_within_75plus": {
+    "75-79": 0.3646833013435701,
+    "80-84": 0.2979198007988795,
+    "85-89": 0.20516677906313224,
+    "90+": 0.1322301187944182
+  },
+  "care_insurance_facility_residents_est": 980134,
+  "national_visit_patients_2023_06": 1001102,
+  "visit_patients_per_elderly_65": 0.027693767462447096
+}

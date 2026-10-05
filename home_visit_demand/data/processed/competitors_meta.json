@@ -1,0 +1,8 @@
+{
+  "source": "厚生労働省 医療情報ネット オープンデータ（診療所施設票・診療科票）2025-12-01",
+  "source_url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html",
+  "clinic_total_with_coords": 72635,
+  "home_competitors": 635,
+  "home_filter": "名称に在宅|訪問診療等、または診療科目に在宅|訪問診療|往診",
+  "note": "在宅療養支援診療所の全件フラグは本オープンデータに含まれないため、名称・科目による近似。"
+}

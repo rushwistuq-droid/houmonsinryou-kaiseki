@@ -1,0 +1,13 @@
+[
+  {
+    "month": "2026-07",
+    "actual_home": 14.0,
+    "actual_facility": 0.0,
+    "market_home_8km": 2447.9,
+    "market_home_5km": 1331.9,
+    "capture_8km_pct": 0.57,
+    "capture_5km_pct": 1.05,
+    "exclusive_home_market": 2447.9,
+    "notes": "初期実績（ユーザー提供）"
+  }
+]

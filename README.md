@@ -1,23 +1,54 @@
-# わかさクリニックグループ 訪問診療 地域・実績分析
+# homemedical-quality-and-score
 
-**新規参加者は [`analysis/引き継ぎ資料.md`](analysis/引き継ぎ資料.md) から読んでください。**
+わかさクリニックグループ向けの **訪問診療・地域需要推計** と、今後の **品質・スコアリング** 拡張を行うリポジトリです。
+
+## 含まれるもの
+
+| パス | 内容 |
+|------|------|
+| [`home_visit_demand/`](home_visit_demand/) | 半径 8km 圏の居宅市場規模推計・本部分析パイプライン（メイン） |
+| [`home_visit_demand/docs/HANDOVER.md`](home_visit_demand/docs/HANDOVER.md) | **引き継ぎ資料**（新エージェントはここから） |
+| [`home_visit_demand/docs/HQ_BRIEFING_2026-07.md`](home_visit_demand/docs/HQ_BRIEFING_2026-07.md) | 本部向け成果サマリー |
+| [`docs/MIGRATION.md`](docs/MIGRATION.md) | 旧リポジトリからの移行手順 |
 
 ## クイックスタート
 
 ```bash
-# 公開統計ベースの8km圏比較
-python3 analysis/wakasa_clinic_regional_analysis.py
+cd home_visit_demand
+pip install -r requirements.txt
 
-# 実績統合（要: analysis/confidential/operational_data.yaml）
-python3 analysis/performance_analysis.py
+# 機密実績の復元（初回のみ）
+mkdir -p data/confidential
+cp data/templates/actuals_2026-07.example.yaml data/confidential/actuals_2026-07.yaml
+cp data/templates/urawa_ramp.example.yaml data/confidential/urawa_ramp.yaml
+
+# 全成果一括生成
+PYTHONPATH=src python3 scripts/run_hq_pipeline.py
 ```
 
-機密データの復元方法は引き継ぎ資料 §4 を参照。
+## 旧リポジトリから移行した場合
 
-## 関連 PR（別ブランチ）
+移行元: `rushwistuq-droid/---`（ブランチ `cursor/home-visit-patient-estimation-28cb`）
 
-| PR | 内容 |
-|----|------|
-| #1 | 本 `analysis/` ディレクトリ |
-| #2 | `home_visit_demand/` 高精度居宅需要推定 |
-| #3 | `home_care_target/` 居宅患者目標KPI |
+手順: [`docs/MIGRATION.md`](docs/MIGRATION.md)
+
+## 一括ダウンロード（zip）
+
+Git 操作なしで全ファイルを取得する場合:
+
+1. **Cursor エージェント実行画面**の Artifacts / 添付から  
+   `homemedical-quality-and-score-handover.zip`（約 14MB）をダウンロード
+2. またはリポジトリ clone 後に生成:
+
+```bash
+bash scripts/create_handover_zip.sh
+# → homemedical-quality-and-score-handover.zip がルートに作成される
+```
+
+zip を展開したら `DOWNLOAD_README.txt` と `home_visit_demand/docs/HANDOVER.md` を参照。
+
+詳細: [`docs/DOWNLOAD.md`](docs/DOWNLOAD.md)
+
+## リポジトリ
+
+https://github.com/rushwistuq-droid/homemedical-quality-and-score

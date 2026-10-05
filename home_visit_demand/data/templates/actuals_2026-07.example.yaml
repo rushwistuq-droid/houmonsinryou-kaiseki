@@ -1,0 +1,117 @@
+# 13院実績（2026-07）— 復元用テンプレート
+# 使い方:
+#   mkdir -p data/confidential
+#   cp data/templates/actuals_2026-07.example.yaml data/confidential/actuals_2026-07.yaml
+#
+# 注意: 患者数はユーザー提供の機密データ。本ファイルは引き継ぎ用。
+#       運用では confidential/ 配下のみ編集し、git にコミットしない。
+
+meta:
+  as_of: "2026-07"
+  source: "ユーザー提供（施設/居宅の実績患者数）"
+  notes: "本部検証・HQパイプラインの入力"
+
+clinics:
+  - id: honin
+    name: 本院
+    address: 埼玉県所沢市若狭4-2468-31
+    lat: 35.805
+    lon: 139.455
+    actual_facility_patients: 1148
+    actual_home_patients: 509
+
+  - id: tokorozawa
+    name: 所沢
+    address: 埼玉県所沢市くすのき台3-4-4
+    lat: 35.799
+    lon: 139.472
+    actual_facility_patients: 611
+    actual_home_patients: 205
+
+  - id: shakujii
+    name: 石神井公園
+    address: 東京都練馬区石神井町
+    lat: 35.743
+    lon: 139.601
+    actual_facility_patients: 310
+    actual_home_patients: 103
+
+  - id: hibarigaoka
+    name: ひばりが丘
+    address: 東京都西東京市ひばりが丘
+    lat: 35.745
+    lon: 139.538
+    actual_facility_patients: 393
+    actual_home_patients: 122
+
+  - id: mitaka
+    name: 三鷹
+    address: 東京都三鷹市
+    lat: 35.683
+    lon: 139.559
+    actual_facility_patients: 187
+    actual_home_patients: 85
+
+  - id: chofu
+    name: 調布
+    address: 東京都調布市
+    lat: 35.652
+    lon: 139.543
+    actual_facility_patients: 152
+    actual_home_patients: 176
+
+  - id: fuchu
+    name: 府中
+    address: 東京都府中市
+    lat: 35.669
+    lon: 139.477
+    actual_facility_patients: 281
+    actual_home_patients: 162
+
+  - id: sangenjaya
+    name: 三軒茶屋
+    address: 東京都世田谷区三軒茶屋
+    lat: 35.646
+    lon: 139.670
+    actual_facility_patients: 188
+    actual_home_patients: 124
+
+  - id: tsudanuma
+    name: 津田沼
+    address: 千葉県習志野市津田沼
+    lat: 35.682
+    lon: 140.020
+    actual_facility_patients: 142
+    actual_home_patients: 335
+
+  - id: koenji
+    name: 高円寺
+    address: 東京都杉並区高円寺
+    lat: 35.705
+    lon: 139.649
+    actual_facility_patients: 172
+    actual_home_patients: 80
+
+  - id: nishinippori
+    name: 西日暮里
+    address: 東京都荒川区西日暮里
+    lat: 35.732
+    lon: 139.768
+    actual_facility_patients: 35
+    actual_home_patients: 95
+
+  - id: ichikawa
+    name: 市川
+    address: 千葉県市川市
+    lat: 35.718
+    lon: 139.915
+    actual_facility_patients: 45
+    actual_home_patients: 59
+
+  - id: urawa
+    name: 浦和
+    address: 埼玉県さいたま市浦和区針ヶ谷1-2-11
+    lat: 35.880526
+    lon: 139.641896
+    actual_facility_patients: 0
+    actual_home_patients: 14

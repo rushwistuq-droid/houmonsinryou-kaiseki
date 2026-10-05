@@ -1,0 +1,1369 @@
+{
+  "definitions": {
+    "market_home": "居宅市場規模: 指定半径圏内に発生しうる居宅訪問診療患者数（他院含む地域需要）。自院の実績患者数ではない。",
+    "market_facility": "施設市場需要: 圏内の入居系施設に由来しうる訪問診療需要（地域全体）。自院の契約施設患者数ではない。",
+    "capture_home": "居宅獲得率: 自院実績居宅患者 ÷ 居宅市場規模。競合・開院年数・施設偏重の影響を受ける。",
+    "facility_contract_kpi": "施設契約KPI: 自院が契約・担当する施設の実績患者数。市場需要との比率（シェア）は原則使わない。",
+    "exclusive_market": "排他的市場: グループ院のうち当該院が最寄りとなるメッシュの需要（重複除去後）。",
+    "union_market": "グループ統合市場: 各院圏域のユニオン（メッシュ重複を1回だけ計上）。"
+  },
+  "radius_km_primary": 8.0,
+  "clinics": [
+    {
+      "id": "honin",
+      "name": "本院",
+      "radius_km": 8.0,
+      "elderly_65": 279679.0,
+      "market_home": 2268.7,
+      "market_facility": 3754.0,
+      "market_total": 5885.3,
+      "facility_count": 201,
+      "facilities_per_10k_elderly": 7.19,
+      "density_tier": "準稠密",
+      "expected_share_low_pct": 2.25,
+      "expected_share_high_pct": 9.6,
+      "expected_home_low": 51.0,
+      "expected_home_high": 217.8,
+      "actual_home": 509.0,
+      "actual_facility": 1148.0,
+      "home_capture_pct": 22.44,
+      "capture_vs_band": "above",
+      "exclusive_elderly_65": 136303.8,
+      "exclusive_market_home": 1291.8,
+      "contested_elderly_65": 263865.3,
+      "sibling_clinics_in_radius": 1,
+      "home_visit_competitors": 59,
+      "all_clinics_in_radius": 449,
+      "external_competition_tier": "外部競合・中",
+      "clinics_per_10k_elderly": 16.05,
+      "notes": [
+        "在支診が圏内59院→期待シェア帯をやや下方調整",
+        "郊外中核・千葉・埼玉の一部"
+      ]
+    },
+    {
+      "id": "tokorozawa",
+      "name": "所沢",
+      "radius_km": 8.0,
+      "elderly_65": 306810.0,
+      "market_home": 2579.6,
+      "market_facility": 4106.6,
+      "market_total": 6580.9,
+      "facility_count": 227,
+      "facilities_per_10k_elderly": 7.4,
+      "density_tier": "準稠密",
+      "expected_share_low_pct": 2.25,
+      "expected_share_high_pct": 9.6,
+      "expected_home_low": 58.0,
+      "expected_home_high": 247.6,
+      "actual_home": 205.0,
+      "actual_facility": 611.0,
+      "home_capture_pct": 7.95,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 114488.2,
+      "exclusive_market_home": 1130.8,
+      "contested_elderly_65": 309316.6,
+      "sibling_clinics_in_radius": 1,
+      "home_visit_competitors": 62,
+      "all_clinics_in_radius": 520,
+      "external_competition_tier": "外部競合・中",
+      "clinics_per_10k_elderly": 16.95,
+      "notes": [
+        "在支診が圏内62院→期待シェア帯をやや下方調整",
+        "郊外中核・千葉・埼玉の一部"
+      ]
+    },
+    {
+      "id": "shakujii",
+      "name": "石神井公園",
+      "radius_km": 8.0,
+      "elderly_65": 613817.0,
+      "market_home": 12382.3,
+      "market_facility": 10134.3,
+      "market_total": 22705.1,
+      "facility_count": 573,
+      "facilities_per_10k_elderly": 9.34,
+      "density_tier": "超稠密",
+      "expected_share_low_pct": 0.19,
+      "expected_share_high_pct": 1.46,
+      "expected_home_low": 23.5,
+      "expected_home_high": 180.8,
+      "actual_home": 103.0,
+      "actual_facility": 310.0,
+      "home_capture_pct": 0.83,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 241023.7,
+      "exclusive_market_home": 5121.2,
+      "contested_elderly_65": 594243.0,
+      "sibling_clinics_in_radius": 3,
+      "home_visit_competitors": 263,
+      "all_clinics_in_radius": 1860,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 30.3,
+      "notes": [
+        "グループ内近接院3院→期待シェア帯を下方調整",
+        "在支診が圏内263院→期待シェア帯を下方調整",
+        "都心・巨大圏。競合厚くシェアは低く見えやすい"
+      ]
+    },
+    {
+      "id": "hibarigaoka",
+      "name": "ひばりが丘",
+      "radius_km": 8.0,
+      "elderly_65": 490915.0,
+      "market_home": 9757.9,
+      "market_facility": 7890.7,
+      "market_total": 17817.7,
+      "facility_count": 431,
+      "facilities_per_10k_elderly": 8.78,
+      "density_tier": "稠密",
+      "expected_share_low_pct": 0.39,
+      "expected_share_high_pct": 2.44,
+      "expected_home_low": 38.1,
+      "expected_home_high": 238.1,
+      "actual_home": 122.0,
+      "actual_facility": 393.0,
+      "home_capture_pct": 1.25,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 171182.6,
+      "exclusive_market_home": 3577.4,
+      "contested_elderly_65": 512564.7,
+      "sibling_clinics_in_radius": 2,
+      "home_visit_competitors": 166,
+      "all_clinics_in_radius": 1319,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 26.87,
+      "notes": [
+        "グループ内近接院2院→期待シェア帯を下方調整",
+        "在支診が圏内166院→期待シェア帯を下方調整",
+        "東京区部・近郊密集"
+      ]
+    },
+    {
+      "id": "mitaka",
+      "name": "三鷹",
+      "radius_km": 8.0,
+      "elderly_65": 542367.0,
+      "market_home": 11082.6,
+      "market_facility": 9052.0,
+      "market_total": 20321.2,
+      "facility_count": 502,
+      "facilities_per_10k_elderly": 9.26,
+      "density_tier": "超稠密",
+      "expected_share_low_pct": 0.19,
+      "expected_share_high_pct": 1.46,
+      "expected_home_low": 21.1,
+      "expected_home_high": 161.8,
+      "actual_home": 85.0,
+      "actual_facility": 187.0,
+      "home_capture_pct": 0.77,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 120470.1,
+      "exclusive_market_home": 2728.6,
+      "contested_elderly_65": 566891.4,
+      "sibling_clinics_in_radius": 4,
+      "home_visit_competitors": 227,
+      "all_clinics_in_radius": 1860,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 34.29,
+      "notes": [
+        "グループ内近接院4院→期待シェア帯を下方調整",
+        "在支診が圏内227院→期待シェア帯を下方調整",
+        "都心・巨大圏。競合厚くシェアは低く見えやすい"
+      ]
+    },
+    {
+      "id": "chofu",
+      "name": "調布",
+      "radius_km": 8.0,
+      "elderly_65": 471588.0,
+      "market_home": 9147.2,
+      "market_facility": 8248.4,
+      "market_total": 17264.9,
+      "facility_count": 481,
+      "facilities_per_10k_elderly": 10.2,
+      "density_tier": "稠密",
+      "expected_share_low_pct": 0.39,
+      "expected_share_high_pct": 2.44,
+      "expected_home_low": 35.7,
+      "expected_home_high": 223.2,
+      "actual_home": 176.0,
+      "actual_facility": 152.0,
+      "home_capture_pct": 1.92,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 199610.4,
+      "exclusive_market_home": 3011.2,
+      "contested_elderly_65": 432861.9,
+      "sibling_clinics_in_radius": 2,
+      "home_visit_competitors": 176,
+      "all_clinics_in_radius": 1456,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 30.87,
+      "notes": [
+        "グループ内近接院2院→期待シェア帯を下方調整",
+        "在支診が圏内176院→期待シェア帯を下方調整",
+        "東京区部・近郊密集"
+      ]
+    },
+    {
+      "id": "fuchu",
+      "name": "府中",
+      "radius_km": 8.0,
+      "elderly_65": 400181.0,
+      "market_home": 7688.8,
+      "market_facility": 6303.1,
+      "market_total": 14082.3,
+      "facility_count": 348,
+      "facilities_per_10k_elderly": 8.7,
+      "density_tier": "稠密",
+      "expected_share_low_pct": 0.52,
+      "expected_share_high_pct": 3.0,
+      "expected_home_low": 40.0,
+      "expected_home_high": 230.7,
+      "actual_home": 162.0,
+      "actual_facility": 281.0,
+      "home_capture_pct": 2.11,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 246294.1,
+      "exclusive_market_home": 4997.8,
+      "contested_elderly_65": 274926.4,
+      "sibling_clinics_in_radius": 2,
+      "home_visit_competitors": 103,
+      "all_clinics_in_radius": 1130,
+      "external_competition_tier": "外部競合・中",
+      "clinics_per_10k_elderly": 28.24,
+      "notes": [
+        "グループ内近接院2院→期待シェア帯を下方調整",
+        "在支診が圏内103院→期待シェア帯をやや下方調整",
+        "東京区部・近郊密集"
+      ]
+    },
+    {
+      "id": "sangenjaya",
+      "name": "三軒茶屋",
+      "radius_km": 8.0,
+      "elderly_65": 661385.0,
+      "market_home": 13721.2,
+      "market_facility": 10069.0,
+      "market_total": 24408.5,
+      "facility_count": 527,
+      "facilities_per_10k_elderly": 7.97,
+      "density_tier": "超稠密",
+      "expected_share_low_pct": 0.28,
+      "expected_share_high_pct": 1.95,
+      "expected_home_low": 38.4,
+      "expected_home_high": 267.6,
+      "actual_home": 124.0,
+      "actual_facility": 188.0,
+      "home_capture_pct": 0.9,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 448923.2,
+      "exclusive_market_home": 9618.9,
+      "contested_elderly_65": 392762.2,
+      "sibling_clinics_in_radius": 1,
+      "home_visit_competitors": 428,
+      "all_clinics_in_radius": 4052,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 61.27,
+      "notes": [
+        "在支診が圏内428院→期待シェア帯を下方調整",
+        "都心・巨大圏。競合厚くシェアは低く見えやすい"
+      ]
+    },
+    {
+      "id": "tsudanuma",
+      "name": "津田沼",
+      "radius_km": 8.0,
+      "elderly_65": 291061.0,
+      "market_home": 2479.7,
+      "market_facility": 3224.6,
+      "market_total": 5615.5,
+      "facility_count": 212,
+      "facilities_per_10k_elderly": 7.28,
+      "density_tier": "準稠密",
+      "expected_share_low_pct": 2.25,
+      "expected_share_high_pct": 9.6,
+      "expected_home_low": 55.8,
+      "expected_home_high": 238.1,
+      "actual_home": 335.0,
+      "actual_facility": 142.0,
+      "home_capture_pct": 13.51,
+      "capture_vs_band": "above",
+      "exclusive_elderly_65": 257091.5,
+      "exclusive_market_home": 2545.8,
+      "contested_elderly_65": 68720.6,
+      "sibling_clinics_in_radius": 0,
+      "home_visit_competitors": 77,
+      "all_clinics_in_radius": 542,
+      "external_competition_tier": "外部競合・中",
+      "clinics_per_10k_elderly": 18.62,
+      "notes": [
+        "在支診が圏内77院→期待シェア帯をやや下方調整",
+        "郊外中核・千葉・埼玉の一部"
+      ]
+    },
+    {
+      "id": "koenji",
+      "name": "高円寺",
+      "radius_km": 8.0,
+      "elderly_65": 718094.0,
+      "market_home": 14930.8,
+      "market_facility": 11592.1,
+      "market_total": 26987.6,
+      "facility_count": 633,
+      "facilities_per_10k_elderly": 8.82,
+      "density_tier": "超稠密",
+      "expected_share_low_pct": 0.19,
+      "expected_share_high_pct": 1.46,
+      "expected_home_low": 28.4,
+      "expected_home_high": 218.0,
+      "actual_home": 80.0,
+      "actual_facility": 172.0,
+      "home_capture_pct": 0.54,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 276537.9,
+      "exclusive_market_home": 5994.2,
+      "contested_elderly_65": 752410.1,
+      "sibling_clinics_in_radius": 2,
+      "home_visit_competitors": 400,
+      "all_clinics_in_radius": 3600,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 50.13,
+      "notes": [
+        "グループ内近接院2院→期待シェア帯を下方調整",
+        "在支診が圏内400院→期待シェア帯を下方調整",
+        "都心・巨大圏。競合厚くシェアは低く見えやすい"
+      ]
+    },
+    {
+      "id": "nishinippori",
+      "name": "西日暮里",
+      "radius_km": 8.0,
+      "elderly_65": 749799.0,
+      "market_home": 14823.6,
+      "market_facility": 10364.5,
+      "market_total": 25974.7,
+      "facility_count": 482,
+      "facilities_per_10k_elderly": 6.43,
+      "density_tier": "超稠密",
+      "expected_share_low_pct": 0.28,
+      "expected_share_high_pct": 1.95,
+      "expected_home_low": 41.5,
+      "expected_home_high": 289.1,
+      "actual_home": 95.0,
+      "actual_facility": 35.0,
+      "home_capture_pct": 0.64,
+      "capture_vs_band": "within",
+      "exclusive_elderly_65": 643185.7,
+      "exclusive_market_home": 12975.5,
+      "contested_elderly_65": 244346.8,
+      "sibling_clinics_in_radius": 0,
+      "home_visit_competitors": 384,
+      "all_clinics_in_radius": 4090,
+      "external_competition_tier": "外部競合・高",
+      "clinics_per_10k_elderly": 54.55,
+      "notes": [
+        "在支診が圏内384院→期待シェア帯を下方調整",
+        "都心・巨大圏。競合厚くシェアは低く見えやすい"
+      ]
+    },
+    {
+      "id": "ichikawa",
+      "name": "市川",
+      "radius_km": 8.0,
+      "elderly_65": 465037.0,
+      "market_home": 8410.3,
+      "market_facility": 6528.9,
+      "market_total": 15121.6,
+      "facility_count": 352,
+      "facilities_per_10k_elderly": 7.57,
+      "density_tier": "稠密",
+      "expected_share_low_pct": 0.75,
+      "expected_share_high_pct": 4.0,
+      "expected_home_low": 63.1,
+      "expected_home_high": 336.4,
+      "actual_home": 59.0,
+      "actual_facility": 45.0,
+      "home_capture_pct": 0.7,
+      "capture_vs_band": "below",
+      "exclusive_elderly_65": 403974.0,
+      "exclusive_market_home": 7755.2,
+      "contested_elderly_65": 146730.5,
+      "sibling_clinics_in_radius": 0,
+      "home_visit_competitors": 136,
+      "all_clinics_in_radius": 1139,
+      "external_competition_tier": "外部競合・中",
+      "clinics_per_10k_elderly": 24.49,
+      "notes": [
+        "在支診が圏内136院→期待シェア帯をやや下方調整",
+        "東京区部・近郊密集"
+      ]
+    },
+    {
+      "id": "urawa",
+      "name": "浦和",
+      "radius_km": 8.0,
+      "elderly_65": 330964.0,
+      "market_home": 2447.9,
+      "market_facility": 5049.0,
+      "market_total": 7064.0,
+      "facility_count": 322,
+      "facilities_per_10k_elderly": 9.73,
+      "density_tier": "準稠密",
+      "expected_share_low_pct": 2.25,
+      "expected_share_high_pct": 9.6,
+      "expected_home_low": 55.1,
+      "expected_home_high": 235.0,
+      "actual_home": 14.0,
+      "actual_facility": 0.0,
+      "home_capture_pct": 0.57,
+      "capture_vs_band": "below",
+      "exclusive_elderly_65": 330879.9,
+      "exclusive_market_home": 3298.2,
+      "contested_elderly_65": 671.0,
+      "sibling_clinics_in_radius": 0,
+      "home_visit_competitors": 125,
+      "all_clinics_in_radius": 809,
+      "external_competition_tier": "外部競合・中",
+      "clinics_per_10k_elderly": 24.44,
+      "notes": [
+        "在支診が圏内125院→期待シェア帯をやや下方調整",
+        "郊外中核・千葉・埼玉の一部"
+      ]
+    }
+  ],
+  "overlap": {
+    "radius_km": 8.0,
+    "clinic_ids": [
+      "honin",
+      "tokorozawa",
+      "shakujii",
+      "hibarigaoka",
+      "mitaka",
+      "chofu",
+      "fuchu",
+      "sangenjaya",
+      "tsudanuma",
+      "koenji",
+      "nishinippori",
+      "ichikawa",
+      "urawa"
+    ],
+    "naive_sum_elderly_65": 6321697.8,
+    "union_elderly_65": 3601127.5,
+    "overlap_elderly_65": 2720570.3,
+    "overlap_pct_of_naive": 43.0,
+    "naive_sum_market_home": 111720.5,
+    "union_market_home": 73149.9,
+    "exclusive_by_clinic": {
+      "honin": 1291.8,
+      "tokorozawa": 1130.8,
+      "shakujii": 5121.2,
+      "hibarigaoka": 3577.4,
+      "mitaka": 2728.6,
+      "chofu": 3011.2,
+      "fuchu": 4997.8,
+      "sangenjaya": 9618.9,
+      "tsudanuma": 2545.8,
+      "koenji": 5994.2,
+      "nishinippori": 12975.5,
+      "ichikawa": 7755.2,
+      "urawa": 3298.2
+    },
+    "contested_elderly_65": 1624564.6,
+    "pair_overlaps": [
+      {
+        "clinic_a": "koenji",
+        "clinic_b": "shakujii",
+        "name_a": "高円寺",
+        "name_b": "石神井公園",
+        "overlap_elderly_65": 408809.5
+      },
+      {
+        "clinic_a": "chofu",
+        "clinic_b": "mitaka",
+        "name_a": "調布",
+        "name_b": "三鷹",
+        "overlap_elderly_65": 372825.3
+      },
+      {
+        "clinic_a": "koenji",
+        "clinic_b": "sangenjaya",
+        "name_a": "高円寺",
+        "name_b": "三軒茶屋",
+        "overlap_elderly_65": 352298.8
+      },
+      {
+        "clinic_a": "hibarigaoka",
+        "clinic_b": "shakujii",
+        "name_a": "ひばりが丘",
+        "name_b": "石神井公園",
+        "overlap_elderly_65": 320751.1
+      },
+      {
+        "clinic_a": "mitaka",
+        "clinic_b": "shakujii",
+        "name_a": "三鷹",
+        "name_b": "石神井公園",
+        "overlap_elderly_65": 281305.3
+      },
+      {
+        "clinic_a": "hibarigaoka",
+        "clinic_b": "mitaka",
+        "name_a": "ひばりが丘",
+        "name_b": "三鷹",
+        "overlap_elderly_65": 266658.3
+      },
+      {
+        "clinic_a": "honin",
+        "clinic_b": "tokorozawa",
+        "name_a": "本院",
+        "name_b": "所沢",
+        "overlap_elderly_65": 260010.4
+      },
+      {
+        "clinic_a": "koenji",
+        "clinic_b": "mitaka",
+        "name_a": "高円寺",
+        "name_b": "三鷹",
+        "overlap_elderly_65": 258844.4
+      },
+      {
+        "clinic_a": "chofu",
+        "clinic_b": "fuchu",
+        "name_a": "調布",
+        "name_b": "府中",
+        "overlap_elderly_65": 218555.0
+      },
+      {
+        "clinic_a": "fuchu",
+        "clinic_b": "mitaka",
+        "name_a": "府中",
+        "name_b": "三鷹",
+        "overlap_elderly_65": 196443.2
+      },
+      {
+        "clinic_a": "koenji",
+        "clinic_b": "nishinippori",
+        "name_a": "高円寺",
+        "name_b": "西日暮里",
+        "overlap_elderly_65": 159699.1
+      },
+      {
+        "clinic_a": "hibarigaoka",
+        "clinic_b": "tokorozawa",
+        "name_a": "ひばりが丘",
+        "name_b": "所沢",
+        "overlap_elderly_65": 154170.8
+      },
+      {
+        "clinic_a": "mitaka",
+        "clinic_b": "sangenjaya",
+        "name_a": "三鷹",
+        "name_b": "三軒茶屋",
+        "overlap_elderly_65": 150923.1
+      },
+      {
+        "clinic_a": "hibarigaoka",
+        "clinic_b": "koenji",
+        "name_a": "ひばりが丘",
+        "name_b": "高円寺",
+        "overlap_elderly_65": 145498.6
+      },
+      {
+        "clinic_a": "chofu",
+        "clinic_b": "koenji",
+        "name_a": "調布",
+        "name_b": "高円寺",
+        "overlap_elderly_65": 135359.6
+      },
+      {
+        "clinic_a": "chofu",
+        "clinic_b": "hibarigaoka",
+        "name_a": "調布",
+        "name_b": "ひばりが丘",
+        "overlap_elderly_65": 133500.0
+      },
+      {
+        "clinic_a": "fuchu",
+        "clinic_b": "hibarigaoka",
+        "name_a": "府中",
+        "name_b": "ひばりが丘",
+        "overlap_elderly_65": 128697.5
+      },
+      {
+        "clinic_a": "chofu",
+        "clinic_b": "shakujii",
+        "name_a": "調布",
+        "name_b": "石神井公園",
+        "overlap_elderly_65": 122409.7
+      },
+      {
+        "clinic_a": "chofu",
+        "clinic_b": "sangenjaya",
+        "name_a": "調布",
+        "name_b": "三軒茶屋",
+        "overlap_elderly_65": 112998.8
+      },
+      {
+        "clinic_a": "hibarigaoka",
+        "clinic_b": "honin",
+        "name_a": "ひばりが丘",
+        "name_b": "本院",
+        "overlap_elderly_65": 112146.9
+      }
+    ]
+  },
+  "sensitivity": [
+    {
+      "id": "honin",
+      "name": "本院",
+      "by_radius": {
+        "5": {
+          "elderly_65": 114414.0,
+          "market_home": 945.2,
+          "market_facility": 1471.4,
+          "home_capture_pct": 53.85
+        },
+        "8": {
+          "elderly_65": 279679.0,
+          "market_home": 2268.7,
+          "market_facility": 3754.0,
+          "home_capture_pct": 22.44
+        },
+        "10": {
+          "elderly_65": 471878.0,
+          "market_home": 3795.4,
+          "market_facility": 6367.8,
+          "home_capture_pct": 13.41
+        }
+      }
+    },
+    {
+      "id": "tokorozawa",
+      "name": "所沢",
+      "by_radius": {
+        "5": {
+          "elderly_65": 122408.0,
+          "market_home": 1010.0,
+          "market_facility": 1684.3,
+          "home_capture_pct": 20.3
+        },
+        "8": {
+          "elderly_65": 306810.0,
+          "market_home": 2579.6,
+          "market_facility": 4106.6,
+          "home_capture_pct": 7.95
+        },
+        "10": {
+          "elderly_65": 523644.0,
+          "market_home": 4393.5,
+          "market_facility": 6893.9,
+          "home_capture_pct": 4.67
+        }
+      }
+    },
+    {
+      "id": "shakujii",
+      "name": "石神井公園",
+      "by_radius": {
+        "5": {
+          "elderly_65": 251710.0,
+          "market_home": 5122.5,
+          "market_facility": 4099.1,
+          "home_capture_pct": 2.01
+        },
+        "8": {
+          "elderly_65": 613817.0,
+          "market_home": 12382.3,
+          "market_facility": 10134.3,
+          "home_capture_pct": 0.83
+        },
+        "10": {
+          "elderly_65": 921892.0,
+          "market_home": 18444.1,
+          "market_facility": 15092.9,
+          "home_capture_pct": 0.56
+        }
+      }
+    },
+    {
+      "id": "hibarigaoka",
+      "name": "ひばりが丘",
+      "by_radius": {
+        "5": {
+          "elderly_65": 213318.0,
+          "market_home": 4288.7,
+          "market_facility": 3556.6,
+          "home_capture_pct": 2.84
+        },
+        "8": {
+          "elderly_65": 490915.0,
+          "market_home": 9757.9,
+          "market_facility": 7890.7,
+          "home_capture_pct": 1.25
+        },
+        "10": {
+          "elderly_65": 763093.0,
+          "market_home": 15067.1,
+          "market_facility": 11957.7,
+          "home_capture_pct": 0.81
+        }
+      }
+    },
+    {
+      "id": "mitaka",
+      "name": "三鷹",
+      "by_radius": {
+        "5": {
+          "elderly_65": 214346.0,
+          "market_home": 4437.1,
+          "market_facility": 3717.6,
+          "home_capture_pct": 1.92
+        },
+        "8": {
+          "elderly_65": 542367.0,
+          "market_home": 11082.6,
+          "market_facility": 9052.0,
+          "home_capture_pct": 0.77
+        },
+        "10": {
+          "elderly_65": 852025.0,
+          "market_home": 17183.5,
+          "market_facility": 14006.8,
+          "home_capture_pct": 0.49
+        }
+      }
+    },
+    {
+      "id": "chofu",
+      "name": "調布",
+      "by_radius": {
+        "5": {
+          "elderly_65": 176104.0,
+          "market_home": 3404.6,
+          "market_facility": 3095.5,
+          "home_capture_pct": 5.17
+        },
+        "8": {
+          "elderly_65": 471588.0,
+          "market_home": 9147.2,
+          "market_facility": 8248.4,
+          "home_capture_pct": 1.92
+        },
+        "10": {
+          "elderly_65": 759609.0,
+          "market_home": 14855.5,
+          "market_facility": 12760.6,
+          "home_capture_pct": 1.18
+        }
+      }
+    },
+    {
+      "id": "fuchu",
+      "name": "府中",
+      "by_radius": {
+        "5": {
+          "elderly_65": 143540.0,
+          "market_home": 2728.8,
+          "market_facility": 2141.3,
+          "home_capture_pct": 5.94
+        },
+        "8": {
+          "elderly_65": 400181.0,
+          "market_home": 7688.8,
+          "market_facility": 6303.1,
+          "home_capture_pct": 2.11
+        },
+        "10": {
+          "elderly_65": 642955.0,
+          "market_home": 12391.4,
+          "market_facility": 10245.9,
+          "home_capture_pct": 1.31
+        }
+      }
+    },
+    {
+      "id": "sangenjaya",
+      "name": "三軒茶屋",
+      "by_radius": {
+        "5": {
+          "elderly_65": 279045.0,
+          "market_home": 6031.6,
+          "market_facility": 4257.7,
+          "home_capture_pct": 2.06
+        },
+        "8": {
+          "elderly_65": 661385.0,
+          "market_home": 13721.2,
+          "market_facility": 10069.0,
+          "home_capture_pct": 0.9
+        },
+        "10": {
+          "elderly_65": 979961.0,
+          "market_home": 19892.7,
+          "market_facility": 15492.2,
+          "home_capture_pct": 0.62
+        }
+      }
+    },
+    {
+      "id": "tsudanuma",
+      "name": "津田沼",
+      "by_radius": {
+        "5": {
+          "elderly_65": 119307.0,
+          "market_home": 1020.3,
+          "market_facility": 1358.7,
+          "home_capture_pct": 32.83
+        },
+        "8": {
+          "elderly_65": 291061.0,
+          "market_home": 2479.7,
+          "market_facility": 3224.6,
+          "home_capture_pct": 13.51
+        },
+        "10": {
+          "elderly_65": 425470.0,
+          "market_home": 3636.9,
+          "market_facility": 4679.2,
+          "home_capture_pct": 9.21
+        }
+      }
+    },
+    {
+      "id": "koenji",
+      "name": "高円寺",
+      "by_radius": {
+        "5": {
+          "elderly_65": 297909.0,
+          "market_home": 6201.3,
+          "market_facility": 4851.0,
+          "home_capture_pct": 1.29
+        },
+        "8": {
+          "elderly_65": 718094.0,
+          "market_home": 14930.8,
+          "market_facility": 11592.1,
+          "home_capture_pct": 0.54
+        },
+        "10": {
+          "elderly_65": 1086287.0,
+          "market_home": 22387.8,
+          "market_facility": 17631.0,
+          "home_capture_pct": 0.36
+        }
+      }
+    },
+    {
+      "id": "nishinippori",
+      "name": "西日暮里",
+      "by_radius": {
+        "5": {
+          "elderly_65": 312615.0,
+          "market_home": 6300.3,
+          "market_facility": 4265.6,
+          "home_capture_pct": 1.51
+        },
+        "8": {
+          "elderly_65": 749799.0,
+          "market_home": 14823.6,
+          "market_facility": 10364.5,
+          "home_capture_pct": 0.64
+        },
+        "10": {
+          "elderly_65": 1103005.0,
+          "market_home": 21338.0,
+          "market_facility": 15973.4,
+          "home_capture_pct": 0.45
+        }
+      }
+    },
+    {
+      "id": "ichikawa",
+      "name": "市川",
+      "by_radius": {
+        "5": {
+          "elderly_65": 199984.0,
+          "market_home": 1844.1,
+          "market_facility": 2177.8,
+          "home_capture_pct": 3.2
+        },
+        "8": {
+          "elderly_65": 465037.0,
+          "market_home": 8410.3,
+          "market_facility": 6528.9,
+          "home_capture_pct": 0.7
+        },
+        "10": {
+          "elderly_65": 715086.0,
+          "market_home": 12842.2,
+          "market_facility": 10048.1,
+          "home_capture_pct": 0.46
+        }
+      }
+    },
+    {
+      "id": "urawa",
+      "name": "浦和",
+      "by_radius": {
+        "5": {
+          "elderly_65": 168547.0,
+          "market_home": 1331.9,
+          "market_facility": 2357.3,
+          "home_capture_pct": 1.05
+        },
+        "8": {
+          "elderly_65": 330964.0,
+          "market_home": 2447.9,
+          "market_facility": 5049.0,
+          "home_capture_pct": 0.57
+        },
+        "10": {
+          "elderly_65": 501022.0,
+          "market_home": 3587.1,
+          "market_facility": 7748.4,
+          "home_capture_pct": 0.39
+        }
+      }
+    }
+  ],
+  "facility_kpi": [
+    {
+      "id": "honin",
+      "name": "本院",
+      "contract_facility_patients": 1148.0,
+      "contract_home_patients": 509.0,
+      "panel_total": 1657.0,
+      "facility_share_of_panel_pct": 69.3,
+      "market_facility_demand": 3754.0,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "tokorozawa",
+      "name": "所沢",
+      "contract_facility_patients": 611.0,
+      "contract_home_patients": 205.0,
+      "panel_total": 816.0,
+      "facility_share_of_panel_pct": 74.9,
+      "market_facility_demand": 4106.6,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "shakujii",
+      "name": "石神井公園",
+      "contract_facility_patients": 310.0,
+      "contract_home_patients": 103.0,
+      "panel_total": 413.0,
+      "facility_share_of_panel_pct": 75.1,
+      "market_facility_demand": 10134.3,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "hibarigaoka",
+      "name": "ひばりが丘",
+      "contract_facility_patients": 393.0,
+      "contract_home_patients": 122.0,
+      "panel_total": 515.0,
+      "facility_share_of_panel_pct": 76.3,
+      "market_facility_demand": 7890.7,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "mitaka",
+      "name": "三鷹",
+      "contract_facility_patients": 187.0,
+      "contract_home_patients": 85.0,
+      "panel_total": 272.0,
+      "facility_share_of_panel_pct": 68.8,
+      "market_facility_demand": 9052.0,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "chofu",
+      "name": "調布",
+      "contract_facility_patients": 152.0,
+      "contract_home_patients": 176.0,
+      "panel_total": 328.0,
+      "facility_share_of_panel_pct": 46.3,
+      "market_facility_demand": 8248.4,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "fuchu",
+      "name": "府中",
+      "contract_facility_patients": 281.0,
+      "contract_home_patients": 162.0,
+      "panel_total": 443.0,
+      "facility_share_of_panel_pct": 63.4,
+      "market_facility_demand": 6303.1,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "sangenjaya",
+      "name": "三軒茶屋",
+      "contract_facility_patients": 188.0,
+      "contract_home_patients": 124.0,
+      "panel_total": 312.0,
+      "facility_share_of_panel_pct": 60.3,
+      "market_facility_demand": 10069.0,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "tsudanuma",
+      "name": "津田沼",
+      "contract_facility_patients": 142.0,
+      "contract_home_patients": 335.0,
+      "panel_total": 477.0,
+      "facility_share_of_panel_pct": 29.8,
+      "market_facility_demand": 3224.6,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "koenji",
+      "name": "高円寺",
+      "contract_facility_patients": 172.0,
+      "contract_home_patients": 80.0,
+      "panel_total": 252.0,
+      "facility_share_of_panel_pct": 68.3,
+      "market_facility_demand": 11592.1,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "nishinippori",
+      "name": "西日暮里",
+      "contract_facility_patients": 35.0,
+      "contract_home_patients": 95.0,
+      "panel_total": 130.0,
+      "facility_share_of_panel_pct": 26.9,
+      "market_facility_demand": 10364.5,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "ichikawa",
+      "name": "市川",
+      "contract_facility_patients": 45.0,
+      "contract_home_patients": 59.0,
+      "panel_total": 104.0,
+      "facility_share_of_panel_pct": 43.3,
+      "market_facility_demand": 6528.9,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    },
+    {
+      "id": "urawa",
+      "name": "浦和",
+      "contract_facility_patients": 0.0,
+      "contract_home_patients": 14.0,
+      "panel_total": 14.0,
+      "facility_share_of_panel_pct": 0.0,
+      "market_facility_demand": 5049.0,
+      "note": "施設の市場シェア（契約÷市場需要）は用いない。施設は契約患者数とパネル内構成比で評価する。"
+    }
+  ],
+  "recommendations": [
+    "グループ8km単純合算の65+は 6,321,698 人だが、重複除去後は 3,601,128 人（二重計上 43.0%）。",
+    "居宅市場も単純合算 111,720 → ユニオン 73,150。グループポテンシャルはユニオンを用いること。",
+    "院間比較の標準半径は8km。5kmは近傍コア、10kmは広域ポテンシャルの補助指標。",
+    "施設は契約患者・パネル構成比で評価し、施設市場需要とのシェアは用いない。",
+    "本院: 居宅獲得率 22.4% が期待帯上限超え。強い獲得、または推計圏が実態より広い可能性。",
+    "石神井公園: 半径内にグループ他院が 3 院。排他的居宅市場≈5,121 を院別KPIの補助に。",
+    "ひばりが丘: 半径内にグループ他院が 2 院。排他的居宅市場≈3,577 を院別KPIの補助に。",
+    "三鷹: 半径内にグループ他院が 4 院。排他的居宅市場≈2,729 を院別KPIの補助に。",
+    "調布: 半径内にグループ他院が 2 院。排他的居宅市場≈3,011 を院別KPIの補助に。",
+    "府中: 半径内にグループ他院が 2 院。排他的居宅市場≈4,998 を院別KPIの補助に。",
+    "津田沼: 居宅獲得率 13.5% が期待帯上限超え。強い獲得、または推計圏が実態より広い可能性。",
+    "高円寺: 半径内にグループ他院が 2 院。排他的居宅市場≈5,994 を院別KPIの補助に。",
+    "市川: 居宅獲得率 0.7% が期待帯 0.75–4.0% を下回る（稠密）。居宅開拓または圏域再定義を検討。",
+    "浦和: 開院直後のため獲得率の低さは立ち上がり要因。期待帯との差は経過観察。"
+  ],
+  "action_sheets": [
+    {
+      "clinic_id": "honin",
+      "clinic_name": "本院",
+      "decision": "横展開",
+      "priority": "高",
+      "rationale": "居宅獲得率 22.44% が期待帯上限超え。強い獲得パターンの抽出対象。",
+      "actions": [
+        "居宅獲得の成功要因（紹介経路・営業範囲・人員配置）を文書化する",
+        "類似密度帯の低シェア院へ横展開可能な型を切り出す",
+        "5kmコアの高獲得が維持されているか感度表で確認する"
+      ],
+      "kpis": [
+        "5km/8km獲得率",
+        "居宅新規の継続率",
+        "パネル内居宅比率"
+      ],
+      "dont": [
+        "成功院の絶対患者数を、密度の違う院にそのまま目標転記する"
+      ]
+    },
+    {
+      "clinic_id": "tokorozawa",
+      "clinic_name": "所沢",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "居宅獲得率は期待帯内（7.95% / 2.25–9.6%）。現状維持モニタリング。 ただし施設偏重が強い。",
+      "actions": [
+        "四半期ごとに獲得率と期待帯の位置を確認する",
+        "施設契約KPIはパネル構成比で別管理する",
+        "施設偏重（パネル≥70%）のため、居宅新規の下限件数を設定する"
+      ],
+      "kpis": [
+        "居宅獲得率（8km）",
+        "施設/パネル構成比",
+        "排他的居宅市場比"
+      ],
+      "dont": [
+        "市場規模の増減だけで院の優劣を決める"
+      ]
+    },
+    {
+      "clinic_id": "shakujii",
+      "clinic_name": "石神井公園",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "超稠密・グループ近接3院。排他的居宅市場≈5,121 を院KPIの母数にする。",
+      "actions": [
+        "排他的居宅市場を院別目標の母数に切り替える",
+        "クラスター役割分担表に当該院の主エリアを記入する",
+        "施設パネル構成比が高い場合は居宅の時間配分を見直す"
+      ],
+      "kpis": [
+        "排他的居宅市場に対する実績比",
+        "施設/パネル構成比",
+        "グループ他院との重複案件数"
+      ],
+      "dont": [
+        "重複する単純8km市場規模で院間ランキングする"
+      ]
+    },
+    {
+      "clinic_id": "hibarigaoka",
+      "clinic_name": "ひばりが丘",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "稠密・グループ近接2院。排他的居宅市場≈3,577 を院KPIの母数にする。",
+      "actions": [
+        "排他的居宅市場を院別目標の母数に切り替える",
+        "クラスター役割分担表に当該院の主エリアを記入する",
+        "施設パネル構成比が高い場合は居宅の時間配分を見直す"
+      ],
+      "kpis": [
+        "排他的居宅市場に対する実績比",
+        "施設/パネル構成比",
+        "グループ他院との重複案件数"
+      ],
+      "dont": [
+        "重複する単純8km市場規模で院間ランキングする"
+      ]
+    },
+    {
+      "clinic_id": "mitaka",
+      "clinic_name": "三鷹",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "超稠密・グループ近接4院。排他的居宅市場≈2,729 を院KPIの母数にする。",
+      "actions": [
+        "排他的居宅市場を院別目標の母数に切り替える",
+        "クラスター役割分担表に当該院の主エリアを記入する",
+        "施設パネル構成比が高い場合は居宅の時間配分を見直す"
+      ],
+      "kpis": [
+        "排他的居宅市場に対する実績比",
+        "施設/パネル構成比",
+        "グループ他院との重複案件数"
+      ],
+      "dont": [
+        "重複する単純8km市場規模で院間ランキングする"
+      ]
+    },
+    {
+      "clinic_id": "chofu",
+      "clinic_name": "調布",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "稠密・グループ近接2院。排他的居宅市場≈3,011 を院KPIの母数にする。",
+      "actions": [
+        "排他的居宅市場を院別目標の母数に切り替える",
+        "クラスター役割分担表に当該院の主エリアを記入する",
+        "施設パネル構成比が高い場合は居宅の時間配分を見直す"
+      ],
+      "kpis": [
+        "排他的居宅市場に対する実績比",
+        "施設/パネル構成比",
+        "グループ他院との重複案件数"
+      ],
+      "dont": [
+        "重複する単純8km市場規模で院間ランキングする"
+      ]
+    },
+    {
+      "clinic_id": "fuchu",
+      "clinic_name": "府中",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "稠密・グループ近接2院。排他的居宅市場≈4,998 を院KPIの母数にする。",
+      "actions": [
+        "排他的居宅市場を院別目標の母数に切り替える",
+        "クラスター役割分担表に当該院の主エリアを記入する",
+        "施設パネル構成比が高い場合は居宅の時間配分を見直す"
+      ],
+      "kpis": [
+        "排他的居宅市場に対する実績比",
+        "施設/パネル構成比",
+        "グループ他院との重複案件数"
+      ],
+      "dont": [
+        "重複する単純8km市場規模で院間ランキングする"
+      ]
+    },
+    {
+      "clinic_id": "sangenjaya",
+      "clinic_name": "三軒茶屋",
+      "decision": "様子見",
+      "priority": "低",
+      "rationale": "居宅獲得率は期待帯内（0.9% / 0.28–1.95%）。現状維持モニタリング。",
+      "actions": [
+        "四半期ごとに獲得率と期待帯の位置を確認する",
+        "施設契約KPIはパネル構成比で別管理する"
+      ],
+      "kpis": [
+        "居宅獲得率（8km）",
+        "施設/パネル構成比",
+        "排他的居宅市場比"
+      ],
+      "dont": [
+        "市場規模の増減だけで院の優劣を決める"
+      ]
+    },
+    {
+      "clinic_id": "tsudanuma",
+      "clinic_name": "津田沼",
+      "decision": "横展開",
+      "priority": "高",
+      "rationale": "居宅獲得率 13.51% が期待帯上限超え。強い獲得パターンの抽出対象。",
+      "actions": [
+        "居宅獲得の成功要因（紹介経路・営業範囲・人員配置）を文書化する",
+        "類似密度帯の低シェア院へ横展開可能な型を切り出す",
+        "5kmコアの高獲得が維持されているか感度表で確認する"
+      ],
+      "kpis": [
+        "5km/8km獲得率",
+        "居宅新規の継続率",
+        "パネル内居宅比率"
+      ],
+      "dont": [
+        "成功院の絶対患者数を、密度の違う院にそのまま目標転記する"
+      ]
+    },
+    {
+      "clinic_id": "koenji",
+      "clinic_name": "高円寺",
+      "decision": "やる",
+      "priority": "中",
+      "rationale": "超稠密・グループ近接2院。排他的居宅市場≈5,994 を院KPIの母数にする。",
+      "actions": [
+        "排他的居宅市場を院別目標の母数に切り替える",
+        "クラスター役割分担表に当該院の主エリアを記入する",
+        "施設パネル構成比が高い場合は居宅の時間配分を見直す"
+      ],
+      "kpis": [
+        "排他的居宅市場に対する実績比",
+        "施設/パネル構成比",
+        "グループ他院との重複案件数"
+      ],
+      "dont": [
+        "重複する単純8km市場規模で院間ランキングする"
+      ]
+    },
+    {
+      "clinic_id": "nishinippori",
+      "clinic_name": "西日暮里",
+      "decision": "様子見",
+      "priority": "低",
+      "rationale": "居宅獲得率は期待帯内（0.64% / 0.28–1.95%）。現状維持モニタリング。",
+      "actions": [
+        "四半期ごとに獲得率と期待帯の位置を確認する",
+        "施設契約KPIはパネル構成比で別管理する"
+      ],
+      "kpis": [
+        "居宅獲得率（8km）",
+        "施設/パネル構成比",
+        "排他的居宅市場比"
+      ],
+      "dont": [
+        "市場規模の増減だけで院の優劣を決める"
+      ]
+    },
+    {
+      "clinic_id": "ichikawa",
+      "clinic_name": "市川",
+      "decision": "やる",
+      "priority": "高",
+      "rationale": "居宅獲得率 0.7% が期待帯 0.75–4.0% を下回る。",
+      "actions": [
+        "居宅未開拓エリア（排他的メッシュ）の訪問リストを作る",
+        "紹介元（居宅介護支援・訪問看護）のカバレッジ点検",
+        "5kmコアの獲得率を先行KPIにし、8kmは監視指標とする"
+      ],
+      "kpis": [
+        "居宅獲得率（期待帯との差）",
+        "新規居宅/月",
+        "紹介元別の新規件数"
+      ],
+      "dont": [
+        "施設市場需要とのシェア比較で評価する",
+        "半径だけ広げて市場を水増し解釈する"
+      ]
+    },
+    {
+      "clinic_id": "urawa",
+      "clinic_name": "浦和",
+      "decision": "様子見",
+      "priority": "中",
+      "rationale": "開院直後。獲得率の低さは立ち上がり要因であり、期待帯との差は経過観察。",
+      "actions": [
+        "3/6/12か月の居宅獲得率軌跡を固定フォーマットで追跡する",
+        "5kmコア圏の居宅リスト化と初期紹介経路の整備",
+        "施設契約は無理に伸ばさず、居宅の型を先に作る"
+      ],
+      "kpis": [
+        "居宅獲得率（5km/8km）の月次",
+        "新規居宅患者数/月",
+        "排他的居宅市場に対する実績比"
+      ],
+      "dont": [
+        "開院直後に施設偏重へ舵を切る",
+        "8km市場規模そのものを短期KPIにする"
+      ]
+    },
+    {
+      "clinic_id": "cluster_mitaka",
+      "clinic_name": "三鷹クラスター（石神井・ひばり・三鷹・調布・府中・高円寺）",
+      "decision": "やる",
+      "priority": "高",
+      "rationale": "8km圏が相互に大きく重複。院別市場の単純比較ではなく、排他的居宅市場での役割分担が必要。",
+      "actions": [
+        "排他的居宅市場が大きい院を居宅の主担当エリアとする",
+        "重複メッシュでは施設契約と居宅の役割を院間で明文化する",
+        "新規居宅案件の一次受付ルール（最寄り院優先）を定める"
+      ],
+      "kpis": [
+        "クラスター合算の居宅獲得率（ユニオン分母）",
+        "院別排他的居宅市場に対する実績比"
+      ],
+      "dont": [
+        "重複圏で居宅ノルマを院ごとに独立設定する（カニバリを招く）"
+      ]
+    }
+  ],
+  "radius_policy": {
+    "standard_km": "8",
+    "core_km": "5",
+    "wide_km": "10",
+    "rule": "院間比較・本部定例の標準半径は8km。5kmは近傍コア（獲得の強さ）、10kmは広域ポテンシャルの補助指標。院間比較は必ず同一半径で行う。",
+    "when_to_use_5km": "立ち上げ初期・強い獲得院の再現範囲の確認・営業コア設計",
+    "when_to_use_10km": "出店検討の広域需要・遠方紹介の余地確認（獲得率は参考）",
+    "do_not": "半径を院ごとに変えてランキングする / 10km市場を短期目標の母数にする"
+  }
+}
