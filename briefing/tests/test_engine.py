@@ -37,5 +37,17 @@ class TestReproducesSystemB(unittest.TestCase):
         self.assertGreater(p["underserved_ratio"], 1.5)
 
 
+class TestCompetitors(unittest.TestCase):
+    def test_enhanced_flag_detected(self):
+        c = Engine().competitors
+        # 名簿の類型は全角（支援診１・２ア等）。機能強化型が一定数検出されること
+        self.assertGreater(c.enhanced.sum(), 1000)
+        self.assertTrue(c[c.zaishi_class == "支援診３"].enhanced.eq(False).all())
+
+    def test_own_group_excluded(self):
+        E = Engine()
+        self.assertFalse(E.comp_geo.name.str.contains("わかさクリニック").any())
+
+
 if __name__ == "__main__":
     unittest.main()

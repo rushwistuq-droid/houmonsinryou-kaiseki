@@ -98,8 +98,10 @@ def benchmark_share(df: pd.DataFrame) -> tuple[float, float]:
 
 def reach_target(exclusive_latent_home, competition_density, bench_pen, bench_cd):
     """本院並みの浸透を、競合の厚さで割り引いた到達目安（居宅患者数）。"""
-    share = bench_pen * (bench_cd / np.asarray(competition_density, dtype=float))
-    share = np.minimum(share, bench_pen * 1.5)  # 競合が極端に薄い地点で過大にならないよう上限
+    cd = np.asarray(competition_density, dtype=float)
+    with np.errstate(divide="ignore"):
+        share = bench_pen * (bench_cd / cd)
+    share = np.minimum(share, bench_pen * 1.5)  # 競合が極端に薄い（ゼロ含む）地点で過大にならないよう上限
     return share * np.asarray(exclusive_latent_home, dtype=float), share
 
 

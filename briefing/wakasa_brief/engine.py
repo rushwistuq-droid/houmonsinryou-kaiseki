@@ -194,7 +194,7 @@ class Engine:
                 z.at[i, "coord_source"] = "JMAP突合"
         z["pref"] = z.pref_code.astype(str).str.zfill(2)
         z["own_group"] = z.name.str.contains(OWN_GROUP_PATTERN)
-        cls = z.zaishi_class.fillna("")
+        cls = z.zaishi_class.fillna("").map(lambda x: unicodedata.normalize("NFKC", x))  # 名簿は全角数字
         is_hosp = z.kind.str.contains("病院")
         enhanced = cls.str.contains("1|2")
         hw = z.pref_name.map(self.hospital_weight).fillna(1.0)
