@@ -30,6 +30,49 @@ def load(path) -> pd.DataFrame:
     return df.sort_values(["clinic", "month"]).reset_index(drop=True)
 
 
+SERIES_COL = {"facility": "facility_patients", "home": "home_patients"}
+
+
+def load_events(path) -> list[dict]:
+    """確認済みの補正イベント（analysis/confidential/monthly_events.yaml）。無ければ空。"""
+    import yaml
+
+    from pathlib import Path
+
+    path = Path(path)
+    if not path.exists():
+        return []
+    return (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("events", [])
+
+
+def apply_adjustments(df: pd.DataFrame, events: list[dict], kinds: tuple[str, ...] = ("移管", "集計修正")) -> pd.DataFrame:
+    """移管・集計修正による水準の段差を、イベント月より前の値に delta を足して取り除く。
+
+    例: 2025年4月に施設 −121 の移管 → 2025年3月以前の施設を121人少なく扱い、自然増減だけを見る。
+    spread: linear のイベント（徐々にずれた報告値の修正）は、ずれが少しずつ積み上がったとみなして按分する。
+    グループ合計では移管は内部の付け替えなので kinds=("集計修正",) だけを使う。
+    """
+    out = df.copy()
+    for e in events:
+        if e.get("kind") not in kinds:
+            continue
+        col = SERIES_COL[e["series"]]
+        ev = pd.Period(e["month"], freq="M")
+        mask = (out.clinic == e["clinic"]) & (out.month < ev)
+        if e.get("spread") == "linear":
+            # 「少しずつずれていた」報告値の修正: 系列の最初の月は0、修正直前の月で delta 全額になるよう按分
+            first = out.loc[out.clinic == e["clinic"], "month"].min()
+            span = max((ev - first).n, 1)
+            frac = np.array([((m - first).n + 1) / span for m in out.loc[mask, "month"]])
+            out.loc[mask, col] = (out.loc[mask, col] + np.round(int(e["delta"]) * np.minimum(frac, 1.0))).clip(lower=0)
+        else:
+            out.loc[mask, col] = (out.loc[mask, col] + int(e["delta"])).clip(lower=0)
+    out["total_patients"] = out.home_patients + out.facility_patients
+    if "home_mix" in out:
+        out["home_mix"] = out.home_patients / out.total_patients
+    return out
+
+
 def add_months_open(df: pd.DataFrame, home_start: dict[str, str]) -> pd.DataFrame:
     df = df.copy()
     df["months_open"] = [

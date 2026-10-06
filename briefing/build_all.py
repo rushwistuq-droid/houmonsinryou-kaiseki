@@ -87,7 +87,13 @@ def main() -> None:
     mdf = gtab = ctab = ramps = None
     if ma_monthly_path().exists():
         starts = {c.name: c.home_start for c in E.clinics}
-        mdf = ma.add_months_open(ma.load(ma_monthly_path()), starts)
+        mdf_raw = ma.add_months_open(ma.load(ma_monthly_path()), starts)
+        events = ma.load_events(ma_monthly_path().parent / "monthly_events.yaml")
+        # 分析は補正後（移管・集計修正の段差を除いた実態ベース）。グループ合計は集計修正のみ補正
+        mdf = ma.apply_adjustments(mdf_raw, events)
+        mdf_group = ma.apply_adjustments(mdf_raw, events, kinds=("集計修正",))
+        if events:
+            print(f"補正イベント {len(events)}件を適用（analysis/confidential/monthly_events.yaml）")
         gtab = ma.growth_table(mdf)
         ctab = ma.curve_table(mdf)
         gtab["home_curve_status"] = ctab[ctab.series == "居宅"].set_index("clinic").status
@@ -130,19 +136,22 @@ def main() -> None:
     monthly_sheets: dict[str, pd.DataFrame] = {}
     if mdf is not None:
         opening = {c.name: c.home_start for c in E.clinics}
-        spikes = ma.detect_spikes(mdf)
+        spikes = ma.detect_spikes(mdf)  # 補正後に残る急変＝未確認の変化
         new_clinics = [c.name for c in E.clinics if c.home_start >= str(mdf.month.min())]
         monthly_sheets = {
             "月次_院別の伸び": gtab,
             "月次_成長曲線": ctab,
-            "月次_急変": spikes,
-            "月次_移管候補": ma.transfer_candidates(spikes, opening),
+            "月次_急変（補正前）": ma.detect_spikes(mdf_raw),
+            "月次_急変（補正後）": spikes,
+            "月次_移管候補": ma.transfer_candidates(ma.detect_spikes(mdf_raw), opening),
             "月次_立ち上げ": ma.ramp_points(mdf, new_clinics),
             "月次_モデル安定性": ma.model_stability(
                 mdf, env, [str(p) for p in pd.period_range("2024-06", str(mdf.month.max()), freq="3M")]
             ),
             "月次_12か月見通し": ma.forecast_12m(mdf, model),
-            "月次_グループ合計": ma.group_totals(mdf),
+            "月次_グループ合計": ma.group_totals(mdf_group),
+            "月次_グループ合計（補正前）": ma.group_totals(mdf_raw),
+            "月次_補正イベント": pd.DataFrame(events),
         }
         for name, t in monthly_sheets.items():
             t.to_csv(CONF / f"{name}.csv", encoding="utf-8-sig")
@@ -161,7 +170,8 @@ def main() -> None:
         for name, t in monthly_sheets.items():
             t.to_excel(xw, sheet_name=name[:31])
         if mdf is not None:
-            mdf.assign(month=mdf.month.astype(str)).to_excel(xw, sheet_name="月次_データ（整形済み）", index=False)
+            mdf_raw.assign(month=mdf_raw.month.astype(str)).to_excel(xw, sheet_name="月次_データ（整形済み）", index=False)
+            mdf.assign(month=mdf.month.astype(str)).to_excel(xw, sheet_name="月次_データ（補正後）", index=False)
     print(f"Excel: {CONF / 'wakasa_briefing_data.xlsx'}")
 
     # 図表

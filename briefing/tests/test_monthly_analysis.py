@@ -37,6 +37,24 @@ class TestMonthlyAnalysis(unittest.TestCase):
         self.assertEqual(tr.iloc[0]["month"], "2025-01")
         self.assertEqual(int(tr.iloc[0]["減少合計"]), -60)
 
+    def test_adjustment_removes_level_shift(self):
+        df = _frame()
+        adj = ma.apply_adjustments(df, [{"month": "2025-01", "clinic": "A", "series": "facility", "delta": -60, "kind": "移管"}])
+        a = adj[adj.clinic == "A"].facility_patients
+        self.assertTrue((a == 140).all())  # 段差が消えて一定
+        self.assertTrue(ma.detect_spikes(adj[adj.clinic == "A"]).empty)
+        # グループ合計用（集計修正のみ）では移管は補正しない
+        same = ma.apply_adjustments(df, [{"month": "2025-01", "clinic": "A", "series": "facility", "delta": -60, "kind": "移管"}], kinds=("集計修正",))
+        self.assertTrue(same.facility_patients.equals(df.facility_patients))
+
+    def test_linear_spread_correction(self):
+        df = _frame()
+        adj = ma.apply_adjustments(df, [{"month": "2025-01", "clinic": "B", "series": "home", "delta": -12, "kind": "集計修正", "spread": "linear"}])
+        b = adj[adj.clinic == "B"].set_index(adj[adj.clinic == "B"].month.astype(str)).home_patients
+        self.assertEqual(b["2024-01"], 99)   # 最初の月はほぼ補正なし
+        self.assertEqual(b["2024-12"], 88)   # 直前の月で全額
+        self.assertEqual(b["2025-01"], 100)  # 修正後はそのまま
+
     def test_forecast_trend_extension(self):
         fc = ma.forecast_12m(_frame())
         self.assertEqual(int(fc.loc["A", "trend_12m"]), 165 + 60)

@@ -260,7 +260,7 @@ def group_trend(gt: pd.DataFrame, path: Path):
     ax.set_ylabel("患者数（人、月末）", color=TEXT2, fontsize=9.5)
     _title(fig, "グループ全体：施設は1年半横ばい、伸びはすべて居宅",
            "全院合計の月末患者数。下＝施設、上＝居宅（がん医総を含む）")
-    _source(fig, "院内月次データ（機密）。2026年3月以前は居宅とがん医総が別集計のため合算して揃えた")
+    _source(fig, "院内月次データ（機密）。居宅はがん医総を含めて全期間で揃えた。2025年8月の報告値修正はそれ以前の値に反映")
     _save(fig, path)
 
 
@@ -287,12 +287,12 @@ def clinic_small_multiples(df: pd.DataFrame, order: list[str], path: Path):
     legend_ax = list(axes.flat)[len(order)]
     legend_ax.plot([], [], color=S1, linewidth=2, label="居宅（がん医総含む）")
     legend_ax.plot([], [], color=FACILITY_TINT, linewidth=2, label="施設")
-    legend_ax.plot([], [], color=GRID, linewidth=1.2, label="2025年4月・8月の変動")
+    legend_ax.plot([], [], color=GRID, linewidth=1.2, label="2025年4月（移管）・8月（集計修正）")
     leg = legend_ax.legend(loc="center left", frameon=False, fontsize=10)
     for t in leg.get_texts():
         t.set_color(TEXT)
-    _title(fig, "院別の月次推移（2023年12月〜2026年9月）", "各院で縦軸の目盛りが異なる。青＝居宅、薄青＝施設")
-    _source(fig, "縦線: 2025年4月（石神井公園・三鷹→高円寺への施設移管と推定）、2025年8月（多摩・区西部で一斉減少。要確認）")
+    _title(fig, "院別の月次推移（補正後、2023年12月〜2026年9月）", "各院で縦軸の目盛りが異なる。青＝居宅、薄青＝施設")
+    _source(fig, "補正: 2025年4月の高円寺への施設移管と、2025年8月の報告値の修正による段差を、それ以前の値をずらして除いた（確認済み）")
     _save(fig, path)
 
 
