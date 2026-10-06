@@ -29,7 +29,7 @@ from briefing.wakasa_brief.site_score import SiteScorer  # noqa: E402
 MODEL_JSON = ROOT / "briefing/output/growth_model.json"
 
 
-def load_model() -> tuple[GrowthModel, float, float]:
+def load_model() -> tuple[GrowthModel, dict]:
     m = json.loads(MODEL_JSON.read_text(encoding="utf-8"))
     c = m["coef"]
     model = GrowthModel(
@@ -39,7 +39,8 @@ def load_model() -> tuple[GrowthModel, float, float]:
         n=m["n"],
         underserved_range=tuple(m["underserved_range"]),
     )
-    return model, m["benchmark_penetration"], m["benchmark_competition_density"]
+    bench = {t: {"share": v} for t, v in m["peer_benchmark_share"].items()}
+    return model, bench
 
 
 def geocode(address: str) -> tuple[float, float]:
@@ -64,7 +65,7 @@ def report(name: str, r: dict, model: GrowthModel) -> str:
         f"（最寄り既存院 {r['nearest_clinic']} {r['nearest_clinic_km']:.1f}km）",
         f"  ▶ 3年後の居宅患者予測 {r['pred_home_36m']:,.0f}人（誤差の目安 ±{model.loo_pct:.0%}）"
         f" / うちグループ純増 {r['pred_home_36m_group_net']:,.0f}人",
-        f"  ▶ 到達目安 {r['reach_target']:,.0f}人（本院並みの浸透 × 競合補正）",
+        f"  ▶ 到達目安 {r['reach_target']:,.0f}人（同じ地域タイプの上位院並みに取り込んだ場合）",
     ]
     if r["underserved_extrapolated"]:
         lines.append(f"  ※未充足度が既存院の実績範囲（最大{model.underserved_range[1]:.1f}）を超えるため、予測は上限値で頭打ち")
@@ -83,8 +84,8 @@ def main() -> None:
     ap.add_argument("--compare", nargs="+", metavar="名前:緯度,経度")
     args = ap.parse_args()
 
-    model, bp, bc = load_model()
-    scorer = SiteScorer(Engine(), model, bp, bc)
+    model, bench = load_model()
+    scorer = SiteScorer(Engine(), model, bench)
     targets = []
     if args.compare:
         for item in args.compare:

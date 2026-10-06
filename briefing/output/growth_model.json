@@ -1,18 +1,21 @@
 {
   "formula": "log(居宅患者) = a + b·log(在宅開始後月数) + c·log(未充足度) + d·[施設重視期]",
   "coef": {
-    "a": 2.2874,
-    "b_months": 0.7597,
-    "c_underserved": 1.518,
-    "d_facility_era": -0.6118
+    "a": 2.5193,
+    "b_months": 0.6916,
+    "c_underserved": 1.4267,
+    "d_facility_era": -0.5949
   },
-  "r2": 0.928,
-  "loo_error_pct": 25.7,
-  "n": 12,
+  "r2": 0.885,
+  "loo_error_pct": 27.1,
+  "n": 11,
   "underserved_range": [
     1.0,
     2.073
   ],
-  "benchmark_penetration": 0.19,
-  "benchmark_competition_density": 3.7
+  "peer_benchmark_share": {
+    "未充足型": 0.07,
+    "都市型": 0.04
+  },
+  "peer_benchmark_rule": "在宅開始24か月以上・本院を除く院のうち、取り込み率の上位2院の平均。未充足度1.2以上＝未充足型"
 }

@@ -7,11 +7,14 @@
 未充足度 = 潜在居宅需要（東京都の受療率）÷ 顕在居宅需要（地元県の受療率）。
 東京都内はほぼ1.0、埼玉・千葉は約2倍。
 
-飽和度診断は3つのレンズで行う:
+診断は次のレンズで行う:
   1. 年数・地域補正後の実力 = 実績 ÷ モデル期待値
-  2. 到達目安に対する浸透度 = 実績 ÷ 到達目安
-     到達目安 = 自院が最寄りの潜在居宅需要 × 本院の浸透率 × (本院の競合密度 ÷ 自院の競合密度)
-  3. 医師キャパシティ = 患者数 ÷ 医師FTE
+  2. 同条件の上位院との比較（到達率）= 実績 ÷ 到達目安
+     到達目安 = 自院が最寄りの潜在居宅需要 × 同じ地域タイプの上位院の取り込み率
+     地域タイプ: 未充足度1.2以上＝未充足型、未満＝都市型。上位院＝在宅開始24か月以上の院のうち
+     取り込み率の上位2院の平均。本院は先行者（地域で最初に訪問診療を始めた）で他院の目安にならないため除外。
+  3. 月次推移（直近6か月の伸び・頭打ち）
+医師数は患者数に合わせて増やす運用のため、医師1人あたり患者数は原因ではなく「次の増員の目安」として扱う。
 """
 
 from __future__ import annotations
@@ -21,9 +24,13 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-BENCHMARK_ID = "honin"
+FIRST_MOVER_ID = "honin"  # 地域で最も早く訪問診療を始めた院。目安の計算から除く
 MIN_MONTHS_FOR_FIT = 6
-CAPACITY_TIGHT_PER_FTE = 250  # 本院・所沢・三軒茶屋の水準。これ以上は医師増員が先
+PEER_MIN_MONTHS = 24
+PEER_TOP_N = 2
+UNDERSERVED_TYPE_THRESHOLD = 1.2
+NEXT_HIRE_PER_FTE = 250  # 医師1人あたりこれ以上なら次の増員を検討する目安（原因ではない）
+NEAR_PEER_TOP = 0.85  # 上位院の水準の85%以上＝自院担当エリアでは上位水準
 RAMP_MONTHS = 12  # これ未満は立ち上げ期として判定保留
 
 
@@ -66,9 +73,15 @@ def _design(df: pd.DataFrame) -> np.ndarray:
     )
 
 
-def fit_growth_model(df: pd.DataFrame) -> GrowthModel:
-    """院別指数表（home, months_open, underserved_ratio, era 列が必要）から推定。"""
+def fit_growth_model(df: pd.DataFrame, exclude_first_mover: bool = True) -> GrowthModel:
+    """院別指数表（home, months_open, underserved_ratio, era 列が必要）から推定。
+
+    本院は地域で最初に訪問診療を始めた先行者で、他院の伸び方の参考にならないため既定で除外する
+    （含めても係数はほぼ同じであることを確認済み）。
+    """
     d = df[df.months_open >= MIN_MONTHS_FOR_FIT].dropna(subset=["home"])
+    if exclude_first_mover:
+        d = d[d.index != FIRST_MOVER_ID]
     d = d[d.home > 0]
     X, y = _design(d), np.log(d.home.values)
     coef, *_ = np.linalg.lstsq(X, y, rcond=None)
@@ -90,19 +103,32 @@ def fit_growth_model(df: pd.DataFrame) -> GrowthModel:
     )
 
 
-def benchmark_share(df: pd.DataFrame) -> tuple[float, float]:
-    """(本院の浸透率, 本院の競合密度)。"""
-    b = df.loc[BENCHMARK_ID]
-    return float(b.home / b.exclusive_latent_home), float(b.competition_density)
+def area_type(underserved_ratio) -> np.ndarray:
+    u = np.asarray(underserved_ratio, dtype=float)
+    return np.where(u >= UNDERSERVED_TYPE_THRESHOLD, "未充足型", "都市型")
 
 
-def reach_target(exclusive_latent_home, competition_density, bench_pen, bench_cd):
-    """本院並みの浸透を、競合の厚さで割り引いた到達目安（居宅患者数）。"""
-    cd = np.asarray(competition_density, dtype=float)
-    with np.errstate(divide="ignore"):
-        share = bench_pen * (bench_cd / cd)
-    share = np.minimum(share, bench_pen * 1.5)  # 競合が極端に薄い（ゼロ含む）地点で過大にならないよう上限
-    return share * np.asarray(exclusive_latent_home, dtype=float), share
+def peer_benchmarks(df: pd.DataFrame) -> dict[str, dict]:
+    """地域タイプ別に「同条件の上位院」の取り込み率（自院が最寄りの潜在居宅需要に対する居宅患者の割合）。"""
+    d = df.copy()
+    d["share"] = d.home / d.exclusive_latent_home
+    d["type"] = area_type(d.underserved_ratio)
+    d = d[(d.months_open >= PEER_MIN_MONTHS) & (d.index != FIRST_MOVER_ID)]
+    out = {}
+    for t, g in d.groupby("type"):
+        top = g.sort_values("share", ascending=False).head(PEER_TOP_N)
+        out[t] = {"share": float(top.share.mean()), "members": list(top["name"]), "n_peers": int(len(g))}
+    return out
+
+
+def reach_target(exclusive_latent_home, underserved_ratio, bench: dict[str, dict]):
+    """同じ地域タイプの上位院並みに自院担当エリアを取り込んだ場合の居宅患者数。"""
+    types = area_type(underserved_ratio)
+    share = np.array([bench.get(t, {"share": np.nan})["share"] for t in np.atleast_1d(types)], dtype=float)
+    pool = np.asarray(exclusive_latent_home, dtype=float)
+    if np.ndim(pool) == 0:
+        share = share[0]
+    return share * pool, share
 
 
 def diagnose(df: pd.DataFrame, model: GrowthModel, monthly: pd.DataFrame | None = None) -> pd.DataFrame:
@@ -119,10 +145,10 @@ def diagnose(df: pd.DataFrame, model: GrowthModel, monthly: pd.DataFrame | None 
     out["expected_home"] = model.predict(out.months_open, out.underserved_ratio, out.era == "施設重視期")
     out["performance_index"] = out.home / out.expected_home
     out["performance_index_loo"] = pd.Series(model.residuals)
-    bench_pen, bench_cd = benchmark_share(out)
-    out["reach_target"], out["reach_share"] = reach_target(
-        out.exclusive_latent_home, out.competition_density, bench_pen, bench_cd
-    )
+    bench = peer_benchmarks(out)
+    out["area_type"] = area_type(out.underserved_ratio)
+    out["territory_share"] = out.home / out.exclusive_latent_home
+    out["reach_target"], out["reach_share"] = reach_target(out.exclusive_latent_home, out.underserved_ratio, bench)
     out["penetration_of_target"] = out.home / out.reach_target
     out["headroom_home"] = (out.reach_target - out.home).clip(lower=0)
     out["months_to_target"] = [
@@ -132,55 +158,60 @@ def diagnose(df: pd.DataFrame, model: GrowthModel, monthly: pd.DataFrame | None 
     # 現在の実力のまま3年経った場合の見込み（同じ成長カーブ）
     b = model.coef[1]
     out["home_in_3y"] = out.home * ((out.months_open + 36) / out.months_open.clip(lower=1)) ** b
-    verdicts, notes = [], []
-    for cid, r in out.iterrows():
-        v, n = _verdict(cid, r)
-        verdicts.append(v)
-        notes.append(n)
-    out["verdict"] = verdicts
-    out["verdict_notes"] = notes
+    res = [_verdict(cid, r) for cid, r in out.iterrows()]
+    out["verdict"] = [r[0] for r in res]
+    out["cause"] = [r[1] for r in res]
+    out["action"] = [r[2] for r in res]
+    out["verdict_notes"] = [r[3] for r in res]
+    out["hire_note"] = [
+        f"医師1人あたり{v:.0f}人（次の増員の目安）" if pd.notna(v) and v >= NEXT_HIRE_PER_FTE else "" for v in out.patients_per_fte
+    ]
     return out
 
 
-def _verdict(cid: str, r: pd.Series) -> tuple[str, str]:
+def _verdict(cid: str, r: pd.Series) -> tuple[str, str, str, str]:
+    """(判定, 主因の候補, 打ち手, 補足) を返す。"""
     notes = []
-    if r.patients_per_fte >= CAPACITY_TIGHT_PER_FTE:
-        notes.append(f"医師1人あたり{r.patients_per_fte:.0f}人＝キャパ逼迫。増患より先に医師増員")
     if r.home_mix < 0.30:
-        notes.append(f"居宅比{r.home_mix:.0%}＝施設偏重。施設→居宅の構成転換余地")
+        notes.append(f"居宅比{r.home_mix:.0%}。施設を抑える方針の下では居宅の伸びが成長の中心")
     if r.months_open < RAMP_MONTHS:
-        return "立ち上げ期（判定保留）", " / ".join(notes + ["開院12か月未満。立ち上げ基準で追跡"])
-    if cid == BENCHMARK_ID:
-        if r.get("home_trend") == "増加":
-            return "ベンチマーク院（月次で増加中＝上限未到達）", " / ".join(
-                notes + ["到達目安の基準そのもの。月次では居宅が増え続けており、上限にはまだ達していない"]
-            )
-        return "ベンチマーク院（月次推移で判定）", " / ".join(
-            notes + ["到達目安の基準そのもの。上限判定は月次推移の伸び鈍化で行う"]
-        )
+        return "立ち上げ期（判定保留）", "—", "立ち上げ基準カーブで月次追跡", " / ".join(notes + ["開院12か月未満"])
     p, perf = r.penetration_of_target, r.performance_index
-    # モデル誤差が±21%のため、±15%を超える差のみ「上回る／下回る」とする
     pace = "期待を上回る" if perf >= 1.15 else ("期待を下回る" if perf <= 0.85 else "期待並み")
+    trend_up = r.get("home_trend") == "増加"
+    if cid == FIRST_MOVER_ID:
+        state = "増加中" if trend_up else "横ばい"
+        return (
+            f"先行者として地域で確立（同条件の上位院の約{p:.1f}倍・{state}）",
+            "先行者優位",
+            "現状維持＋周辺の未開拓エリアへの展開",
+            " / ".join(notes + ["地域で最初に訪問診療を始めた院。他院の目安には使わない"]),
+        )
     stalled = r.get("home_curve_status") == "上限接近" or r.get("home_trend") in ("横ばい", "減少")
+    overlap = r.exclusive_ratio < 0.5
     if stalled:
-        # 月次で居宅が頭打ち。地域の到達目安に届いていないなら、原因は市場以外
-        if r.patients_per_fte >= CAPACITY_TIGHT_PER_FTE:
-            cause = "医師キャパ"
-        elif r.exclusive_ratio < 0.5:
-            cause = "グループ内重複・営業エリア"
+        if p >= NEAR_PEER_TOP:
+            cause = "担当エリアが狭い（他院と重複）" if overlap else "担当エリア内では上位水準"
+            action = "担当エリアの再設定・エリア外（隣接地域）の開拓"
+        elif overlap:
+            cause = "他院との重複＋エリア内にも取り込み余地"
+            action = "担当エリアの整理と、エリア内の紹介経路（CM・病院）の強化"
+        elif r.competition_density >= 9:
+            cause = "競合過密"
+            action = "強みのある紹介元（病院・CM）への集中、差別化"
         else:
-            cause = "営業・紹介経路"
+            cause = "居宅の獲得の仕組み（紹介経路）"
+            action = "紹介経路（CM・病院の退院調整・訪看）の強化"
         trend = "減少" if r.get("home_trend") == "減少" else "横ばい"
-        notes.append(f"居宅が直近6か月{trend}（到達目安の{p:.0%}で停滞）→ 主因の候補: {cause}")
-        return f"停滞・{cause}（{pace}）", " / ".join(notes)
-    if p >= 0.8:
-        v = "上限接近"
-        notes.append("周辺エリアの深掘りより、隣接エリア出店・構成転換・医師増員を検討")
+        notes.append(f"居宅が直近6か月{trend}。同条件の上位院の{p:.0%}の水準")
+        return f"停滞（{pace}）", cause, action, " / ".join(notes)
+    if p >= NEAR_PEER_TOP:
+        v, cause, action = "上位水準で成長中", "—", "現状の獲得方法を他院へ横展開"
     elif p < 0.4:
-        v = "伸長余地大"
+        v, cause, action = "伸長余地大", "—", "立ち上げ・成長ペースの維持"
     else:
-        v = "成長中"
-    return f"{v}（{pace}）", " / ".join(notes)
+        v, cause, action = "成長中", "—", "成長ペースの維持"
+    return f"{v}（{pace}）", cause, action, " / ".join(notes)
 
 
 # 候補指数の比較（どの指数が居宅患者数を説明するか）。結果は集計値のみで個別院の実績は含まない。
@@ -206,7 +237,7 @@ SCREEN_CANDIDATES = {
 
 
 def screen_indices(df: pd.DataFrame) -> pd.DataFrame:
-    d = df[df.months_open >= MIN_MONTHS_FOR_FIT].copy()
+    d = df[(df.months_open >= MIN_MONTHS_FOR_FIT) & (df.index != FIRST_MOVER_ID)].copy()
     d["facility_era"] = (d.era == "施設重視期").astype(float)
     y = np.log(d.home.values)
     rows = []

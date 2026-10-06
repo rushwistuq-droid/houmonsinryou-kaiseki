@@ -2,7 +2,7 @@
 
 候補地ごとに2つの数字を出す:
   ① 3年後の居宅患者予測 … 獲得予測モデル（転換期型の立ち上げを仮定）
-  ② 到達目安 … 本院並みの浸透率 × 競合密度補正 × 「新院が最寄りになる」潜在居宅需要
+  ② 到達目安 … 同じ地域タイプ（都市型／未充足型）の上位院の取り込み率 × 「新院が最寄りになる」潜在居宅需要
 さらに、既存院との重複を除いた「グループ純増」も出す。
 
 総合スコア(0-100) = ①グループ純増 40% ＋ ②到達目安 40% ＋ ③85歳以上の伸び（2025→2035）20% の順位（パーセンタイル）の加重平均。
@@ -35,9 +35,9 @@ def grid_points(engine: Engine, step_km: float = 2.0) -> pd.DataFrame:
 
 
 class SiteScorer:
-    def __init__(self, engine: Engine, model: GrowthModel, bench_pen: float, bench_cd: float):
+    def __init__(self, engine: Engine, model: GrowthModel, bench: dict[str, dict]):
         self.E, self.model = engine, model
-        self.bench_pen, self.bench_cd = bench_pen, bench_cd
+        self.bench = bench
         ma = engine._mesh_arr
         # 各メッシュから最寄り既存院までの距離（重複判定用）
         d = np.vstack([haversine_km(c.lat, c.lon, ma["lat"], ma["lon"]) for c in engine.clinics])
@@ -58,7 +58,7 @@ class SiteScorer:
             return {}
         x = self.exclusive_ratio(lat, lon, radius_km)
         pred = float(self.model.predict(HORIZON_MONTHS, p["underserved_ratio"], False))
-        target, share = reach_target(p["latent_home"] * x, p["competition_density"], self.bench_pen, self.bench_cd)
+        target, share = reach_target(p["latent_home"] * x, p["underserved_ratio"], self.bench)
         nearest = min(
             ((c.name, float(haversine_km(lat, lon, c.lat, c.lon))) for c in self.E.clinics), key=lambda t: t[1]
         )

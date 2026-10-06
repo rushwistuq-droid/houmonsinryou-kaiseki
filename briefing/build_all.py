@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT))
 from briefing.wakasa_brief import charts  # noqa: E402
 from briefing.wakasa_brief.clinics_table import add_performance, build_environment, load_actuals  # noqa: E402
 from briefing.wakasa_brief.engine import Engine  # noqa: E402
-from briefing.wakasa_brief.model import benchmark_share, diagnose, fit_growth_model, screen_indices  # noqa: E402
+from briefing.wakasa_brief.model import diagnose, fit_growth_model, peer_benchmarks, screen_indices  # noqa: E402
 from briefing.wakasa_brief import monthly_analysis as ma  # noqa: E402
 from briefing.wakasa_brief.clinics_table import CONF_MONTHLY  # noqa: E402
 
@@ -81,7 +81,9 @@ def main() -> None:
     CONF.mkdir(parents=True, exist_ok=True)
     df = add_performance(env, actuals)
     model = fit_growth_model(df)
-    bench_pen, bench_cd = benchmark_share(df)
+    bench = peer_benchmarks(df)
+    CONF.mkdir(parents=True, exist_ok=True)
+    (CONF / "peer_benchmarks.json").write_text(json.dumps(bench, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # 月次推移（あれば）: 院別の伸び・頭打ち判定を診断の4つ目のレンズに使う
     mdf = gtab = ctab = ramps = None
@@ -107,9 +109,9 @@ def main() -> None:
         "loo_error_pct": round(100 * model.loo_pct, 1),
         "n": model.n,
         "underserved_range": [round(x, 3) for x in model.underserved_range],
-        # 公開ファイルのため丸める（本院の患者数を逆算できないように）
-        "benchmark_penetration": round(bench_pen, 2),
-        "benchmark_competition_density": round(bench_cd, 1),
+        # 地域タイプ別の上位院の取り込み率。公開ファイルのため丸める（個別院の患者数を逆算できないように）
+        "peer_benchmark_share": {t: round(v["share"], 2) for t, v in bench.items()},
+        "peer_benchmark_rule": "在宅開始24か月以上・本院を除く院のうち、取り込み率の上位2院の平均。未充足度1.2以上＝未充足型",
     }
     # モデル係数は実績を集約したものだが個別院の数値は復元できないため公開側にも置く
     (PUB / "growth_model.json").write_text(json.dumps(model_info, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -125,7 +127,7 @@ def main() -> None:
     if args.no_grid and grid_csv.exists():
         grid = pd.read_csv(grid_csv)
     else:
-        scorer = SiteScorer(E, model, bench_pen, bench_cd)
+        scorer = SiteScorer(E, model, bench)
         grid = scorer.score_grid(2.0)
         grid[SITE_COLS].round(4).to_csv(grid_csv, index=False, encoding="utf-8-sig")
     top = top_sites(grid, 30)
@@ -180,7 +182,7 @@ def main() -> None:
     charts.map_underserved(grid, E.clinics, PUB / "fig_map_underserved.png")
     charts.map_site_score(grid, top.head(10), E.clinics, PUB / "fig_map_site_score.png")
     charts.model_fit(diag, model, figs / "fig_model_fit.png")
-    charts.saturation_bars(diag, figs / "fig_saturation.png")
+    charts.peer_position(diag, figs / "fig_saturation.png")
     charts.growth_curves(diag, model, figs / "fig_growth_curves.png", ramps=ramps)
     # スライド貼り付け用（タイトルなし）
     slide = figs / "slide"
@@ -189,7 +191,7 @@ def main() -> None:
     charts.map_underserved(grid, E.clinics, slide / "fig_map_underserved.png")
     charts.map_site_score(grid, top.head(10), E.clinics, slide / "fig_map_site_score.png")
     charts.model_fit(diag, model, slide / "fig_model_fit.png")
-    charts.saturation_bars(diag, slide / "fig_saturation.png")
+    charts.peer_position(diag, slide / "fig_saturation.png")
     charts.growth_curves(diag, model, slide / "fig_growth_curves.png", ramps=ramps)
     charts.SHOW_TITLES = True
     if mdf is not None:

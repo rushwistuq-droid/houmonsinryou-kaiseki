@@ -41,6 +41,11 @@ for cid, r in diag.iterrows():
             "cm_n": int(r.cm_offices_n),
             "e85_growth_25_35": round(float(r.e85_growth_25_35), 2),
             "verdict": r.verdict,
+            "cause": r.cause if isinstance(r.cause, str) else "",
+            "action": r.action if isinstance(r.action, str) else "",
+            "area_type": r.area_type,
+            "territory_share": round(float(r.territory_share), 4),
+            "hire_note": r.hire_note if isinstance(r.hire_note, str) else "",
             "notes": r.verdict_notes if isinstance(r.verdict_notes, str) else "",
         }
     )
@@ -74,12 +79,14 @@ if gpath.exists():
                         "fc_low": int(fc.loc[c, "low"]), "fc_high": int(fc.loc[c, "high"])} for c, r in gr.iterrows()},
         "transfers": tr.to_dict(orient="records"),
     }
+peer = json.loads((CONF / "peer_benchmarks.json").read_text(encoding="utf-8"))
 out = {
     "as_of": "2026-07",
     "model": model,
     "screen": screen.to_dict(orient="records"),
     "clinics": clinics,
     "monthly": monthly,
+    "peer": peer,
     "top_sites": top.head(10)[["area", "score", "underserved_ratio", "competition_density", "pred_home_36m_group_net", "reach_target", "nearest_clinic", "nearest_clinic_km"]].round(2).to_dict(orient="records"),
 }
 (CONF / "deck_data.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")

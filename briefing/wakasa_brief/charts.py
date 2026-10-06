@@ -164,8 +164,8 @@ def model_fit(diag: pd.DataFrame, model, path: Path):
     for t in leg.get_texts():
         t.set_color(TEXT)
     _title(fig, "居宅患者数は「開院後の年数」「地域の未充足度」「立ち上げ方針」でほぼ説明できる",
-           f"12院で検証: 決定係数 R²={model.r2:.2f}、1院ずつ抜いて予測した誤差 ±{model.loo_pct:.0%}。斜線より上＝地域・年数の割に多い")
-    _source(fig, "浦和（開院3か月）は推定から除外。モデル: log(居宅) = a + b·log(月数) + c·log(未充足度) + d·[施設重視期]")
+           f"{model.n}院で検証: 決定係数 R²={model.r2:.2f}、1院ずつ抜いて予測した誤差 ±{model.loo_pct:.0%}。斜線より上＝地域・年数の割に多い")
+    _source(fig, "推定から除外: 浦和（開院直後）・本院（先行者。図には参考表示）。モデル: log(居宅) = a + b·log(月数) + c·log(未充足度) + d·[施設重視期]")
     _save(fig, path)
 
 
@@ -347,4 +347,33 @@ def forecast_bars(fc: pd.DataFrame, order: list[str], path: Path):
         t.set_color(TEXT)
     _title(fig, "居宅患者の12か月後の見通し（2027年9月）", "低い方＝直近12か月の傾きの延長、高い方＝獲得予測モデルの成長カーブ（逆の場合もあり）")
     _source(fig, "見通しは施策を変えない場合の延長。医師増員・営業エリアの見直しで上振れしうる")
+    _save(fig, path)
+
+
+def peer_position(diag: pd.DataFrame, path: Path):
+    """同条件（地域タイプ）の上位院の取り込み率を100%としたときの各院の水準。"""
+    d = diag[(diag.index != "honin") & (diag.months_open >= 12)].copy()
+    d = d.sort_values("penetration_of_target")
+    stalled = d.verdict.str.startswith("停滞")
+    fig, ax = plt.subplots(figsize=(9.6, 6.2))
+    fig.subplots_adjust(left=0.2, right=0.93, top=_top(0.8), bottom=0.11)
+    _style(ax, grid_axis="x")
+    y = np.arange(len(d))
+    ax.barh(y, 100 * d.penetration_of_target, height=0.6, color=np.where(stalled, S2, S1))
+    ax.axvline(100, color=TEXT2, linewidth=1, linestyle=(0, (4, 3)))
+    ax.annotate("同条件の上位院の水準", (100, len(d) - 0.4), xytext=(4, 0), textcoords="offset points", fontsize=8.5, color=TEXT2)
+    for yi, r in zip(y, d.itertuples()):
+        ax.annotate(f"{100 * r.penetration_of_target:.0f}%", (max(100 * r.penetration_of_target, 100), yi), xytext=(5, 0),
+                    textcoords="offset points", va="center", fontsize=9, color=TEXT)
+    ax.set_yticks(y, [f"{n}（{t}）" for n, t in zip(d["name"], d.area_type)], color=TEXT, fontsize=9.5)
+    ax.set_xlim(0, max(125, 100 * d.penetration_of_target.max() + 15))
+    ax.set_xlabel("自院が最寄りの潜在居宅需要の取り込み率（同条件の上位院＝100%）", color=TEXT2, fontsize=9.5)
+    from matplotlib.patches import Patch
+
+    handles = [Patch(color=S2, label="停滞（直近6か月横ばい・減少）"), Patch(color=S1, label="増加中")]
+    leg = ax.legend(handles=handles, loc="lower left", bbox_to_anchor=(0, 1.0), ncol=2, frameon=False, fontsize=9)
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    _title(fig, "同じ条件の院と比べた取り込みの水準", "上位院＝都市型はひばりが丘・調布、未充足型は津田沼・所沢の平均（在宅24か月以上、本院は先行者のため除外）")
+    _source(fig, "100%前後で停滞＝自院の担当エリアは取り切りつつある（エリアが狭いのが制約）。100%を大きく下回って停滞＝エリア内に余地がある")
     _save(fig, path)
