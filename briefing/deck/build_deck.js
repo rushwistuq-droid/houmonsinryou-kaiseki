@@ -31,7 +31,10 @@ pres.theme = { headFontFace: THEME.headFontFace, bodyFontFace: THEME.bodyFontFac
 pres.title = "訪問診療データ分析のご報告";
 pres.author = "わかさクリニックグループ";
 const C = pres.SchemeColor;
-const FOOTER = "機密｜わかさクリニックグループ 理事長面談資料｜2026年10月（実績は2026年7月時点）";
+const ym = (m) => { const [y, mo] = m.split("-"); return `${y}年${Number(mo)}月`; };
+const FOOTER = D.monthly && D.monthly.last_month
+  ? `機密｜わかさクリニックグループ 理事長面談資料｜2026年10月（実績は${ym(D.monthly.last_month)}末時点）`
+  : "機密｜わかさクリニックグループ 理事長面談資料｜2026年10月（実績は2026年7月時点）";
 
 // ---------------------------------------------------------------- layouts
 pres.defineSlideMaster({
@@ -107,6 +110,15 @@ const byId = Object.fromEntries(clinics.map((c) => [c.id, c]));
 const judged = clinics.filter((c) => c.months >= 12 && c.id !== "honin");
 const tight = clinics.filter((c) => c.per_fte >= 250);
 const maxPen = Math.max(...judged.map((c) => c.penetration));
+const coef = D.model.coef;
+const loo = D.model.loo_error_pct / 100;
+const eraPct = Math.round((1 - Math.exp(coef.d_facility_era)) * 100);
+const fitted = clinics.filter((c) => c.months >= 6);
+const inBand = fitted.filter((c) => c.perf <= 1 + loo && c.perf >= 1 / (1 + loo)).length;
+const above = fitted.filter((c) => c.perf >= 1.15).map((c) => c.name);
+const screenErr = (label) => Math.round(100 * D.screen.find((r) => r["モデル"].startsWith(label))["予測誤差(LOO)"]);
+const M = D.monthly || null;
+const stalled = clinics.filter((c) => c.verdict.startsWith("停滞"));
 
 // ---------------------------------------------------------------- 1. 表紙
 pres.addSection({ title: "表紙" });
@@ -122,26 +134,31 @@ pres.addSection({ title: "表紙" });
 // ---------------------------------------------------------------- 2. 要旨
 pres.addSection({ title: "要旨" });
 {
-  const s = content("本日お伝えしたいこと：差の大半は地域と年数で説明でき、次の伸びは「出店先」と「医師」で決まる", "要旨");
+  const s = content("本日お伝えしたいこと：伸びは居宅に移った。止まっている院の原因は市場ではなく医師と重複", "要旨");
   const r2 = Math.round(D.model.r2 * 100);
-  const items = [
+  const items = M ? [
+    [`${(M.home_last / M.home_first).toFixed(1)}倍`, `グループの居宅患者は${ym(M.first_month)}の${fmt(M.home_first)}人から${fmt(M.home_last)}人へ。施設は2025年春から横ばい`],
+    [`${r2}%`, "院ごとの居宅患者数の差は「年数」「地域の未充足度」「立ち上げ方針」の3つで説明できる"],
+    [`${stalled.length}院`, `居宅が直近6か月伸びていない院（${stalled.map((c) => c.name).join("・")}）。地域の到達目安の2〜4割で止まっている`],
+    [`${tight.length}院`, "医師1人あたり250人超。停滞院の多くはここに当たる。次の伸びは医師増員と担当エリアの整理で決まる"],
+  ] : [
     [`${r2}%`, "院ごとの居宅患者数の差は「在宅開始からの年数」「地域の未充足度」「立ち上げ方針」の3つで説明できる"],
     ["約3倍", "在宅医療がまだ行き渡っていない埼玉・千葉では、同じ年数でも東京の約3倍伸びる"],
-    [pct(maxPen), "判定できる院の到達率は最大でもこの水準。全院が地域の到達目安の半分未満で、市場の上限に当たっている院はない"],
+    [pct(maxPen), "判定できる院の到達率は最大でもこの水準。全院が地域の到達目安の半分未満"],
     [`${tight.length}院`, "医師1人あたり250人を超える院。次の伸びを止めるのは市場より医師の可能性が高い"],
   ];
   const cw = (W - 2 * MX - 3 * 0.3) / 4;
   items.forEach(([big, label], i) => {
     const x = MX + i * (cw + 0.3);
     card(s, x, 1.55, cw, 3.3, `要旨カード${i + 1}`);
-    txt(s, big, { x: x + 0.3, y: 1.85, w: cw - 0.6, h: 1.0, fontSize: 40, bold: true, color: i === 3 ? C.accent2 : C.accent1, fontFace: "Yu Gothic" });
-    txt(s, label, { x: x + 0.3, y: 3.0, w: cw - 0.6, h: 1.7, fontSize: 15 });
+    txt(s, big, { x: x + 0.3, y: 1.85, w: cw - 0.6, h: 1.0, fontSize: 40, bold: true, color: i >= 2 ? C.accent2 : C.accent1, fontFace: "Yu Gothic" });
+    txt(s, label, { x: x + 0.3, y: 3.0, w: cw - 0.6, h: 1.75, fontSize: 14 });
   });
   txt(s, "ご提案", { x: MX, y: 5.2, w: 2, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   s.addText(bullets([
+    `停滞院は「医師増員」（${stalled.filter((c) => c.verdict.includes("医師")).map((c) => c.name).join("・")}）と「担当エリアの整理」（${stalled.filter((c) => !c.verdict.includes("医師")).map((c) => c.name).join("・")}）で打ち手を分ける`,
     "院の評価は「年数・地域補正後の実力」で行い、本当に支援が要る院に絞る",
-    "次の出店は埼玉東部・千葉北西部（未充足度2倍超・競合が薄い・既存院と重ならない）を軸に検討する",
-    "院別の月次患者数をいただければ、各院の「上限」を成長曲線から確定できる",
+    "次の出店は埼玉東部・千葉北西部を軸に。浦和は立ち上げが基準を下回っており、早期の支援が必要",
   ]), { x: MX, y: 5.6, w: W - 2 * MX, h: 1.3, fontSize: 15, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 
@@ -222,23 +239,23 @@ sectionSlide("2. 患者獲得の予測指数", "13種類の候補を、12院の�
   txt(s, "読み方", { x: x + 0.3, y: 1.75, w: 3.8, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   s.addText(bullets([
     "高齢者数・需要・競合の「量」は、多いほど居宅が少ない（都会度を測っているだけ）",
-    "未充足度を加えると誤差が±65%→±34%に半減",
+    `未充足度を加えると誤差が±${screenErr("月数のみ")}%→±${screenErr("月数＋未充足度")}%に縮小`,
     `さらに立ち上げ方針（開院時期）を加えると±${Math.round(D.model.loo_error_pct)}%、R²=${D.model.r2.toFixed(2)}`,
-    "施設重視期に開院した院は、同じ条件で居宅が約4割少ない",
+    `施設重視期に開院した院は、同じ条件で居宅が約${eraPct}%少ない`,
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.3, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 {
-  const s = content(`予測モデルの当てはまり：12院中11院が誤差±${Math.round(D.model.loo_error_pct)}%の帯に入る`);
+  const s = content(`予測モデルの当てはまり：${fitted.length}院中${inBand}院が誤差±${Math.round(D.model.loo_error_pct)}%の帯に入る`);
   const im = img(s, path.join(CONF, "figures/slide/fig_model_fit.png"), MX, 1.35, 7.4, 5.5, 1720, 1280, "モデル当てはまり図");
   const x = MX + im.w + 0.4;
   card(s, x, 1.5, W - MX - x, 5.25, "モデル説明");
   txt(s, "モデルの中身", { x: x + 0.3, y: 1.75, w: 3.8, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   s.addText(bullets([
-    "年数が2倍になると居宅は約1.7倍",
-    "未充足度2.0の地域は1.0の地域の約2.9倍",
-    "施設重視期に開院した院は約44%少ない",
-    "斜線より大きく上の院（西日暮里・所沢）は、地域と年数の割に多く取れている",
-    "12院の横断データなので「強い傾向」として扱い、月次データで検証を続ける",
+    `年数が2倍になると居宅は約${Math.pow(2, coef.b_months).toFixed(1)}倍`,
+    `未充足度2.0の地域は1.0の地域の約${Math.pow(2, coef.c_underserved).toFixed(1)}倍`,
+    `施設重視期に開院した院は約${eraPct}%少ない`,
+    above.length ? `斜線より大きく上の院（${above.join("・")}）は、地域と年数の割に多く取れている` : "斜線から大きく外れる院はない",
+    "2024年6月〜2026年9月の各四半期の実績で推定し直しても、係数はほぼ同じ（安定）",
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 {
@@ -261,9 +278,9 @@ sectionSlide("2. 患者獲得の予測指数", "13種類の候補を、12院の�
 }
 
 // ---------------------------------------------------------------- 5. 既存院
-sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせるのか");
+sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせるのか（月次推移を含めた判定）");
 {
-  const s = content("院別の診断：判定できる院はすべて「伸長余地あり」、課題は院ごとに異なる");
+  const s = content(M ? `院別の診断（${ym(M.last_month)}）：${stalled.length}院が停滞。原因は医師キャパとグループ内重複` : "院別の診断：判定できる院はすべて「伸長余地あり」、課題は院ごとに異なる");
   const head = ["院", "在宅\n月数", "居宅", "施設", "居宅比", "医師1人\nあたり", "実力", "到達率", "判定"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 }, align: "center" } }));
   const body = clinics.map((c) => {
     const warnFte = c.per_fte >= 250;
@@ -289,7 +306,7 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
   txt(s, "実力＝実績÷モデル期待値（1.15以上を青、0.85以下を橙）／到達率＝実績÷到達目安／橙字＝居宅比30%未満・医師1人あたり250人以上。本院は到達目安の基準のため到達率なし。在宅月数は本院2014-04・所沢2021-06を仮置き", { x: MX, y: 6.35, w: W - 2 * MX, h: 0.6, fontSize: 11, color: C.accent5 });
 }
 {
-  const s = content("地域の到達目安から見ると、どの院もまだ半分未満：「上限」に当たっている院はない");
+  const s = content("地域の到達目安から見れば、停滞している院も含めてまだ半分未満：止まっているのは市場ではない");
   const im = img(s, path.join(CONF, "figures/slide/fig_saturation.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "到達目安図");
   const x = MX + im.w + 0.35;
   card(s, x, 1.5, W - MX - x, 5.25, "到達目安の説明");
@@ -363,8 +380,96 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 
+// ---------------------------------------------------------------- 月次推移
+if (M) {
+  sectionSlide("4. 月次推移で見えたこと", `${ym(M.first_month)}〜${ym(M.last_month)}の院別月次データ`);
+  {
+    const s = content(`グループ全体：居宅は${(M.home_last / M.home_first).toFixed(1)}倍に。施設は2025年春から横ばいで、伸びはすべて居宅`);
+    const im = img(s, path.join(CONF, "figures/slide/fig_m_group_trend.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "グループ推移図");
+    const x = MX + im.w + 0.35;
+    card(s, x, 1.5, W - MX - x, 5.25, "グループ推移の要点");
+    txt(s, "要点", { x: x + 0.25, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+    s.addText(bullets([
+      `総患者 ${fmt(M.total_first)}人 → ${fmt(M.total_last)}人`,
+      `居宅比 ${pct(M.mix_first)} → ${pct(M.mix_last)}`,
+      `直近12か月：居宅 +${fmt(M.home_last - M.home_12m_ago)}人、施設 ${M.fac_last - M.fac_12m_ago >= 0 ? "+" : ""}${fmt(M.fac_last - M.fac_12m_ago)}人`,
+      `施設のピークは${ym(M.fac_peak_month)}の${fmt(M.fac_peak)}人`,
+    ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  }
+  {
+    const s = content("院別の推移：伸び続ける院と、1年以上横ばいの院がはっきり分かれる");
+    img(s, path.join(CONF, "figures/slide/fig_m_clinics.png"), MX + 0.6, 1.2, W - 2 * MX - 1.2, 5.75, 2400, 1720, "院別推移図");
+  }
+  {
+    const s = content("停滞している院：到達目安の2〜4割で止まっており、原因は医師キャパかグループ内重複");
+    const head = ["院", "居宅", "12か月の\n増減", "直近6か月\n（人/月）", "医師1人\nあたり", "排他率", "到達率", "主因の候補と打ち手"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 }, align: "center" } }));
+    const body = stalled.map((c) => {
+      const m = M.clinics[c.name];
+      const cause = c.verdict.includes("医師") ? "医師キャパ → 医師増員が先" : "グループ内重複 → 担当エリアの整理・営業先の再配分";
+      return [
+        { text: c.name, options: { bold: true } },
+        { text: fmt(c.home), options: { align: "right" } },
+        { text: `${m.home_chg_12m >= 0 ? "+" : ""}${m.home_chg_12m}`, options: { align: "right" } },
+        { text: `${m.home_slope_6m >= 0 ? "+" : ""}${m.home_slope_6m}`, options: { align: "right" } },
+        { text: fmt(c.per_fte), options: { align: "right", color: c.per_fte >= 250 ? HEX.accent2 : HEX.dk1, bold: c.per_fte >= 250 } },
+        { text: pct(c.exclusive_ratio), options: { align: "right", color: c.exclusive_ratio < 0.5 ? HEX.accent2 : HEX.dk1, bold: c.exclusive_ratio < 0.5 } },
+        { text: pct(c.penetration), options: { align: "right" } },
+        { text: cause },
+      ];
+    });
+    s.addTable([head, ...body], {
+      x: MX, y: 1.45, w: W - 2 * MX, colW: [1.6, 0.9, 1.1, 1.2, 1.1, 0.95, 0.95, 4.33],
+      fontSize: 14, color: HEX.dk1, border: { type: "solid", pt: 0.5, color: "D9DEE5" }, rowH: 0.55, valign: "middle", margin: [0.03, 0.08, 0.03, 0.08], fontFace: "Yu Gothic",
+    });
+    txt(s, "判定: 直近6か月の居宅の傾きが統計的に0と区別できない、またはS字カーブで頭打ち。医師1人あたり250人以上なら医師キャパ、排他率50%未満ならグループ内重複を主因候補とした（橙字）", { x: MX, y: 5.1, w: W - 2 * MX, h: 0.6, fontSize: 12, color: C.accent5 });
+    txt(s, "地域の到達目安にはまだ大きく届いていないため、市場の上限ではなく、院の体制と担当範囲の問題と考えられる", { x: MX, y: 5.8, w: W - 2 * MX, h: 0.6, fontSize: 15, bold: true, color: C.text2 });
+  }
+  {
+    const s = content("データから見えた出来事：確認をお願いしたい点");
+    const tr = (M.transfers || [])[0];
+    const rows = [
+      ["2025年4月", tr ? `施設 ${tr["減少"]}（計${tr["減少合計"]}人）、同月に高円寺が施設117人で開院` : "—", "石神井公園・三鷹から高円寺への施設移管と推定。事実か"],
+      ["2025年8月", "調布・府中・三軒茶屋・石神井公園・三鷹で施設・居宅が同時に減少（−15〜−33人/院）", "集計方法の見直し（入院・休止者の除外など）か、実際の減少か"],
+      ["2025年4月〜2026年1月", `本院の施設 ${M.clinics["本院"].facility_from_peak}人（ピーク比）`, "施設の契約終了・移管の有無"],
+      ["2026年4月", "居宅にがん医総を含める集計に変更（市川を除く）", "当分析では全期間を「総数−施設」で揃えた。市川も同じ定義に揃えるか"],
+    ];
+    const head = ["時期", "データの動き", "確認したいこと"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 } } }));
+    s.addTable([head, ...rows.map((r) => r.map((t) => ({ text: t })))], {
+      x: MX, y: 1.5, w: W - 2 * MX, colW: [2.3, 5.4, 4.43], fontSize: 14, color: HEX.dk1,
+      border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.8, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
+    });
+    txt(s, "移管や集計変更は「院の実力」の評価を歪めるため、事実が分かれば補正して再計算します", { x: MX, y: 5.8, w: W - 2 * MX, h: 0.5, fontSize: 15, bold: true, color: C.text2 });
+  }
+  {
+    const s = content(`新しい院の立ち上げ：西日暮里・市川は基準どおり、浦和は未充足度${byId.urawa.underserved.toFixed(1)}の割に伸びが遅い`);
+    const im = img(s, path.join(CONF, "figures/slide/fig_m_launch.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "立ち上げ実績図");
+    const x = MX + im.w + 0.35;
+    card(s, x, 1.5, W - MX - x, 5.25, "立ち上げの要点");
+    txt(s, "要点と運用ルール案", { x: x + 0.25, y: 1.75, w: 3.5, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+    s.addText(bullets([
+      "津田沼は最初の1年で基準を大きく上回り、その後は基準どおり",
+      `浦和は${byId.urawa.months}か月で${byId.urawa.home}人。地域条件（未充足度${byId.urawa.underserved.toFixed(1)}）からの基準の約${Math.round(100 * byId.urawa.perf)}%`,
+      "3・6・12か月で基準の70%未満なら本部が立ち上げ支援に入る",
+    ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  }
+  {
+    const s = content("12か月後（2027年9月）の居宅の見通し：施策を変えなければ停滞院は横ばいのまま");
+    const im = img(s, path.join(CONF, "figures/slide/fig_m_forecast.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "見通し図");
+    const x = MX + im.w + 0.35;
+    const sumLow = Object.values(M.clinics).reduce((a, c) => a + c.fc_low, 0);
+    const sumHigh = Object.values(M.clinics).reduce((a, c) => a + c.fc_high, 0);
+    card(s, x, 1.5, W - MX - x, 5.25, "見通しの要点");
+    txt(s, "要点", { x: x + 0.25, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+    s.addText(bullets([
+      `グループの居宅は ${fmt(M.home_last)}人 → ${fmt(sumLow)}〜${fmt(sumHigh)}人`,
+      "伸びの大半は津田沼・西日暮里・高円寺・市川・浦和の新しい院",
+      `停滞${stalled.length}院が到達目安の半分まで伸びれば、さらに約${fmt(stalled.reduce((a, c) => a + Math.max(0, 0.5 * c.reach_target - c.home), 0))}人の上積み余地`,
+    ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  }
+}
+
 // ---------------------------------------------------------------- 6. 出店
-sectionSlide("4. 出店と立ち上げ", "どこに出すと伸びるか、出した後に順調かをどう判定するか");
+sectionSlide("5. 出店と立ち上げ", "どこに出すと伸びるか、出した後に順調かをどう判定するか");
 {
   const s = content("在宅医療の未充足度：埼玉・千葉は東京都並みに普及した場合の2倍超の需要が眠っている");
   img(s, path.join(CONF, "figures/slide/fig_map_underserved.png"), MX + 0.4, 1.25, W - 2 * MX - 0.8, 5.7, 2000, 1440, "未充足度マップ");
@@ -393,27 +498,14 @@ sectionSlide("4. 出店と立ち上げ", "どこに出すと伸びるか、出�
   const s = content("出店候補：上位は埼玉東部〜千葉北西部、既存院から16km以上離れ、10年で需要も大きく伸びる");
   img(s, path.join(CONF, "figures/slide/fig_map_site_score.png"), MX, 1.25, W - 2 * MX, 5.75, 2520, 1440, "立地スコアマップ");
 }
-{
-  const s = content("立ち上げ基準カーブ：新規院が「順調か」を開院直後から月数で判定する");
-  const im = img(s, path.join(CONF, "figures/slide/fig_growth_curves.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "立ち上げカーブ図");
-  const x = MX + im.w + 0.35;
-  card(s, x, 1.5, W - MX - x, 5.25, "立ち上げ管理ルール");
-  txt(s, "運用ルール案", { x: x + 0.25, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
-  s.addText(bullets([
-    "地域の未充足度に応じた基準線と毎月比べる",
-    "3・6・12か月で基準の70%未満なら本部が立ち上げ支援に入る",
-    `最初の対象：浦和（未充足度${byId.urawa.underserved.toFixed(1)}＝グループ最高）、市川`,
-  ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
-}
-
 // ---------------------------------------------------------------- 7. 活用提案
-sectionSlide("5. 活用のご提案", "データを意思決定の道具として定着させる");
+sectionSlide("6. 活用のご提案", "データを意思決定の道具として定着させる");
 {
   const s = content("このデータで、評価・出店・人員配置・立ち上げ管理を同じ物差しで判断できるようになります");
   const items = [
     ["院の公平な評価", "「実力」指数を四半期の評価会議の最初の資料に"],
     ["出店先の選定", "候補住所を入れれば3年後予測と食い合いを即比較"],
-    ["立ち上げ管理", "基準カーブで3・6・12か月に判定"],
+    ["立ち上げ管理", "月次データと基準カーブで3・6・12か月に判定（浦和から）"],
     ["医師配置・採用", "到達率×医師1人あたり患者数で優先順位"],
     ["多摩の役割分担", "最寄り院の地図で営業エリアを決める"],
     ["居宅への構成転換", "施設偏重院は新規居宅を月次目標に"],
@@ -435,8 +527,8 @@ pres.addSection({ title: "お願いと次のステップ" });
   const s = pres.addSlide({ masterName: "CLOSING", sectionTitle: "お願いと次のステップ" });
   s.addText("お願いしたいことと次のステップ", { placeholder: "title" });
   const asks = [
-    ["院別の月次患者数（開院〜現在）", "各院の「上限」を成長曲線から確定"],
-    ["紹介元別の新規患者数", "院ごとの弱い紹介経路を特定"],
+    ["施設移管・一斉減少の事実確認", "補正して各院の「実力」を再計算"],
+    ["紹介元別の新規・終了患者数", "停滞院の原因（紹介不足か終了増か）を特定"],
     ["出店候補物件の住所", "その場で3年後予測・食い合いを比較"],
     ["評価会議での「実力」指数の試行", "四半期ごとに更新（再計算は約40秒）"],
   ];

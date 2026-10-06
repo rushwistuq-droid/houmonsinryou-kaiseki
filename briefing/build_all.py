@@ -26,7 +26,12 @@ from briefing.wakasa_brief import charts  # noqa: E402
 from briefing.wakasa_brief.clinics_table import add_performance, build_environment, load_actuals  # noqa: E402
 from briefing.wakasa_brief.engine import Engine  # noqa: E402
 from briefing.wakasa_brief.model import benchmark_share, diagnose, fit_growth_model, screen_indices  # noqa: E402
-from briefing.wakasa_brief.monthly import analyze_monthly, load_monthly, ramp_table  # noqa: E402
+from briefing.wakasa_brief import monthly_analysis as ma  # noqa: E402
+from briefing.wakasa_brief.clinics_table import CONF_MONTHLY  # noqa: E402
+
+
+def ma_monthly_path():
+    return CONF_MONTHLY
 from briefing.wakasa_brief.sales_lists import write_sales_lists  # noqa: E402
 from briefing.wakasa_brief.site_score import SiteScorer, add_scores, top_sites  # noqa: E402
 
@@ -76,8 +81,18 @@ def main() -> None:
     CONF.mkdir(parents=True, exist_ok=True)
     df = add_performance(env, actuals)
     model = fit_growth_model(df)
-    diag = diagnose(df, model)
     bench_pen, bench_cd = benchmark_share(df)
+
+    # 月次推移（あれば）: 院別の伸び・頭打ち判定を診断の4つ目のレンズに使う
+    mdf = gtab = ctab = ramps = None
+    if ma_monthly_path().exists():
+        starts = {c.name: c.home_start for c in E.clinics}
+        mdf = ma.add_months_open(ma.load(ma_monthly_path()), starts)
+        gtab = ma.growth_table(mdf)
+        ctab = ma.curve_table(mdf)
+        gtab["home_curve_status"] = ctab[ctab.series == "居宅"].set_index("clinic").status
+        ramps = mdf.rename(columns={"home_patients": "home"})[["clinic", "months_open", "home"]]
+    diag = diagnose(df, model, gtab)
 
     model_info = {
         "formula": "log(居宅患者) = a + b·log(在宅開始後月数) + c·log(未充足度) + d·[施設重視期]",
@@ -111,15 +126,28 @@ def main() -> None:
     top[SITE_COLS].round(3).to_csv(PUB / "site_top30.csv", index=False, encoding="utf-8-sig")
     print(f"出店候補 上位30: {PUB / 'site_top30.csv'}")
 
-    # 月次（あれば）
-    monthly = load_monthly()
-    curves = ramps = None
-    if monthly is not None:
-        starts = {c.name: c.home_start for c in E.clinics}
-        curves = analyze_monthly(monthly, starts)
-        ramps = ramp_table(monthly, starts)
-        curves.to_csv(CONF / "monthly_curves.csv", index=False, encoding="utf-8-sig")
-        print(f"月次成長曲線: {CONF / 'monthly_curves.csv'}")
+    # 月次の詳細（機密）
+    monthly_sheets: dict[str, pd.DataFrame] = {}
+    if mdf is not None:
+        opening = {c.name: c.home_start for c in E.clinics}
+        spikes = ma.detect_spikes(mdf)
+        new_clinics = [c.name for c in E.clinics if c.home_start >= str(mdf.month.min())]
+        monthly_sheets = {
+            "月次_院別の伸び": gtab,
+            "月次_成長曲線": ctab,
+            "月次_急変": spikes,
+            "月次_移管候補": ma.transfer_candidates(spikes, opening),
+            "月次_立ち上げ": ma.ramp_points(mdf, new_clinics),
+            "月次_モデル安定性": ma.model_stability(
+                mdf, env, [str(p) for p in pd.period_range("2024-06", str(mdf.month.max()), freq="3M")]
+            ),
+            "月次_12か月見通し": ma.forecast_12m(mdf, model),
+            "月次_グループ合計": ma.group_totals(mdf),
+        }
+        for name, t in monthly_sheets.items():
+            t.to_csv(CONF / f"{name}.csv", encoding="utf-8-sig")
+        print(f"月次解析: {CONF}/月次_*.csv")
+        print(gtab[["home", "home_chg_12m", "home_slope_6m", "home_trend", "facility_trend", "home_curve_status"]].round(1).to_string())
     else:
         print("月次データ未投入（analysis/confidential/monthly_patients.csv）。成長曲線の判定は保留。")
 
@@ -130,8 +158,10 @@ def main() -> None:
         top[SITE_COLS].round(3).to_excel(xw, sheet_name="出店候補_上位30", index=False)
         pd.DataFrame([model_info]).T.to_excel(xw, sheet_name="予測モデル")
         screen.to_excel(xw, sheet_name="指数の比較", index=False)
-        if curves is not None:
-            curves.to_excel(xw, sheet_name="月次_成長曲線", index=False)
+        for name, t in monthly_sheets.items():
+            t.to_excel(xw, sheet_name=name[:31])
+        if mdf is not None:
+            mdf.assign(month=mdf.month.astype(str)).to_excel(xw, sheet_name="月次_データ（整形済み）", index=False)
     print(f"Excel: {CONF / 'wakasa_briefing_data.xlsx'}")
 
     # 図表
@@ -152,6 +182,17 @@ def main() -> None:
     charts.saturation_bars(diag, slide / "fig_saturation.png")
     charts.growth_curves(diag, model, slide / "fig_growth_curves.png", ramps=ramps)
     charts.SHOW_TITLES = True
+    if mdf is not None:
+        order = [c.name for c in E.clinics]
+        launch = [c for c in ("津田沼", "西日暮里", "高円寺", "市川", "浦和") if c in set(mdf.clinic)]
+        us = dict(zip(env["name"], env.underserved_ratio))
+        for flag, d in ((True, figs), (False, slide)):
+            charts.SHOW_TITLES = flag
+            charts.group_trend(monthly_sheets["月次_グループ合計"], d / "fig_m_group_trend.png")
+            charts.clinic_small_multiples(mdf, order, d / "fig_m_clinics.png")
+            charts.launch_curves(mdf, launch, us, model, d / "fig_m_launch.png")
+            charts.forecast_bars(monthly_sheets["月次_12か月見通し"], order, d / "fig_m_forecast.png")
+        charts.SHOW_TITLES = True
     print(f"図表: {PUB}/fig_*.png, {figs}/fig_*.png, {slide}/fig_*.png")
 
 

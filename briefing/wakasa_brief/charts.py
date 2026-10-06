@@ -226,3 +226,125 @@ def growth_curves(diag: pd.DataFrame, model, path: Path, ramps: pd.DataFrame | N
            "線＝居宅重視（転換期型）で立ち上げた場合のモデル予測。点＝転換期に開院した各院の現在値（括弧内＝その院の未充足度）")
     _source(fig, "施設重視で立ち上げた院は同じ条件で約4割少ない。月次データ投入後は各院の実際の軌跡（灰色の線）を重ねる")
     _save(fig, path)
+
+
+# ---------------------------------------------------------------- 月次推移（機密）
+CAT5 = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
+FACILITY_TINT = "#9ec5f4"
+EVENT_MONTHS = {"2025-04": "高円寺開院・施設移管", "2025-08": "複数院で一斉減少"}
+
+
+def _month_axis(ax, months):
+    idx = np.arange(len(months))
+    ticks = [i for i, m in enumerate(months) if m.endswith("-01") or m.endswith("-07")]
+    ax.set_xticks(ticks, [months[i].replace("-", "/") for i in ticks], fontsize=8.5, color=TEXT2)
+    return idx
+
+
+def group_trend(gt: pd.DataFrame, path: Path):
+    months = [str(m) for m in gt.index]
+    fig, ax = plt.subplots(figsize=(9.6, 6.2))
+    fig.subplots_adjust(left=0.09, right=0.9, top=_top(0.84), bottom=0.1)
+    _style(ax, grid_axis="y")
+    x = _month_axis(ax, months)
+    ax.stackplot(x, gt.facility_patients, gt.home_patients, colors=[FACILITY_TINT, S1], edgecolor=SURFACE, linewidth=0.5)
+    end = len(x) - 1
+    ax.annotate(f"居宅 {gt.home_patients.iloc[-1]:,}人", (end, gt.facility_patients.iloc[-1] + gt.home_patients.iloc[-1] / 2),
+                xytext=(8, 0), textcoords="offset points", va="center", fontsize=10, color=TEXT)
+    ax.annotate(f"施設 {gt.facility_patients.iloc[-1]:,}人", (end, gt.facility_patients.iloc[-1] / 2),
+                xytext=(8, 0), textcoords="offset points", va="center", fontsize=10, color=TEXT)
+    for i, ha in ((0, "left"), (end, "right")):
+        ax.annotate(f"居宅比 {gt.home_mix.iloc[i]:.0%}", (i, gt.total_patients.iloc[i]), xytext=(0, 8),
+                    textcoords="offset points", ha=ha, fontsize=9, color=TEXT2)
+    ax.set_xlim(-0.5, end + 0.5)
+    ax.set_ylabel("患者数（人、月末）", color=TEXT2, fontsize=9.5)
+    _title(fig, "グループ全体：施設は1年半横ばい、伸びはすべて居宅",
+           "全院合計の月末患者数。下＝施設、上＝居宅（がん医総を含む）")
+    _source(fig, "院内月次データ（機密）。2026年3月以前は居宅とがん医総が別集計のため合算して揃えた")
+    _save(fig, path)
+
+
+def clinic_small_multiples(df: pd.DataFrame, order: list[str], path: Path):
+    months = sorted({str(m) for m in df.month})
+    fig, axes = plt.subplots(4, 4, figsize=(12, 8.6), sharex=True)
+    fig.subplots_adjust(left=0.05, right=0.98, top=_top(0.86), bottom=0.06, hspace=0.45, wspace=0.28)
+    for ax, c in zip(axes.flat, order):
+        _style(ax, grid_axis="y")
+        g = df[df.clinic == c].set_index(df[df.clinic == c].month.astype(str)).reindex(months)
+        x = np.arange(len(months))
+        for m in EVENT_MONTHS:
+            if m in months:
+                ax.axvline(months.index(m), color=GRID, linewidth=1.2, zorder=0)
+        ax.plot(x, g.facility_patients, color=FACILITY_TINT, linewidth=2)
+        ax.plot(x, g.home_patients, color=S1, linewidth=2)
+        ax.set_title(c, fontsize=10.5, color=TEXT, loc="left")
+        ax.set_ylim(0, None)
+        ax.tick_params(labelsize=7.5)
+        ticks = [i for i, m in enumerate(months) if m.endswith("-01")]
+        ax.set_xticks(ticks, [months[i][2:4] + "年" for i in ticks])
+    for ax in list(axes.flat)[len(order):]:
+        ax.axis("off")
+    legend_ax = list(axes.flat)[len(order)]
+    legend_ax.plot([], [], color=S1, linewidth=2, label="居宅（がん医総含む）")
+    legend_ax.plot([], [], color=FACILITY_TINT, linewidth=2, label="施設")
+    legend_ax.plot([], [], color=GRID, linewidth=1.2, label="2025年4月・8月の変動")
+    leg = legend_ax.legend(loc="center left", frameon=False, fontsize=10)
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    _title(fig, "院別の月次推移（2023年12月〜2026年9月）", "各院で縦軸の目盛りが異なる。青＝居宅、薄青＝施設")
+    _source(fig, "縦線: 2025年4月（石神井公園・三鷹→高円寺への施設移管と推定）、2025年8月（多摩・区西部で一斉減少。要確認）")
+    _save(fig, path)
+
+
+def launch_curves(df: pd.DataFrame, clinics: list[str], underserved: dict[str, float], model, path: Path):
+    fig, ax = plt.subplots(figsize=(9.6, 6.2))
+    fig.subplots_adjust(left=0.09, right=0.86, top=_top(0.84), bottom=0.11)
+    _style(ax, grid_axis="y")
+    tmax = int(df[df.clinic.isin(clinics)].months_open.max()) + 1
+    t = np.arange(1, tmax + 1)
+    levels = sorted({round(min(underserved[c], model.underserved_range[1]), 1) for c in clinics})
+    for u in levels:
+        yv = model.predict(t, u, False)
+        ax.plot(t, yv, color=MUTED, linewidth=1, linestyle=(0, (4, 3)), zorder=1)
+        ax.annotate(f"基準{u:.1f}", (t[-1], yv[-1]), xytext=(4, 0), textcoords="offset points", va="center", fontsize=8, color=TEXT2)
+    for c, col in zip(clinics, CAT5):
+        g = df[(df.clinic == c) & (df.months_open >= 0)]
+        ax.plot(g.months_open, g.home_patients, color=col, linewidth=2.2, zorder=2)
+        ax.annotate(f"{c}（{underserved[c]:.1f}）", (g.months_open.iloc[-1], g.home_patients.iloc[-1]), xytext=(6, 0),
+                    textcoords="offset points", va="center", fontsize=9, color=TEXT)
+    ax.plot([], [], color=MUTED, linewidth=2.2, label="実績")
+    ax.plot([], [], color=MUTED, linewidth=1, linestyle=(0, (4, 3)), label="モデルの基準カーブ（数字＝未充足度、転換期型）")
+    leg = ax.legend(loc="upper left", frameon=False, fontsize=9)
+    for t_ in leg.get_texts():
+        t_.set_color(TEXT)
+    ax.set_xlabel("在宅開始からの月数", color=TEXT2, fontsize=9.5)
+    ax.set_ylabel("居宅患者数（人）", color=TEXT2, fontsize=9.5)
+    ax.set_xlim(0, tmax + 1)
+    ax.set_ylim(0, None)
+    _title(fig, "新しい院の立ち上げ：実績（実線）と基準カーブ（点線）", "括弧内＝その院の未充足度。自院の未充足度の点線を上回れば基準より順調（2.1以上は2.1で頭打ち）")
+    _source(fig, "院内月次データ（機密）")
+    _save(fig, path)
+
+
+def forecast_bars(fc: pd.DataFrame, order: list[str], path: Path):
+    d = fc.reindex(order)
+    fig, ax = plt.subplots(figsize=(9.6, 6.2))
+    fig.subplots_adjust(left=0.13, right=0.95, top=_top(0.8), bottom=0.1)
+    _style(ax, grid_axis="x")
+    y = np.arange(len(d))
+    ax.barh(y, d.high, height=0.6, color="#cde2fb", label="12か月後の見通し（幅）")
+    ax.barh(y, d.low, height=0.6, color="#9ec5f4")
+    ax.barh(y, d.home_now, height=0.25, color="#0d366b", label="現在（2026年9月）")
+    for yi, r in zip(y, d.itertuples()):
+        ax.annotate(f"{r.home_now}→{r.low:.0f}〜{r.high:.0f}人", (max(r.high, r.home_now), yi), xytext=(6, 0),
+                    textcoords="offset points", va="center", fontsize=9, color=TEXT)
+    ax.set_yticks(y, d.index, color=TEXT, fontsize=9.5)
+    ax.set_xlim(0, d.high.max() * 1.28)
+    ax.invert_yaxis()
+    ax.set_xlabel("居宅患者数（人）", color=TEXT2, fontsize=9.5)
+    leg = ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=2, frameon=False, fontsize=8.5)
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    _title(fig, "居宅患者の12か月後の見通し（2027年9月）", "低い方＝直近12か月の傾きの延長、高い方＝獲得予測モデルの成長カーブ（逆の場合もあり）")
+    _source(fig, "見通しは施策を変えない場合の延長。医師増員・営業エリアの見直しで上振れしうる")
+    _save(fig, path)

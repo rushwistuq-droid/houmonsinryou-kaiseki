@@ -1,13 +1,13 @@
 {
   "formula": "log(居宅患者) = a + b·log(在宅開始後月数) + c·log(未充足度) + d·[施設重視期]",
   "coef": {
-    "a": 2.2668,
-    "b_months": 0.7556,
-    "c_underserved": 1.5507,
-    "d_facility_era": -0.5753
+    "a": 2.2874,
+    "b_months": 0.7597,
+    "c_underserved": 1.518,
+    "d_facility_era": -0.6118
   },
-  "r2": 0.958,
-  "loo_error_pct": 20.6,
+  "r2": 0.928,
+  "loo_error_pct": 25.7,
   "n": 12,
   "underserved_range": [
     1.0,

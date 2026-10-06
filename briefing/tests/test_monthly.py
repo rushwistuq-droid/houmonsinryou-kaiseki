@@ -31,6 +31,12 @@ class TestCurveFit(unittest.TestCase):
         f = fit_curve(t, y, "X", "居宅")
         self.assertEqual(f.status, "上限接近")
 
+    def test_slowed_but_growing_is_not_saturated(self):
+        # 前半は月6人、後半は月3.5人。減速しているが月3%以上伸びている → 上限とは言わない
+        y = np.concatenate([np.arange(0, 60, 6.0), 60 + np.arange(1, 9) * 3.5])
+        f = fit_curve(np.arange(len(y)), y, "X", "居宅")
+        self.assertNotEqual(f.status, "上限接近")
+
     def test_short_series(self):
         f = fit_curve(np.arange(5), np.arange(5) + 1, "X", "居宅")
         self.assertEqual(f.status, "データ不足")

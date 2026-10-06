@@ -105,9 +105,17 @@ def reach_target(exclusive_latent_home, competition_density, bench_pen, bench_cd
     return share * np.asarray(exclusive_latent_home, dtype=float), share
 
 
-def diagnose(df: pd.DataFrame, model: GrowthModel) -> pd.DataFrame:
-    """既存院の飽和度診断。df は機密の実績列を含む院別指数表。"""
+def diagnose(df: pd.DataFrame, model: GrowthModel, monthly: pd.DataFrame | None = None) -> pd.DataFrame:
+    """既存院の飽和度診断。df は機密の実績列を含む院別指数表。
+
+    monthly を渡すと（院名で引ける: home_curve_status, home_slope_6m, home_trend, facility_trend）、
+    月次推移の「頭打ち」を4つ目のレンズとして判定に加える。
+    """
     out = df.copy()
+    if monthly is not None:
+        mm = monthly.reindex(out["name"].values)
+        for col in ("home_curve_status", "home_slope_6m", "home_trend", "facility_trend", "facility_from_peak"):
+            out[col] = mm[col].values if col in mm else np.nan
     out["expected_home"] = model.predict(out.months_open, out.underserved_ratio, out.era == "施設重視期")
     out["performance_index"] = out.home / out.expected_home
     out["performance_index_loo"] = pd.Series(model.residuals)
@@ -143,12 +151,28 @@ def _verdict(cid: str, r: pd.Series) -> tuple[str, str]:
     if r.months_open < RAMP_MONTHS:
         return "立ち上げ期（判定保留）", " / ".join(notes + ["開院12か月未満。立ち上げ基準で追跡"])
     if cid == BENCHMARK_ID:
+        if r.get("home_trend") == "増加":
+            return "ベンチマーク院（月次で増加中＝上限未到達）", " / ".join(
+                notes + ["到達目安の基準そのもの。月次では居宅が増え続けており、上限にはまだ達していない"]
+            )
         return "ベンチマーク院（月次推移で判定）", " / ".join(
             notes + ["到達目安の基準そのもの。上限判定は月次推移の伸び鈍化で行う"]
         )
     p, perf = r.penetration_of_target, r.performance_index
     # モデル誤差が±21%のため、±15%を超える差のみ「上回る／下回る」とする
     pace = "期待を上回る" if perf >= 1.15 else ("期待を下回る" if perf <= 0.85 else "期待並み")
+    stalled = r.get("home_curve_status") == "上限接近" or r.get("home_trend") in ("横ばい", "減少")
+    if stalled:
+        # 月次で居宅が頭打ち。地域の到達目安に届いていないなら、原因は市場以外
+        if r.patients_per_fte >= CAPACITY_TIGHT_PER_FTE:
+            cause = "医師キャパ"
+        elif r.exclusive_ratio < 0.5:
+            cause = "グループ内重複・営業エリア"
+        else:
+            cause = "営業・紹介経路"
+        trend = "減少" if r.get("home_trend") == "減少" else "横ばい"
+        notes.append(f"居宅が直近6か月{trend}（到達目安の{p:.0%}で停滞）→ 主因の候補: {cause}")
+        return f"停滞・{cause}（{pace}）", " / ".join(notes)
     if p >= 0.8:
         v = "上限接近"
         notes.append("周辺エリアの深掘りより、隣接エリア出店・構成転換・医師増員を検討")

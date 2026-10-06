@@ -13,6 +13,9 @@ M = D["model"]
 clinics = D["clinics"]
 judged = [c for c in clinics if c["months"] >= 12 and c["id"] != "honin"]
 tight = [c for c in clinics if c["per_fte"] >= 250]
+MM = D.get("monthly") or {}
+ym = lambda m: f"{m[:4]}年{int(m[5:])}月"  # noqa: E731
+stalled = [c for c in clinics if c["verdict"].startswith("停滞")]
 below = [c["name"] for c in clinics if c["months"] >= 6 and c["perf"] <= 0.85]
 below_text = f"期待を下回るのは{'・'.join(below)}のみで、他は期待並み以上" if below else "期待を下回る院はない"
 
@@ -37,7 +40,7 @@ sites = "".join(
 
 page = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
 @page {{ size: A4; margin: 14mm 14mm 12mm; }}
-body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:9.6pt; line-height:1.5; }}
+body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:9.3pt; line-height:1.45; }}
 h1 {{ font-size:15pt; color:#0f2d4a; margin:0 0 2mm; }}
 h2 {{ font-size:11pt; color:#0f2d4a; margin:5mm 0 1.5mm; }}
 .meta {{ color:#6b6a66; font-size:8.5pt; margin-bottom:3mm; }}
@@ -56,22 +59,23 @@ td.v {{ text-align:left; white-space:normal; }}
 .pb {{ page-break-before:always; }}
 </style></head><body>
 <h1>訪問診療データ分析 要旨（理事長面談用・機密）</h1>
-<div class="meta">2026年10月／実績は2026年7月時点／半径8km圏・公的統計ベース</div>
+<div class="meta">2026年10月／実績は{ym(MM["last_month"]) if MM else "2026年7月"}末時点（月次は{ym(MM["first_month"]) if MM else "—"}〜）／半径8km圏・公的統計ベース</div>
 <div class="kpis">
+<div class="kpi"><b>{MM["home_last"] / MM["home_first"]:.1f}倍</b>グループの居宅（{MM["home_first"]:,}→{MM["home_last"]:,}人）。施設は2025年春から横ばい</div>
 <div class="kpi"><b>{M['r2']:.0%}</b>居宅患者数の院間差を「年数・未充足度・立ち上げ方針」で説明（誤差±{M['loo_error_pct']:.0f}%）</div>
-<div class="kpi"><b>約3倍</b>埼玉・千葉は同じ年数で東京の約3倍伸びる（未充足度2倍）</div>
-<div class="kpi"><b>{max(c['penetration'] for c in judged):.0%}</b>判定可能院の到達率の最大値。上限に当たる院はない</div>
-<div class="kpi o"><b>{len(tight)}院</b>医師1人あたり250人超。次の制約は医師</div>
+<div class="kpi o"><b>{len(stalled)}院</b>居宅が直近6か月伸びていない（到達目安の2〜4割で停滞）</div>
+<div class="kpi o"><b>{len(tight)}院</b>医師1人あたり250人超。停滞の主因候補</div>
 </div>
 <h2>結論と提案</h2>
 <ul>
+<li><b>停滞院</b>: {html.escape('・'.join(c['name'] for c in stalled if '医師' in c['verdict']))}は医師キャパ（医師増員が先）、{html.escape('・'.join(c['name'] for c in stalled if '医師' not in c['verdict']))}はグループ内重複（担当エリアの整理）。地域の到達目安には遠く、市場の上限ではない</li>
+<li><b>浦和</b>: {[c for c in clinics if c['id']=='urawa'][0]['months']}か月で居宅{[c for c in clinics if c['id']=='urawa'][0]['home']}人。地域条件からの基準の約{[c for c in clinics if c['id']=='urawa'][0]['perf']:.0%}で、立ち上げ支援が必要</li>
+<li><b>確認事項</b>: 2025年4月の石神井公園・三鷹→高円寺の施設移管（推定）、2025年8月の多摩・区西部での一斉減少、2026年4月の居宅集計定義の変更</li>
 <li><b>院の評価</b>は「年数・地域補正後の実力」（実績÷モデル期待値）で。都心と郊外を同じ物差しで比べられる。{below_text}</li>
 <li><b>医師配置</b>: {html.escape('・'.join(c['name'] for c in tight))}は伸びしろがあっても医師が先に詰まる。到達率の低い院から増員を優先</li>
-<li><b>役割分担</b>: 三鷹・ひばりが丘・高円寺・石神井公園は圏内の半分以上で別のわかさ院が近い。営業エリアの分担を決める（院別のCM・訪看営業先リストを作成済み）</li>
 <li><b>CM営業の深さ</b>: 自院担当エリアのCM1か所あたり居宅で比べると、ひばりが丘は府中・調布と同水準。「CM営業が弱い」という従来の評価は、グループ内重複による見かけ上の差</li>
 <li><b>10年後</b>: 85歳以上は2035年までに各院の圏域で2〜6割増。埼玉・千葉の院（平均+48%）は都内の院（+29%）より速い</li>
 <li><b>出店</b>: 埼玉東部・千葉北西部が上位（未充足度2倍超・競合が薄い・既存院と16km以上離れる）。新規院は居宅重視で立ち上げる（施設重視型は約4割少ない）</li>
-<li><b>立ち上げ管理</b>: 地域別の基準カーブで3・6・12か月に判定。浦和・市川から適用</li>
 </ul>
 <h2>院別の診断</h2>
 <table><thead><tr><th>院</th><th>在宅月数</th><th>居宅</th><th>施設</th><th>居宅比</th><th>医師1人あたり</th><th>実力</th><th>到達率</th><th>判定</th></tr></thead>
@@ -94,7 +98,8 @@ td.v {{ text-align:left; white-space:normal; }}
 </ul>
 <h2>お願いしたいこと</h2>
 <ul>
-<li>院別の月次患者数（開院〜現在）→ 各院の上限を成長曲線で確定</li>
+<li>2025年4月の施設移管・2025年8月の一斉減少の事実確認 → 補正して「実力」を再計算</li>
+<li>院別の医師FTEの最新値 → 医師1人あたり患者数・キャパ判定を更新</li>
 <li>紹介元別の新規患者数 → 弱い紹介経路の特定</li>
 <li>出店候補物件の住所 → 3年後予測・食い合いをその場で比較</li>
 <li>評価会議での「実力」指数の試行</li>

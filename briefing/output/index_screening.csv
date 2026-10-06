@@ -1,18 +1,18 @@
 ﻿モデル,R2,予測誤差(LOO),追加指数の係数
-月数のみ,0.49,0.65,
-月数＋高齢者数(75歳以上),0.82,0.48,elderly_75=-1.19
-月数＋顕在居宅需要,0.86,0.41,market_home=-0.69
-月数＋潜在居宅需要,0.82,0.49,latent_home=-1.03
-月数＋実効競合ユニット,0.78,0.54,competitor_units=-0.55
-月数＋競合密度,0.72,0.6,competition_density=-0.97
-月数＋競合あたり居宅需要,0.49,0.68,market_per_competitor=-0.14
-月数＋入居系施設の入居者数,0.85,0.42,facility_residents=-1.06
-月数＋排他率(グループ重複の少なさ),0.81,0.41,exclusive_ratio=+0.86
-月数＋CM事業所密度,0.55,0.65,cm_per_10k75=-2.64
-月数＋訪問看護密度,0.59,0.7,nursing_per_10k75=-1.85
-月数＋未充足度,0.85,0.34,underserved_ratio=+1.70
-月数＋未充足度＋競合密度,0.85,0.39,"underserved_ratio=+1.85, competition_density=+0.12"
-月数＋未充足度＋排他率,0.92,0.3,"underserved_ratio=+1.17, exclusive_ratio=+0.49"
-月数＋未充足度＋開院時期【採用】,0.96,0.21,"underserved_ratio=+1.55, facility_era=-0.58"
-月数＋未充足度＋開院時期＋CM事業所密度,0.96,0.23,"underserved_ratio=+1.51, facility_era=-0.56, cm_per_10k75=-0.61"
-月数＋未充足度＋開院時期＋訪問看護密度,0.96,0.23,"underserved_ratio=+1.53, facility_era=-0.58, nursing_per_10k75=-0.05"
+月数のみ,0.41,0.69,
+月数＋高齢者数(75歳以上),0.76,0.54,elderly_75=-1.18
+月数＋顕在居宅需要,0.8,0.47,market_home=-0.69
+月数＋潜在居宅需要,0.76,0.55,latent_home=-1.03
+月数＋実効競合ユニット,0.71,0.61,competitor_units=-0.54
+月数＋競合密度,0.65,0.67,competition_density=-0.95
+月数＋競合あたり居宅需要,0.42,0.73,market_per_competitor=-0.25
+月数＋入居系施設の入居者数,0.79,0.48,facility_residents=-1.06
+月数＋排他率(グループ重複の少なさ),0.77,0.44,exclusive_ratio=+0.88
+月数＋CM事業所密度,0.47,0.7,cm_per_10k75=-2.49
+月数＋訪問看護密度,0.5,0.77,nursing_per_10k75=-1.67
+月数＋未充足度,0.8,0.4,underserved_ratio=+1.69
+月数＋未充足度＋競合密度,0.8,0.45,"underserved_ratio=+1.91, competition_density=+0.19"
+月数＋未充足度＋排他率,0.88,0.36,"underserved_ratio=+1.11, exclusive_ratio=+0.53"
+月数＋未充足度＋開院時期【採用】,0.93,0.26,"underserved_ratio=+1.52, facility_era=-0.61"
+月数＋未充足度＋開院時期＋CM事業所密度,0.93,0.29,"underserved_ratio=+1.50, facility_era=-0.60, cm_per_10k75=-0.38"
+月数＋未充足度＋開院時期＋訪問看護密度,0.93,0.29,"underserved_ratio=+1.63, facility_era=-0.58, nursing_per_10k75=+0.30"

@@ -10,9 +10,18 @@ import yaml
 
 from .engine import ROOT, Engine
 
-AS_OF = "2026-07"
+def _latest_month() -> str:
+    """月次データがあればその最新月、無ければ単月実績の時点。"""
+    path = ROOT / "analysis/confidential/monthly_patients.csv"
+    if path.exists():
+        return str(pd.read_csv(path, usecols=["month"]).month.max())
+    return "2026-07"
+
+
+AS_OF = _latest_month()
 CONF_ACTUALS = ROOT / "home_visit_demand/data/confidential/actuals_2026-07.yaml"
 CONF_OPS = ROOT / "analysis/confidential/operational_data.yaml"
+CONF_MONTHLY = ROOT / "analysis/confidential/monthly_patients.csv"
 NAME_ALIAS = {"リーフシティ市川": "市川", "浦和針ヶ谷": "浦和"}
 
 
@@ -22,13 +31,27 @@ def months_between(start: str, end: str = AS_OF) -> int:
     return (y1 - y0) * 12 + (m1 - m0)
 
 
-def load_actuals() -> pd.DataFrame | None:
-    """機密実績（居宅・施設・医師FTE）。無ければ None。"""
+def load_actuals(prefer_monthly: bool = True) -> pd.DataFrame | None:
+    """機密実績（居宅・施設・医師FTE）。無ければ None。
+
+    月次データ（analysis/confidential/monthly_patients.csv）があれば、その最新月を使う。
+    居宅はがん医総を含む（総数−施設）。
+    """
     if not CONF_ACTUALS.exists():
         return None
     a = yaml.safe_load(CONF_ACTUALS.read_text(encoding="utf-8"))
     rows = {c["id"]: {"home": c["actual_home_patients"], "facility": c["actual_facility_patients"]} for c in a["clinics"]}
     df = pd.DataFrame.from_dict(rows, orient="index")
+    df["as_of"] = a.get("meta", {}).get("as_of", AS_OF)
+    if prefer_monthly and CONF_MONTHLY.exists():
+        m = pd.read_csv(CONF_MONTHLY)
+        latest = m.sort_values("month").groupby("clinic").tail(1).set_index("clinic")
+        name_to_id = {NAME_ALIAS.get(c["name"], c["name"]): c["id"] for c in a["clinics"]}
+        for name, r in latest.iterrows():
+            cid = name_to_id.get(NAME_ALIAS.get(name, name))
+            if cid in df.index:
+                df.loc[cid, ["home", "facility", "as_of"]] = [int(r.home_patients), int(r.facility_patients), r.month]
+        df[["home", "facility"]] = df[["home", "facility"]].astype(int)
     if CONF_OPS.exists():
         ops = yaml.safe_load(CONF_OPS.read_text(encoding="utf-8"))
         fte = {NAME_ALIAS.get(k, k): v for k, v in ops.get("physicians_fte", {}).items()}

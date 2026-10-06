@@ -23,6 +23,7 @@ from .engine import ROOT
 MONTHLY_PATH = ROOT / "analysis/confidential/monthly_patients.csv"
 MIN_POINTS = 12
 K_UNSTABLE_MULTIPLE = 3.0  # 推定上限が現在値の3倍超なら「上限未見」
+PLATEAU_RATE = 0.005  # 直近6か月の純増が月0.5%未満なら「頭打ち」
 SLOWDOWN_EVIDENCE = 0.7  # 直近6か月の純増が前6か月の7割未満になって初めて「鈍化」とみなす
 
 
@@ -80,7 +81,7 @@ def fit_curve(t: np.ndarray, y: np.ndarray, clinic: str, series: str) -> CurveFi
     # 直線的な伸びにもS字は当てはまってしまうため、実データで減速が見えない限り上限とは言わない
     if K > cur * K_UNSTABLE_MULTIPLE or t[-1] < t0 or not decel:
         status = "上限未見（成長継続中）"
-    elif cur >= 0.9 * K:
+    elif g6 < PLATEAU_RATE * cur and cur >= 0.9 * K:
         status = "上限接近"
     else:
         status = "伸び鈍化局面"
