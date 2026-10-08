@@ -19,6 +19,12 @@ stalled = [c for c in clinics if c["verdict"].startswith("停滞")]
 full = [c for c in stalled if c["penetration"] >= 0.8]
 room = [c for c in stalled if c["penetration"] < 0.8]
 P = D["peer"]
+F = D.get("flow") or {}
+FC = F.get("clinics", {})
+cause_of = lambda c: FC.get(c["name"], {}).get("stall_cause") or ""  # noqa: E731
+bA = [c for c in stalled if cause_of(c).startswith("A")]
+bB = [c for c in stalled if cause_of(c).startswith("B")]
+jn = lambda arr: html.escape("・".join(c["name"] for c in arr))  # noqa: E731
 below = [c["name"] for c in clinics if c["months"] >= 6 and c["perf"] <= 0.85]
 below_text = f"期待を下回るのは{'・'.join(below)}のみで、他は期待並み以上" if below else "期待を下回る院はない"
 
@@ -41,9 +47,27 @@ sites = "".join(
     for i, s in enumerate(D["top_sites"])
 )
 
+if F:
+    FLOW_ITEMS = (
+        f"<li><b>新規と終了</b>: 居宅は毎月患者の約{100 * F['group_end_rate_home']:.1f}%が終了（平均在籍約{1 / F['group_end_rate_home']:.0f}か月）。"
+        f"患者数は「月間新規÷終了率」に落ち着くため、グループの居宅新規 月{F['group_new_home_m']:.0f}人（2024年夏から横ばい）のままなら"
+        f"居宅は約{round(F['group_eq_home'], -2):,.0f}人で頭打ち（現在{MM['home_last']:,}人）。2024年までに開院した9院の居宅新規は"
+        f"月{F['new_home_by_year']['2024']['既存院']:.0f}→{F['new_home_by_year']['2026']['既存院']:.0f}人に減り、新しい院が補っている</li>"
+        f"<li><b>停滞院の原因（新規・終了で確認）</b>: 停滞{len(stalled)}院はいずれも均衡に到達済みで、終了率は他院並み（終了の多さは原因ではない）。"
+        f"{jn(bA)}は新規が担当エリアの大きさに見合う＝<b>エリアを取り切った</b> → 担当エリアの再設定・隣接地域の開拓。"
+        f"{jn(bB)}は<b>新規が少ない</b>（エリアの大きさ比で上位院の{'・'.join(format(FC[c['name']]['inflow_vs_ref'], '.0%') for c in bB)}）"
+        f" → 紹介経路の立て直し（到達目安に必要な新規は月{'・'.join(format(FC[c['name']]['new_home_needed'], '.0f') for c in bB)}人）</li>"
+    )
+    KPI4 = (f'<div class="kpi o"><b>月{F["group_new_home_m"]:.0f}人</b>グループの居宅新規。2024年夏から横ばいで、'
+            f'このままなら居宅は約{round(F["group_eq_home"], -2):,.0f}人で頭打ち</div>')
+else:
+    FLOW_ITEMS = (f"<li><b>停滞院の2タイプ</b>: {jn(full)}は担当エリアを取り込み済み → エリアの再設定。"
+                  f"{jn(room)}はエリア内に余地 → 紹介経路の強化</li>")
+    KPI4 = f'<div class="kpi o"><b>{len(full)}院</b>うち担当エリアを同条件の上位院並みに取り込み済み（{jn(full)}）</div>'
+
 page = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
 @page {{ size: A4; margin: 14mm 14mm 12mm; }}
-body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:9.3pt; line-height:1.45; }}
+body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:8.9pt; line-height:1.4; }}
 h1 {{ font-size:15pt; color:#0f2d4a; margin:0 0 2mm; }}
 h2 {{ font-size:11pt; color:#0f2d4a; margin:5mm 0 1.5mm; }}
 .meta {{ color:#6b6a66; font-size:8.5pt; margin-bottom:3mm; }}
@@ -67,17 +91,16 @@ td.v {{ text-align:left; white-space:normal; }}
 <div class="kpi"><b>{MM["home_last"] / MM["home_first"]:.1f}倍</b>グループの居宅（{MM["home_first"]:,}→{MM["home_last"]:,}人）。施設は2025年春から横ばい</div>
 <div class="kpi"><b>{M['r2']:.0%}</b>居宅患者数の院間差を「年数・未充足度・立ち上げ方針」で説明（誤差±{M['loo_error_pct']:.0f}%）</div>
 <div class="kpi o"><b>{len(stalled)}院</b>居宅が直近6か月伸びていない（{html.escape('・'.join(c['name'] for c in stalled))}）</div>
-<div class="kpi o"><b>{len(full)}院</b>うち担当エリアを同条件の上位院並みに取り込み済み（{html.escape('・'.join(c['name'] for c in full))}）</div>
+{KPI4}
 </div>
 <h2>結論と提案</h2>
 <ul>
-<li><b>停滞院の2タイプ</b>: {html.escape('・'.join(c['name'] for c in full))}は自院の担当エリアを同条件の上位院並みに取り込み済みで、エリアが狭い（他院と重複）のが制約 → 担当エリアの再設定・隣接地域の開拓。{html.escape('・'.join(c['name'] for c in room))}はエリア内に余地 → 紹介経路の強化（三軒茶屋は競合過密）</li>
+{FLOW_ITEMS}
 <li><b>背景</b>: 診療報酬改定ごとに施設を抑える方針。施設型で立ち上げた院ほど居宅の獲得の仕組みが育っておらず（同条件で居宅が約{round((1-__import__('math').exp(M['coef']['d_facility_era']))*100)}%少ない）、施設の伸びが止まると全体も止まる</li>
 <li><b>比較の基準</b>: 本院は先行者のため除外し、同じ地域タイプの上位院（都市型: {html.escape('・'.join(P['都市型']['members']))}、未充足型: {html.escape('・'.join(P['未充足型']['members']))}）と比べた。医師数は患者に合わせて増やす運用のため、原因ではなく増員時期の目安として扱う</li>
 <li><b>浦和</b>: {[c for c in clinics if c['id']=='urawa'][0]['months']}か月で居宅{[c for c in clinics if c['id']=='urawa'][0]['home']}人。地域条件からの基準の約{[c for c in clinics if c['id']=='urawa'][0]['perf']:.0%}で、立ち上げ支援が必要</li>
 <li><b>データ補正（確認済み）</b>: 2025年4月の石神井公園・三鷹→高円寺の施設移管、2025年8月の報告値の修正を除いた実態ベースで評価。居宅は全院・全期間でがん医総を含めて統一（市川も）。本院の施設減は補正せず</li>
 <li><b>院の評価</b>は「年数・地域補正後の実力」（実績÷モデル期待値）で。都心と郊外を同じ物差しで比べられる。{below_text}</li>
-<li><b>CM営業の深さ</b>: 自院担当エリアのCM1か所あたり居宅で比べると、ひばりが丘は府中・調布と同水準。「CM営業が弱い」という従来の評価は、グループ内重複による見かけ上の差</li>
 <li><b>10年後</b>: 85歳以上は2035年までに各院の圏域で2〜6割増。埼玉・千葉の院（平均+48%）は都内の院（+29%）より速い</li>
 <li><b>出店</b>: 埼玉東部・千葉北西部が上位（未充足度2倍超・競合が薄い・既存院と16km以上離れる）。新規院は居宅重視で立ち上げる（施設重視型は約4割少ない）</li>
 </ul>
@@ -102,7 +125,7 @@ td.v {{ text-align:left; white-space:normal; }}
 </ul>
 <h2>お願いしたいこと</h2>
 <ul>
-<li>新規・終了・紹介元の月次記録を開始（院ごと1行／月）→ 停滞院の原因を3か月で特定</li>
+<li>紹介元別の新規と終了理由の内訳の記録（新規不足の院から）→ 弱い紹介経路を特定</li>
 <li>院別の医師FTEの最新値 → 医師1人あたり患者数・キャパ判定を更新</li>
 <li>出店候補物件の住所 → 3年後予測・食い合いをその場で比較</li>
 <li>評価会議での「実力」指数の試行</li>

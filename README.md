@@ -15,12 +15,13 @@
 
 ```bash
 pip install pandas numpy scipy openpyxl pyyaml matplotlib
+python3 briefing/scripts/import_monthly_upload.py <院から届いたExcel>   # 月次の患者数・新規・終了を取り込む（機密）
 python3 briefing/build_all.py                 # 全指数・図表・Excel（約40秒）
 python3 briefing/site_check.py --lat 35.89 --lon 139.79 --name 候補地   # 出店候補地の評価
 python3 -m unittest discover -s briefing/tests
 ```
 
-機密データ（院別の患者数・医師数・月次推移）は `analysis/confidential/` と `home_visit_demand/data/confidential/` に置き、**コミットしない**（`.gitignore` 済み）。復元方法は `analysis/引き継ぎ資料.md` §4。月次データのテンプレートは `briefing/templates/monthly_patients.example.csv`。
+機密データ（院別の患者数・医師数・月次推移）は `analysis/confidential/` と `home_visit_demand/data/confidential/` に置き、**コミットしない**（`.gitignore` 済み）。復元方法は `analysis/引き継ぎ資料.md` §4。月次データの取り込み方は `briefing/templates/README_monthly_flow.md`。
 
 ## ディレクトリ
 

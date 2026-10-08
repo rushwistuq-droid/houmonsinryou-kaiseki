@@ -118,6 +118,7 @@ const inBand = fitted.filter((c) => c.perf <= 1 + loo && c.perf >= 1 / (1 + loo)
 const above = fitted.filter((c) => c.perf >= 1.15).map((c) => c.name);
 const screenErr = (label) => Math.round(100 * D.screen.find((r) => r["モデル"].startsWith(label))["予測誤差(LOO)"]);
 const M = D.monthly || null;
+const F = D.flow && D.flow.clinics ? D.flow : null;
 const stalled = clinics.filter((c) => c.verdict.startsWith("停滞"));
 const stalledFull = stalled.filter((c) => c.penetration >= 0.8);  // 自院エリアは上位院並みに取り込み済み
 const stalledRoom = stalled.filter((c) => c.penetration < 0.8);   // エリア内に余地あり
@@ -172,8 +173,8 @@ sectionSlide("1. 現在保有しているデータ", "公的統計11種＋院内
   const cols = [
     ["需要（どれだけ患者が生まれるか）", C.accent1, ["国勢調査 250mメッシュ人口（2020）", "社人研 将来推計人口（〜2050）", "NDB 在宅医療の受療率（年齢・県別）", "NDB 居宅/施設の比率", "総務省 人口推計"]],
     ["競合・連携先（誰と取り合い、誰と組むか）", C.accent1, ["厚生局 在支診・在支病名簿（2026-08）全件の位置", "医療施設調査（2023）", "介護施設 7,790か所・定員40万人", "CM事業所 10,601か所", "訪問看護 5,208か所"]],
-    ["院内（機密）", C.accent2, ["院別 月次患者数（2023-12〜2026-09、居宅・施設・がん医総）", "院別 医師FTE（2026-07）", "開院日・立ち上げ時期", "補正イベント（移管・報告値修正、確認済み）"]],
-    ["まだ無いデータ（院内）", C.accent5, ["新規・終了患者数（記録様式を用意）", "紹介元別の新規患者数（同上）", "施設の契約リスト"]],
+    ["院内（機密）", C.accent2, ["院別 月次患者数（2023-12〜2026-09、居宅・施設・がん医総）", "院別 月次の新規・終了（2024-01〜2026-09）", "院別 医師FTE（2026-07）", "開院日・立ち上げ時期", "補正イベント（移管・報告値修正、確認済み）"]],
+    ["まだ無いデータ（院内）", C.accent5, ["紹介元別の新規患者数（記録様式を用意）", "終了の理由（看取り・入院・転居・他院）", "施設の契約リスト"]],
   ];
   const cw = (W - 2 * MX - 3 * 0.3) / 4;
   cols.forEach(([head, col, items], i) => {
@@ -403,29 +404,78 @@ if (M) {
     const s = content("院別の推移：伸び続ける院と、1年以上横ばいの院がはっきり分かれる");
     img(s, path.join(CONF, "figures/slide/fig_m_clinics.png"), MX + 0.6, 1.2, W - 2 * MX - 1.2, 5.75, 2400, 1720, "院別推移図");
   }
+  if (F) {
+    const s = content(`新規と終了：グループの居宅新規は月${Math.round(F.group_new_home_m)}人で横ばい。このままなら居宅は約${fmt(Math.round(F.group_eq_home / 100) * 100)}人で頭打ち`);
+    const im = img(s, path.join(CONF, "figures/slide/fig_m_group_flow.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "新規と終了の推移図");
+    const x = MX + im.w + 0.35;
+    const ny = F.new_home_by_year;
+    card(s, x, 1.5, W - MX - x, 5.25, "新規と終了の要点");
+    txt(s, "要点", { x: x + 0.25, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+    s.addText(bullets([
+      `居宅は毎月、患者の約${(100 * F.group_end_rate_home).toFixed(1)}%が終了（看取り・入院など）。平均の在籍は約${Math.round(1 / F.group_end_rate_home)}か月`,
+      `患者数は「新規÷終了率」に向かって落ち着く。今の新規（月${Math.round(F.group_new_home_m)}人）では約${fmt(Math.round(F.group_eq_home / 100) * 100)}人（現在${fmt(M.home_last)}人）`,
+      `2024年までに開院した9院の居宅新規は月${Math.round(ny["2024"]["既存院"])}人（2024年）→${Math.round(ny["2026"]["既存院"])}人（2026年）。新しい院の${Math.round(ny["2026"]["新しい院"])}人で補っている`,
+      `施設の新規は月${Math.round(F.group_new_fac_2024_m)}人（2024年）→${Math.round(F.group_new_fac_m)}人。終了とほぼ同数で、施設は横ばい`,
+    ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 13.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  }
+  if (F) {
+    const s = content("院別：停滞5院は「今の新規ペースで落ち着く水準」に到達済み。伸ばすには新規を増やすしかない");
+    const im = img(s, path.join(CONF, "figures/slide/fig_m_flow_balance.png"), MX, 1.3, 8.4, 5.6, 1920, 1240, "均衡患者数図");
+    const x = MX + im.w + 0.35;
+    card(s, x, 1.5, W - MX - x, 5.25, "均衡患者数の説明");
+    txt(s, "読み方", { x: x + 0.25, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+    const grow = Object.entries(F.clinics).filter(([, c]) => c.flow_outlook === "まだ伸びる").map(([n]) => n);
+    s.addText(bullets([
+      "◆＝直近12か月の「月間新規÷終了率」。患者数は約1〜2年でこの水準に近づく",
+      `${grow.join("・")}は◆が先にあり、今のペースのままでも伸びる`,
+      "停滞院の終了率は他院と同程度。終了が多いせいで伸びない院は無い",
+      "停滞の原因は新規の量。それが担当エリアの大きさに見合っているか（A）、不足か（B）で打ち手が分かれる",
+    ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 13.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  }
   {
-    const s = content("停滞している院：担当エリアを取り切りつつある院と、エリア内に余地がある院で打ち手が異なる");
-    const head = ["院", "居宅", "12か月の\n増減", "直近6か月\n（人/月）", "排他率", "競合密度", "上位院比", "主因の候補 → 打ち手"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 }, align: "center" } }));
+    const s = content(F ? "停滞院の原因：新規・終了の記録で確かめると、エリア分析の見立てと一致した" : "停滞している院：担当エリアを取り切りつつある院と、エリア内に余地がある院で打ち手が異なる");
+    const head = (F ? ["院", "居宅", "月間新規\n(前年比)", "終了率\n/月", "新規の強さ\n(上位院比)", "上位院比\n(取り込み)", "エリア分析の見立て", "新規・終了で確認 → 打ち手"]
+      : ["院", "居宅", "12か月の\n増減", "直近6か月\n（人/月）", "排他率", "競合密度", "上位院比", "主因の候補 → 打ち手"]).map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 }, align: "center" } }));
     const body = stalled.map((c) => {
       const m = M.clinics[c.name];
-      const cause = `${c.cause} → ${c.action}`;
+      if (!F) {
+        return [
+          { text: c.name, options: { bold: true } },
+          { text: fmt(c.home), options: { align: "right" } },
+          { text: `${m.home_chg_12m >= 0 ? "+" : ""}${m.home_chg_12m}`, options: { align: "right" } },
+          { text: `${m.home_slope_6m >= 0 ? "+" : ""}${m.home_slope_6m}`, options: { align: "right" } },
+          { text: pct(c.exclusive_ratio), options: { align: "right" } },
+          { text: c.competition_density.toFixed(1), options: { align: "right" } },
+          { text: pct(c.penetration), options: { align: "right" } },
+          { text: `${c.cause} → ${c.action}` },
+        ];
+      }
+      const f = F.clinics[c.name];
+      const low = f.inflow_vs_ref < 0.6;
+      const yoy = f.new_home_chg_yoy == null ? "" : `（${f.new_home_chg_yoy >= 0 ? "+" : ""}${Math.round(100 * f.new_home_chg_yoy)}%）`;
+      const act = f.stall_cause.startsWith("A") ? "担当エリアの再設定・隣接地域の開拓"
+        : `新規を月${f.new_home_m.toFixed(0)}→${Math.round(f.new_home_needed)}人へ（紹介経路の立て直し）`;
       return [
         { text: c.name, options: { bold: true } },
         { text: fmt(c.home), options: { align: "right" } },
-        { text: `${m.home_chg_12m >= 0 ? "+" : ""}${m.home_chg_12m}`, options: { align: "right" } },
-        { text: `${m.home_slope_6m >= 0 ? "+" : ""}${m.home_slope_6m}`, options: { align: "right" } },
-        { text: pct(c.exclusive_ratio), options: { align: "right", color: c.exclusive_ratio < 0.5 ? HEX.accent2 : HEX.dk1, bold: c.exclusive_ratio < 0.5 } },
-        { text: c.competition_density.toFixed(1), options: { align: "right", color: c.competition_density >= 9 ? HEX.accent2 : HEX.dk1, bold: c.competition_density >= 9 } },
+        { text: `${f.new_home_m.toFixed(1)}人\n${yoy}`, options: { align: "right" } },
+        { text: `${(100 * f.end_rate_home).toFixed(1)}%`, options: { align: "right" } },
+        { text: pct(f.inflow_vs_ref), options: { align: "right", color: low ? HEX.accent2 : HEX.dk1, bold: low } },
         { text: pct(c.penetration), options: { align: "right", bold: c.penetration >= 0.8 } },
-        { text: cause },
+        { text: c.cause, options: { fontSize: 11.5 } },
+        { text: `${f.stall_cause}\n→ ${act}`, options: { fontSize: 11.5, bold: false } },
       ];
     });
     s.addTable([head, ...body], {
-      x: MX, y: 1.45, w: W - 2 * MX, colW: [1.5, 0.8, 1.0, 1.1, 0.85, 0.95, 0.95, 4.98],
-      fontSize: 13, color: HEX.dk1, border: { type: "solid", pt: 0.5, color: "D9DEE5" }, rowH: 0.55, valign: "middle", margin: [0.03, 0.08, 0.03, 0.08], fontFace: "Yu Gothic",
+      x: MX, y: 1.4, w: W - 2 * MX, colW: F ? [1.2, 0.7, 1.1, 0.75, 1.05, 1.0, 2.45, 3.88] : [1.5, 0.8, 1.0, 1.1, 0.85, 0.95, 0.95, 4.98],
+      fontSize: 12.5, color: HEX.dk1, border: { type: "solid", pt: 0.5, color: "D9DEE5" }, rowH: 0.62, valign: "middle", margin: [0.03, 0.07, 0.03, 0.07], fontFace: "Yu Gothic",
     });
-    txt(s, "判定: 直近6か月の居宅の傾きが統計的に0と区別できない、またはS字カーブで頭打ち。上位院比80%以上＝担当エリアを取り切りつつある。排他率50%未満＝他院との重複、競合密度9以上＝競合過密（橙字）", { x: MX, y: 5.1, w: W - 2 * MX, h: 0.6, fontSize: 12, color: C.accent5 });
-    txt(s, "施設を抑える方針の下で、施設型で立ち上げた院の居宅の伸びが止まっている。エリアの再設定と紹介経路づくりが打ち手", { x: MX, y: 5.8, w: W - 2 * MX, h: 0.6, fontSize: 15, bold: true, color: C.text2 });
+    if (F) {
+      txt(s, `新規の強さ＝担当エリアの到達目安100人あたりの月間新規を、上位4院の平均（${F.ref_inflow.toFixed(1)}人）と比べた値（60%未満を橙）。終了率の比較院中央値は${(100 * F.ref_end_rate).toFixed(1)}%/月。新規・終了は直近12か月（${F.window}）の平均、前年比はその前の12か月との比較。移管・報告値修正の月は終了から除外`, { x: MX, y: 5.9, w: W - 2 * MX, h: 0.5, fontSize: 10.5, color: C.accent5 });
+      txt(s, "A（取り切り）はエリアを広げる、B（新規不足）は紹介経路を立て直す。どの院も終了率は他院並みで、終了の多さは原因ではない", { x: MX, y: 6.45, w: W - 2 * MX, h: 0.5, fontSize: 14, bold: true, color: C.text2 });
+    } else {
+      txt(s, "判定: 直近6か月の居宅の傾きが統計的に0と区別できない、またはS字カーブで頭打ち。上位院比80%以上＝担当エリアを取り切りつつある", { x: MX, y: 5.1, w: W - 2 * MX, h: 0.6, fontSize: 12, color: C.accent5 });
+    }
   }
   {
     const s = content("データの補正（確認済み）：移管と報告値の修正を除いた「実態ベース」で分析しています");
@@ -512,14 +562,14 @@ sectionSlide("6. 活用のご提案", "データを意思決定の道具とし�
     ["担当エリアの再設定", "上位院並みに取り込んだ院はエリアの再設定・隣接地域の開拓"],
     ["多摩の役割分担", "最寄り院の地図で営業エリアを決める"],
     ["居宅への構成転換", "施設偏重院は新規居宅を月次目標に"],
-    ["紹介経路の診断", "新規・終了・紹介元の記録を始めれば3か月で弱い経路を特定"],
+    ["新規の月次管理", "均衡患者数（新規÷終了率）で院ごとの到達点を毎月確認。B院は新規目標を設定"],
     ["10年後の需要", "85歳以上の将来推計で院ごとの需要増を先読み"],
   ];
   const cw = (W - 2 * MX - 3 * 0.3) / 4, ch = 2.35;
   items.forEach(([head, body], i) => {
     const x = MX + (i % 4) * (cw + 0.3), y = 1.45 + Math.floor(i / 4) * (ch + 0.3);
     card(s, x, y, cw, ch, `活用${i + 1}`);
-    s.addShape(pres.shapes.OVAL, { x: x + 0.3, y: y + 0.3, w: 0.5, h: 0.5, fill: { color: i !== 6 ? C.accent1 : C.accent5 }, line: { type: "none" }, objectName: `活用番号${i + 1}` });
+    s.addShape(pres.shapes.OVAL, { x: x + 0.3, y: y + 0.3, w: 0.5, h: 0.5, fill: { color: C.accent1 }, line: { type: "none" }, objectName: `活用番号${i + 1}` });
     txt(s, String(i + 1), { x: x + 0.3, y: y + 0.3, w: 0.5, h: 0.5, fontSize: 16, bold: true, color: C.background1, align: "center", valign: "middle" });
     txt(s, head, { x: x + 0.95, y: y + 0.3, w: cw - 1.2, h: 0.5, fontSize: 16, bold: true, color: C.text2, valign: "middle" });
     txt(s, body, { x: x + 0.3, y: y + 1.0, w: cw - 0.6, h: ch - 1.2, fontSize: 14 });
@@ -530,7 +580,7 @@ pres.addSection({ title: "お願いと次のステップ" });
   const s = pres.addSlide({ masterName: "CLOSING", sectionTitle: "お願いと次のステップ" });
   s.addText("お願いしたいことと次のステップ", { placeholder: "title" });
   const asks = [
-    ["新規・終了・紹介元の月次記録を開始", "停滞院の原因（紹介不足か終了増か）を3か月で特定"],
+    ["紹介元と終了理由の内訳の記録", `新規不足の院（${F ? Object.entries(F.clinics).filter(([, c]) => (c.stall_cause || "").startsWith("B ")).map(([n]) => n).join("・") : "停滞院"}）から弱い経路を特定`],
     ["院別の医師FTEの最新値", "増員時期の目安を更新"],
     ["出店候補物件の住所", "その場で3年後予測・食い合いを比較"],
     ["評価会議での「実力」指数の試行", "四半期ごとに更新（再計算は約40秒）"],

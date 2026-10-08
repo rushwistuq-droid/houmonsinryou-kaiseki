@@ -27,6 +27,7 @@ from briefing.wakasa_brief.clinics_table import add_performance, build_environme
 from briefing.wakasa_brief.engine import Engine  # noqa: E402
 from briefing.wakasa_brief.model import diagnose, fit_growth_model, peer_benchmarks, screen_indices  # noqa: E402
 from briefing.wakasa_brief import monthly_analysis as ma  # noqa: E402
+from briefing.wakasa_brief import monthly_flow as mf  # noqa: E402
 from briefing.wakasa_brief.clinics_table import CONF_MONTHLY  # noqa: E402
 
 
@@ -102,6 +103,34 @@ def main() -> None:
         ramps = mdf.rename(columns={"home_patients": "home"})[["clinic", "months_open", "home"]]
     diag = diagnose(df, model, gtab)
 
+    # 新規・終了（あれば）: 横ばいの原因を A 取り切り／B 新規不足／C 終了過多に分ける
+    flow_sheets: dict[str, pd.DataFrame] = {}
+    fcls = None
+    flow_path = ma_monthly_path().parent / "monthly_flow.csv"
+    if mdf is not None and flow_path.exists():
+        flow = mf.adjust_flow(mf.load(flow_path), events)
+        stock = mdf[["clinic", "month", "home_patients", "facility_patients"]]
+        fcls = mf.classify(mf.flow_table(flow, stock), diag)
+        f6 = mf.flow_table(flow, stock, window=6)
+        fcls["eq_home_6m"] = f6.eq_home
+        fcls["eq_ratio_home_6m"] = f6.eq_ratio_home
+        fcls["new_home_6m"] = f6.new_home_m
+        gflow = mf.group_flow(flow)
+        flow_sheets = {
+            "新規終了_院別": fcls,
+            "新規終了_グループ": gflow,
+            "新規終了_突合（院別）": mf.reconcile_summary(flow, stock),
+            "新規終了_突合（食い違い月）": mf.reconcile(flow, stock),
+            "新規終了_データ（補正後）": flow.assign(month=flow.month.astype(str)),
+        }
+        refs = {k: round(float(v), 4) for k, v in fcls.attrs.items()}
+        (CONF / "flow_refs.json").write_text(json.dumps(refs, ensure_ascii=False), encoding="utf-8")
+        keep = ["new_home_m", "end_rate_home", "stay_home_months", "eq_home", "eq_ratio_home", "inflow_per_target",
+                "inflow_vs_ref", "end_rate_vs_ref", "new_home_needed", "new_home_chg_yoy", "flow_outlook", "stall_cause", "flow_note"]
+        diag = diag.join(fcls[keep], on="name")
+        print(f"新規・終了: 物差し {refs}")
+        print(fcls[["home", "new_home_m", "end_rate_home", "eq_home", "inflow_vs_ref", "end_rate_vs_ref", "flow_outlook", "stall_cause"]].round(2).to_string())
+
     model_info = {
         "formula": "log(居宅患者) = a + b·log(在宅開始後月数) + c·log(未充足度) + d·[施設重視期]",
         "coef": dict(zip(["a", "b_months", "c_underserved", "d_facility_era"], model.coef.round(4).tolist())),
@@ -155,7 +184,7 @@ def main() -> None:
             "月次_グループ合計（補正前）": ma.group_totals(mdf_raw),
             "月次_補正イベント": pd.DataFrame(events),
         }
-        for name, t in monthly_sheets.items():
+        for name, t in {**monthly_sheets, **{f"月次_{k}": v for k, v in flow_sheets.items()}}.items():
             t.to_csv(CONF / f"{name}.csv", encoding="utf-8-sig")
         print(f"月次解析: {CONF}/月次_*.csv")
         print(gtab[["home", "home_chg_12m", "home_slope_6m", "home_trend", "facility_trend", "home_curve_status"]].round(1).to_string())
@@ -171,6 +200,8 @@ def main() -> None:
         screen.to_excel(xw, sheet_name="指数の比較", index=False)
         for name, t in monthly_sheets.items():
             t.to_excel(xw, sheet_name=name[:31])
+        for name, t in flow_sheets.items():
+            t.to_excel(xw, sheet_name=name[:31], index=not name.endswith("（補正後）"))
         if mdf is not None:
             mdf_raw.assign(month=mdf_raw.month.astype(str)).to_excel(xw, sheet_name="月次_データ（整形済み）", index=False)
             mdf.assign(month=mdf.month.astype(str)).to_excel(xw, sheet_name="月次_データ（補正後）", index=False)
@@ -204,6 +235,9 @@ def main() -> None:
             charts.clinic_small_multiples(mdf, order, d / "fig_m_clinics.png")
             charts.launch_curves(mdf, launch, us, model, d / "fig_m_launch.png")
             charts.forecast_bars(monthly_sheets["月次_12か月見通し"], order, d / "fig_m_forecast.png")
+            if fcls is not None:
+                charts.group_flow(flow_sheets["新規終了_グループ"], d / "fig_m_group_flow.png")
+                charts.flow_balance(fcls, order, d / "fig_m_flow_balance.png")
         charts.SHOW_TITLES = True
     print(f"図表: {PUB}/fig_*.png, {figs}/fig_*.png, {slide}/fig_*.png")
 

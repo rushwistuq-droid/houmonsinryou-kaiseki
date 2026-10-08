@@ -79,6 +79,43 @@ if gpath.exists():
                         "fc_low": int(fc.loc[c, "low"]), "fc_high": int(fc.loc[c, "high"])} for c, r in gr.iterrows()},
         "transfers": tr.to_dict(orient="records"),
     }
+flow = {}
+fpath = CONF / "月次_新規終了_院別.csv"
+if fpath.exists():
+    fc = pd.read_csv(fpath, index_col=0)
+    gf = pd.read_csv(CONF / "月次_新規終了_グループ.csv")
+    fd = pd.read_csv(CONF / "月次_新規終了_データ（補正後）.csv")
+    gt = pd.read_csv(CONF / "月次_グループ合計.csv")
+    refs = json.loads((CONF / "flow_refs.json").read_text(encoding="utf-8"))
+    last12 = gf.tail(12)
+    g_home_now = int(monthly["home_last"]) if monthly else None
+    # 2024年までに開院した院と、2025年以降に開院した院に分けた居宅新規（月平均）
+    first = fd.groupby("clinic").month.min()
+    existing = set(first[first <= "2024-12"].index)
+    fd["grp"] = ["既存院" if c in existing else "新しい院" for c in fd.clinic]
+    fd["year"] = fd.month.str[:4]
+    by_year = fd.pivot_table(index="year", columns="grp", values="new_home", aggfunc="sum") / fd.groupby("year").month.nunique().values[:, None]
+    end_rate_group = float(last12.end_home.sum() / gt[gt.month.isin(last12.month)].home_patients.sum())
+    flow = {
+        "window": f"{last12.month.iloc[0]}〜{last12.month.iloc[-1]}",
+        "group_new_home_m": round(float(last12.new_home.mean()), 1),
+        "group_end_home_m": round(float(last12.end_home.mean()), 1),
+        "group_new_fac_m": round(float(last12.new_facility.mean()), 1),
+        "group_end_fac_m": round(float(last12.end_facility.mean()), 1),
+        "group_new_fac_2024_m": round(float(gf[gf.month.str.startswith("2024")].new_facility.mean()), 1),
+        "group_end_rate_home": round(end_rate_group, 4) if end_rate_group else None,
+        "group_eq_home": round(float(last12.new_home.mean()) / end_rate_group) if end_rate_group else None,
+        "existing_clinics": sorted(existing),
+        "new_home_by_year": {y: {k: round(float(v), 1) for k, v in r.dropna().items()} for y, r in by_year.iterrows()},
+        "ref_inflow": refs["ref_inflow"], "ref_end_rate": refs["ref_end_rate"],
+        "clinics": {c: {k: (None if pd.isna(r[k]) else (round(float(r[k]), 3) if isinstance(r[k], (int, float)) else r[k]))
+                        for k in ["home", "new_home_m", "new_home_6m", "new_home_prev12_m", "new_home_chg_yoy", "end_home_m", "end_rate_home",
+                                  "stay_home_months", "eq_home", "eq_ratio_home", "eq_home_6m", "inflow_per_target", "inflow_vs_ref",
+                                  "end_rate_vs_ref", "new_home_needed", "reach_target", "penetration_of_target", "new_facility_m",
+                                  "new_facility_prev12_m", "end_facility_m", "eq_facility", "eq_ratio_facility", "facility",
+                                  "flow_outlook", "stall_cause", "flow_note"]}
+                    for c, r in fc.iterrows()},
+    }
 peer = json.loads((CONF / "peer_benchmarks.json").read_text(encoding="utf-8"))
 out = {
     "as_of": "2026-07",
@@ -86,6 +123,7 @@ out = {
     "screen": screen.to_dict(orient="records"),
     "clinics": clinics,
     "monthly": monthly,
+    "flow": flow,
     "peer": peer,
     "top_sites": top.head(10)[["area", "score", "underserved_ratio", "competition_density", "pred_home_36m_group_net", "reach_target", "nearest_clinic", "nearest_clinic_km"]].round(2).to_dict(orient="records"),
 }

@@ -377,3 +377,66 @@ def peer_position(diag: pd.DataFrame, path: Path):
     _title(fig, "同じ条件の院と比べた取り込みの水準", "上位院＝都市型はひばりが丘・調布、未充足型は津田沼・所沢の平均（在宅24か月以上、本院は先行者のため除外）")
     _source(fig, "100%前後で停滞＝自院の担当エリアは取り切りつつある（エリアが狭いのが制約）。100%を大きく下回って停滞＝エリア内に余地がある")
     _save(fig, path)
+
+
+def group_flow(gf: pd.DataFrame, path: Path):
+    """グループ全体の月間新規と終了（3か月移動平均）。左＝居宅、右＝施設。"""
+    months = [str(m) for m in gf.index]
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 6.2), sharey=False)
+    fig.subplots_adjust(left=0.08, right=0.97, top=_top(0.8), bottom=0.12, wspace=0.22)
+    for ax, kind, label in ((axes[0], "home", "居宅"), (axes[1], "facility", "施設")):
+        _style(ax, grid_axis="y")
+        x = _month_axis(ax, months)
+        last = {}
+        for col, color, name in ((f"new_{kind}", S1, "新規"), (f"end_{kind}", S2, "終了")):
+            ax.scatter(x, gf[col], s=10, color=color, alpha=0.3, linewidths=0)
+            ma3 = gf[col].rolling(3, min_periods=2).mean()
+            ax.plot(x, ma3, color=color, linewidth=2.2)
+            last[name] = (ma3.iloc[-1], color)
+        # 末尾ラベルが重なる場合は上下に離す
+        (vn, cn), (ve, ce) = last["新規"], last["終了"]
+        sep = 9 if abs(vn - ve) < 0.08 * ax.get_ylim()[1] else 0
+        for name, (v, color), dy in (("新規", (vn, cn), sep if vn >= ve else -sep), ("終了", (ve, ce), -sep if vn >= ve else sep)):
+            ax.annotate(f"{name} {v:.0f}", (x[-1], v), xytext=(4, dy), textcoords="offset points",
+                        va="center", fontsize=9.5, color=color)
+        ax.set_xlim(-0.5, len(x) + 3.5)
+        ax.set_ylim(0, max(gf[f"new_{kind}"].max(), gf[f"end_{kind}"].max()) * 1.12)
+        ax.set_title(label, loc="left", fontsize=12, color=TEXT, weight="bold")
+    axes[0].set_ylabel("人／月（線は3か月移動平均）", color=TEXT2, fontsize=9.5)
+    _title(fig, "グループ全体の新規と終了：居宅の新規は2024年夏から月150人前後で横ばい",
+           "新規と終了の差が純増。終了は患者数にほぼ比例して増えるため、新規が横ばいなら純増はしだいに細る")
+    _source(fig, "院内月次データ（機密）。移管・報告値修正の月は、その人数を終了から除いた")
+    _save(fig, path)
+
+
+def flow_balance(cls: pd.DataFrame, order: list[str], path: Path):
+    """院別：現在の居宅患者数と、今の新規・終了のペースが続いた場合の落ち着き先（均衡患者数）。"""
+    d = cls.reindex([c for c in order if c in cls.index])
+    fig, ax = plt.subplots(figsize=(9.6, 6.2))
+    fig.subplots_adjust(left=0.13, right=0.97, top=_top(0.8), bottom=0.1)
+    _style(ax, grid_axis="x")
+    y = np.arange(len(d))
+    flat = d.flow_outlook.str.startswith("横ばい") | d.flow_outlook.str.startswith("縮小")
+    launch = d.flow_outlook == "立ち上げ中"
+    colors = np.where(flat, S2, np.where(launch, "#9ec5f4", S1))
+    ax.barh(y, d.home, height=0.6, color=colors)
+    ax.scatter(d.eq_home, y, marker="D", s=34, color=TEXT, zorder=3)
+    for yi, r in zip(y, d.itertuples()):
+        ax.plot([r.home, r.eq_home], [yi, yi], color=TEXT, linewidth=1, zorder=2)
+        tag = r.stall_cause if isinstance(r.stall_cause, str) and r.stall_cause and not r.stall_cause.startswith("（") else ""
+        ax.annotate(f"{r.home:.0f}→{r.eq_home:.0f}人  {tag}", (max(r.home, r.eq_home), yi), xytext=(7, 0),
+                    textcoords="offset points", va="center", fontsize=9, color=TEXT)
+    ax.set_yticks(y, d.index, color=TEXT, fontsize=9.5)
+    ax.set_xlim(0, d[["home", "eq_home"]].max().max() * 1.45)
+    ax.invert_yaxis()
+    ax.set_xlabel("居宅患者数（人）　棒＝現在、◆＝均衡患者数（月間新規 ÷ 終了率）", color=TEXT2, fontsize=9.5)
+    from matplotlib.patches import Patch
+
+    handles = [Patch(color=S2, label="横ばい（均衡に到達）"), Patch(color=S1, label="まだ伸びる"), Patch(color="#9ec5f4", label="立ち上げ中")]
+    leg = ax.legend(handles=handles, loc="lower left", bbox_to_anchor=(0, 1.0), ncol=3, frameon=False, fontsize=9)
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    _title(fig, "今の新規ペースが続くと、居宅患者はどこで落ち着くか",
+           "直近12か月の月間新規と終了率から。◆が棒の先と重なる院は、新規を増やさない限り横ばいが続く")
+    _source(fig, "A＝担当エリアを取り切った／B＝新規が少ない（エリアの大きさ比）／C＝終了が多い。院内月次データ（機密）")
+    _save(fig, path)
