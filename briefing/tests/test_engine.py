@@ -23,7 +23,7 @@ class TestReproducesSystemB(unittest.TestCase):
 
     def test_market_home_within_half_percent(self):
         for cid, (lat, lon) in self.old.items():
-            p = self.E.point(lat, lon, single_pref=True)
+            p = self.E.point(lat, lon, 8.0, single_pref=True)  # 系統Bは半径8km
             b = self.B[cid]
             self.assertAlmostEqual(p["elderly_65"], b["elderly_65"], delta=1.0, msg=cid)
             self.assertLess(abs(p["market_home"] / b["market_home"] - 1), 0.005, msg=cid)
@@ -51,3 +51,14 @@ class TestCompetitors(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRadius(unittest.TestCase):
+    def test_engine_radius_is_used_by_default(self):
+        E6, E8 = Engine(radius_km=6.0), Engine(radius_km=8.0)
+        c = E6.clinics[0]
+        p6, p8 = E6.point(c.lat, c.lon), E8.point(c.lat, c.lon)
+        self.assertEqual(p6["radius_km"], 6.0)
+        # 面積比 (6/8)^2 ≈ 0.56 前後（人口分布で多少ずれる）
+        self.assertLess(p6["elderly_65"] / p8["elderly_65"], 0.75)
+        self.assertGreater(p6["elderly_65"] / p8["elderly_65"], 0.35)

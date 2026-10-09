@@ -65,6 +65,12 @@ else:
                   f"{jn(room)}はエリア内に余地 → 紹介経路の強化</li>")
     KPI4 = f'<div class="kpi o"><b>{len(full)}院</b>うち担当エリアを同条件の上位院並みに取り込み済み（{jn(full)}）</div>'
 
+_g = [c["e85_growth_25_35"] for c in clinics]
+G85_LO, G85_HI = round(10 * (min(_g) - 1)), round(10 * (max(_g) - 1))
+G85_OUT = round(100 * (sum(c["e85_growth_25_35"] for c in clinics if c["pref"] != "東京都") / sum(1 for c in clinics if c["pref"] != "東京都") - 1))
+G85_TKY = round(100 * (sum(c["e85_growth_25_35"] for c in clinics if c["pref"] == "東京都") / sum(1 for c in clinics if c["pref"] == "東京都") - 1))
+MIN_KM = int(min(t["nearest_clinic_km"] for t in D["top_sites"]))
+
 page = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
 @page {{ size: A4; margin: 14mm 14mm 12mm; }}
 body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:8.9pt; line-height:1.4; }}
@@ -86,7 +92,7 @@ td.v {{ text-align:left; white-space:normal; }}
 .pb {{ page-break-before:always; }}
 </style></head><body>
 <h1>訪問診療データ分析 要旨（理事長面談用・機密）</h1>
-<div class="meta">2026年10月／実績は{ym(MM["last_month"]) if MM else "2026年7月"}末時点（月次は{ym(MM["first_month"]) if MM else "—"}〜）／半径8km圏・公的統計ベース</div>
+<div class="meta">2026年10月／実績は{ym(MM["last_month"]) if MM else "2026年7月"}末時点（月次は{ym(MM["first_month"]) if MM else "—"}〜）／半径{M.get("radius_km", 8):g}km圏・公的統計ベース</div>
 <div class="kpis">
 <div class="kpi"><b>{MM["home_last"] / MM["home_first"]:.1f}倍</b>グループの居宅（{MM["home_first"]:,}→{MM["home_last"]:,}人）。施設は2025年春から横ばい</div>
 <div class="kpi"><b>{M['r2']:.0%}</b>居宅患者数の院間差を「年数・未充足度・立ち上げ方針」で説明（誤差±{M['loo_error_pct']:.0f}%）</div>
@@ -101,8 +107,8 @@ td.v {{ text-align:left; white-space:normal; }}
 <li><b>浦和</b>: {[c for c in clinics if c['id']=='urawa'][0]['months']}か月で居宅{[c for c in clinics if c['id']=='urawa'][0]['home']}人。地域条件からの基準の約{[c for c in clinics if c['id']=='urawa'][0]['perf']:.0%}で、立ち上げ支援が必要</li>
 <li><b>データ補正（確認済み）</b>: 2025年4月の石神井公園・三鷹→高円寺の施設移管、2025年8月の報告値の修正を除いた実態ベースで評価。居宅は全院・全期間でがん医総を含めて統一（市川も）。本院の施設減は補正せず</li>
 <li><b>院の評価</b>は「年数・地域補正後の実力」（実績÷モデル期待値）で。都心と郊外を同じ物差しで比べられる。{below_text}</li>
-<li><b>10年後</b>: 85歳以上は2035年までに各院の圏域で2〜6割増。埼玉・千葉の院（平均+48%）は都内の院（+29%）より速い</li>
-<li><b>出店</b>: 埼玉東部・千葉北西部が上位（未充足度2倍超・競合が薄い・既存院と16km以上離れる）。新規院は居宅重視で立ち上げる（施設重視型は約4割少ない）</li>
+<li><b>10年後</b>: 85歳以上は2035年までに各院の圏域で{G85_LO}〜{G85_HI}割増。埼玉・千葉の院（平均+{G85_OUT}%）は都内の院（+{G85_TKY}%）より速い</li>
+<li><b>出店</b>: 埼玉東部・千葉北西部が上位（未充足度2倍超・競合が薄い・既存院と{MIN_KM}km以上離れる）。新規院は居宅重視で立ち上げる（施設重視型は約4割少ない）</li>
 </ul>
 <h2>院別の診断</h2>
 <table><thead><tr><th>院</th><th>在宅月数</th><th>居宅</th><th>施設</th><th>居宅比</th><th>地域タイプ</th><th>実力</th><th>上位院比</th><th>判定</th></tr></thead>
@@ -115,7 +121,7 @@ td.v {{ text-align:left; white-space:normal; }}
 <ul>
 <li><b>未充足度</b> = 東京都並みに普及した場合の居宅需要 ÷ 現在の居宅需要（最も効く予測指数）</li>
 <li><b>在宅開始からの月数</b>・<b>立ち上げ方針</b>（施設重視期/転換期）</li>
-<li><b>排他率</b> = 8km圏の高齢者のうち自院が最寄りの割合（グループ内の食い合い）</li>
+<li><b>排他率</b> = {M.get("radius_km", 8):g}km圏の高齢者のうち自院が最寄りの割合（グループ内の食い合い）</li>
 <li><b>競合密度</b> = 在支診・在支病（機能強化型を重く）÷ 75歳以上1万人</li>
 <li>人口・需要・競合の「量」そのものは予測に効かない（多いほど居宅が少ない＝都会度の指標）</li>
 </ul>

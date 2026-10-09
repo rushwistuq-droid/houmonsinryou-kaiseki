@@ -1,6 +1,6 @@
 """院ごとの営業先リスト（CM事業所・訪問看護）。公開データのみ。
 
-各事業所を「最寄りのわかさ院」に割り当て（8km以内）、院ごとに距離順で出力する。
+各事業所を「最寄りのわかさ院」に割り当て（診療圏の半径以内）、院ごとに距離順で出力する。
 多摩クラスターのように圏域が重なる院どうしで、同じ事業所に重複して営業しないための担当表にもなる。
 """
 
@@ -11,10 +11,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .engine import RADIUS_KM, Engine, haversine_km
+from .engine import Engine, haversine_km
 
 
-def assign_nearest(engine: Engine, df: pd.DataFrame, radius_km: float = RADIUS_KM) -> pd.DataFrame:
+def assign_nearest(engine: Engine, df: pd.DataFrame, radius_km: float | None = None) -> pd.DataFrame:
+    radius_km = engine.radius_km if radius_km is None else radius_km
     if len(df) == 0:
         return df.assign(clinic=[], distance_km=[])
     d = np.vstack([haversine_km(c.lat, c.lon, df.lat.values, df.lon.values) for c in engine.clinics])
@@ -24,7 +25,7 @@ def assign_nearest(engine: Engine, df: pd.DataFrame, radius_km: float = RADIUS_K
     out = df.assign(
         clinic=[engine.clinics[k].name for k in i],
         distance_km=dmin.round(2),
-        # 2番目に近い院も8km以内なら「係争」。役割分担の協議対象
+        # 2番目に近い院も半径以内なら「係争」。役割分担の協議対象
         contested=second <= radius_km,
     )
     return out[out.distance_km <= radius_km]

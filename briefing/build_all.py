@@ -46,7 +46,7 @@ ENV_COLS = [
     "market_facility", "facility_count", "facility_residents",
     "competitors_n", "competitors_enhanced_n", "competitor_units", "competition_density",
     "exclusive_ratio", "exclusive_market_home", "exclusive_latent_home",
-    "siblings_8km", "siblings_16km", "e75_growth_20_25",
+    "siblings_in_radius", "siblings_16km", "e75_growth_20_25",
     "cm_offices_n", "cm_per_10k75", "nursing_n", "nursing_per_10k75",
     "e75_growth_25_35", "e85_growth_25_35", "e85_growth_25_40", "latent_home_2035",
 ]
@@ -74,6 +74,19 @@ def main() -> None:
         sales = write_sales_lists(E, PUB / "sales_lists")
         print(f"院別 営業先リスト（CM・訪看）: {PUB / 'sales_lists'}")
         print(sales.pivot(index="clinic", columns="kind", values="件数").to_string())
+
+    # 自治体の実数との照合（あれば）
+    chk_path = ROOT / "analysis/confidential/municipal_checks.yaml"
+    if chk_path.exists():
+        import yaml
+
+        from briefing.wakasa_brief.municipal_check import compare
+
+        CONF.mkdir(parents=True, exist_ok=True)
+        chk = compare(E, yaml.safe_load(chk_path.read_text(encoding="utf-8"))["checks"])
+        chk.round(3).to_csv(CONF / "検証_市区町村の実数.csv", index=False, encoding="utf-8-sig")
+        print("自治体の実数との照合:")
+        print(chk[["name", "year", "actual", "est_home", "ratio_home", "est_total", "ratio_total"]].round(2).to_string(index=False))
 
     actuals = load_actuals()
     if actuals is None:
@@ -132,6 +145,7 @@ def main() -> None:
         print(fcls[["home", "new_home_m", "end_rate_home", "eq_home", "inflow_vs_ref", "end_rate_vs_ref", "flow_outlook", "stall_cause"]].round(2).to_string())
 
     model_info = {
+        "radius_km": E.radius_km,
         "formula": "log(居宅患者) = a + b·log(在宅開始後月数) + c·log(未充足度) + d·[施設重視期]",
         "coef": dict(zip(["a", "b_months", "c_underserved", "d_facility_era"], model.coef.round(4).tolist())),
         "r2": round(model.r2, 3),

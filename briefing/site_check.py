@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 import urllib.parse
 import urllib.request
@@ -24,7 +25,7 @@ sys.path.insert(0, str(ROOT))
 
 from briefing.wakasa_brief.engine import Engine  # noqa: E402
 from briefing.wakasa_brief.model import GrowthModel  # noqa: E402
-from briefing.wakasa_brief.site_score import SiteScorer  # noqa: E402
+from briefing.wakasa_brief.site_score import MIN_ELDERLY_65_PER_KM2, SiteScorer  # noqa: E402
 
 MODEL_JSON = ROOT / "briefing/output/growth_model.json"
 
@@ -69,8 +70,8 @@ def report(name: str, r: dict, model: GrowthModel) -> str:
     ]
     if r["underserved_extrapolated"]:
         lines.append(f"  ※未充足度が既存院の実績範囲（最大{model.underserved_range[1]:.1f}）を超えるため、予測は上限値で頭打ち")
-    if r["elderly_65"] < 30_000:
-        lines.append("  ※8km圏の高齢者が少なく、モデルの適用範囲外の可能性")
+    if r["elderly_65"] < MIN_ELDERLY_65_PER_KM2 * math.pi * r["radius_km"] ** 2:
+        lines.append("  ※診療圏の高齢者が少なく、モデルの適用範囲外の可能性")
     return "\n".join(lines)
 
 
@@ -80,12 +81,12 @@ def main() -> None:
     ap.add_argument("--lon", type=float)
     ap.add_argument("--address")
     ap.add_argument("--name", default="候補地")
-    ap.add_argument("--radius", type=float, default=8.0)
+    ap.add_argument("--radius", type=float, default=None, help="既定は診療圏の半径（engine.RADIUS_KM）。モデルと物差しはその半径で推定済み")
     ap.add_argument("--compare", nargs="+", metavar="名前:緯度,経度")
     args = ap.parse_args()
 
     model, bench = load_model()
-    scorer = SiteScorer(Engine(), model, bench)
+    scorer = SiteScorer(Engine(radius_km=args.radius), model, bench)
     targets = []
     if args.compare:
         for item in args.compare:

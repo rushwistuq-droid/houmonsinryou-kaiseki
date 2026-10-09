@@ -116,6 +116,10 @@ if fpath.exists():
                                   "flow_outlook", "stall_cause", "flow_note"]}
                     for c, r in fc.iterrows()},
     }
+muni = []
+mpath = CONF / "検証_市区町村の実数.csv"
+if mpath.exists():
+    muni = pd.read_csv(mpath).round(3).to_dict(orient="records")
 peer = json.loads((CONF / "peer_benchmarks.json").read_text(encoding="utf-8"))
 out = {
     "as_of": "2026-07",
@@ -124,6 +128,7 @@ out = {
     "clinics": clinics,
     "monthly": monthly,
     "flow": flow,
+    "muni_check": muni,
     "peer": peer,
     "top_sites": top.head(10)[["area", "score", "underserved_ratio", "competition_density", "pred_home_36m_group_net", "reach_target", "nearest_clinic", "nearest_clinic_km"]].round(2).to_dict(orient="records"),
 }

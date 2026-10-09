@@ -117,6 +117,7 @@ const fitted = clinics.filter((c) => c.months >= 6 && c.id !== "honin");
 const inBand = fitted.filter((c) => c.perf <= 1 + loo && c.perf >= 1 / (1 + loo)).length;
 const above = fitted.filter((c) => c.perf >= 1.15).map((c) => c.name);
 const screenErr = (label) => Math.round(100 * D.screen.find((r) => r["モデル"].startsWith(label))["予測誤差(LOO)"]);
+const RK = D.model.radius_km || 8;  // 診療圏の半径（km）
 const M = D.monthly || null;
 const F = D.flow && D.flow.clinics ? D.flow : null;
 const stalled = clinics.filter((c) => c.verdict.startsWith("停滞"));
@@ -204,7 +205,7 @@ sectionSlide("1. 現在保有しているデータ", "公的統計11種＋院内
   txt(s, "定義と判断理由は付録「02 指数辞書」", { x: MX, y: 6.45, w: W - 2 * MX, h: 0.4, fontSize: 12, color: C.accent5 });
 }
 {
-  const s = content("検証の過程で過去の分析の誤りを6点見つけ、すべて修正しました");
+  const s = content(RK !== 8 ? `過去の分析の誤り6点を修正し、診療圏の半径を${RK}kmに見直しました` : "検証の過程で過去の分析の誤りを6点見つけ、すべて修正しました");
   const rows = [
     ["自治体データ（手入力）の誤り", "57件中20件が公式推計と10〜15%超ずれ（入間市の人口が半分など）", "公的原典ベースに一本化"],
     ["院の位置のずれ", "本院3.8km・三鷹2.4km・所沢1.3km・市川1.2km", "国土地理院の住所検索に差し替え"],
@@ -213,12 +214,13 @@ sectionSlide("1. 現在保有しているデータ", "公的統計11種＋院内
     ["競合の座標欠落", "在支診の36%に位置情報なし", "名簿突合＋国土地理院で100%に"],
     ["CM営業の深さの誤読", "ひばりが丘のCMあたり居宅は府中・調布の半分とされていた", "自院担当エリアで比べると同水準"],
   ];
+  if (RK !== 8) rows.push(["診療圏の半径", "8km（過去分析から継承）。実際の訪問範囲は約6km（本院の実績）", `${RK}kmで全指標・診断・出店候補を再計算`]);
   const head = ["問題", "影響", "対応"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 } } }));
   s.addTable([head, ...rows.map((r) => r.map((t) => ({ text: t })))], {
-    x: MX, y: 1.55, w: W - 2 * MX, colW: [3.0, 5.6, 3.53], fontSize: 14, color: HEX.dk1,
-    border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.58, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
+    x: MX, y: 1.55, w: W - 2 * MX, colW: [3.0, 5.6, 3.53], fontSize: 13, color: HEX.dk1,
+    border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.52, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
   });
-  txt(s, "結果として、院ごとの市場規模や獲得率の数字は過去資料から変わっています。今後は本資料の数値を基準とします", { x: MX, y: 5.95, w: W - 2 * MX, h: 0.6, fontSize: 15, color: C.text2, bold: true });
+  txt(s, "結果として、院ごとの市場規模や獲得率の数字は過去資料から変わっています。今後は本資料の数値を基準とします", { x: MX, y: 6.15, w: W - 2 * MX, h: 0.6, fontSize: 15, color: C.text2, bold: true });
 }
 
 // ---------------------------------------------------------------- 4. 予測指数
@@ -282,6 +284,34 @@ sectionSlide("2. 患者獲得の予測指数", "13種類の候補を、12院の�
 }
 
 // ---------------------------------------------------------------- 5. 既存院
+if (D.muni_check && D.muni_check.length) {
+  const rows = D.muni_check;
+  const city = rows[0].name;
+  const s = content(`推計の検証：${city}の実数（訪問診療を受けている患者数）は、居宅の推計とほぼ一致`);
+  const head = ["年", `${city}の資料`, "居宅の推計", "実数÷推計", "参考：施設を含む総数の推計"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 }, align: "center" } }));
+  const body = rows.map((r) => [
+    { text: `${r.year}年`, options: { bold: true } },
+    { text: `${fmt(r.actual)}人`, options: { align: "right" } },
+    { text: `${fmt(r.est_home)}人`, options: { align: "right" } },
+    { text: pct(r.ratio_home), options: { align: "right", bold: true, color: Math.abs(r.ratio_home - 1) <= 0.1 ? HEX.accent1 : HEX.dk1 } },
+    { text: `${fmt(r.est_total)}人`, options: { align: "right", color: HEX.accent5 } },
+  ]);
+  s.addTable([head, ...body], {
+    x: MX, y: 1.5, w: 7.6, colW: [1.0, 1.55, 1.55, 1.4, 2.1], fontSize: 15, color: HEX.dk1,
+    border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.6, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
+  });
+  const x = 8.6;
+  card(s, x, 1.5, W - MX - x, 5.25, "検証の要点");
+  txt(s, "読み方", { x: x + 0.3, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+  const last = rows[rows.length - 1], first = rows[0];
+  s.addText(bullets([
+    `直近は推計の${pct(last.ratio_home)}。施設を含む総数の推計（${fmt(last.est_total)}人）の約半分で、市の数字は「居宅」に相当すると読める`,
+    `${first.year}年は推計の${pct(first.ratio_home)}。翌年に${Math.round(100 * (rows[1].actual / first.actual - 1))}%増えており、集計方法の変化か利用の伸びのどちらか`,
+    "推計は2022年度NDBの受療率で固定。利用率の年々の伸びは入れていない",
+    "市の資料の定義（時点・対象者・施設入居者を含むか）を確認したい",
+  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 13.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  txt(s, `推計＝${city}の年齢別人口（国勢調査2020・推計2025、中間年は補間）× 東京都の年齢別受療率（NDB 2022年度、月あたり）。院の需要推計（半径${RK}km）と同じ算式`, { x: MX, y: 4.6, w: 7.6, h: 0.8, fontSize: 11, color: C.accent5 });
+}
 sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせるのか（月次推移を含めた判定）");
 {
   const s = content(M ? `院別の診断（${ym(M.last_month)}）：${stalled.length}院が停滞。主な課題は担当エリアの狭さと居宅獲得の仕組み` : "院別の診断：判定できる院はすべて「伸長余地あり」、課題は院ごとに異なる");
@@ -317,7 +347,7 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
   s.addText(bullets([
     "自院が最寄りの潜在居宅需要のうち、何%を居宅患者にできているかを、同じ地域タイプの上位院と比べた値",
     `上位院：都市型は${D.peer.都市型.members.join("・")}（約${(100 * D.peer.都市型.share).toFixed(0)}%）、未充足型は${D.peer.未充足型.members.join("・")}（約${(100 * D.peer.未充足型.share).toFixed(0)}%）`,
-    "本院は地域で最初に訪問診療を始めた先行者のため比較対象外（上位院の約2.7倍）",
+    `本院は地域で最初に訪問診療を始めた先行者のため比較対象外（上位院の約${byId.honin.penetration.toFixed(1)}倍）`,
     "上位院も伸び続けているため、100%は上限ではなく「いまの上位水準」",
   ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
@@ -342,7 +372,8 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 {
-  const s = content("多摩〜区西部の4院は、圏内の半分以上で別のわかさ院のほうが近い：役割分担が論点");
+  const overlapped = clinics.filter((c) => c.exclusive_ratio < 0.5).sort((a, b) => a.exclusive_ratio - b.exclusive_ratio);
+  const s = content(`${names(overlapped)}は、圏内の半分以上で別のわかさ院のほうが近い：多摩〜区西部は役割分担が論点`);
   const sorted = clinics.slice().sort((a, b) => a.exclusive_ratio - b.exclusive_ratio);
   s.addChart(pres.charts.BAR, [{ name: "排他率", labels: sorted.map((c) => c.name), values: sorted.map((c) => Math.round(c.exclusive_ratio * 100)) }], {
     x: MX, y: 1.4, w: 7.8, h: 5.4, barDir: "bar", chartColors: sorted.map((c) => (c.exclusive_ratio < 0.5 ? HEX.accent2 : HEX.accent1)),
@@ -350,7 +381,7 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
     catAxisLabelFontSize: 12, valAxisLabelFontSize: 10, catAxisLabelColor: HEX.dk1, valAxisLabelColor: HEX.accent5,
     catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", catAxisOrientation: "maxMin",
     valGridLine: { color: "E6E5E1", size: 0.75 }, catGridLine: { style: "none" }, valAxisMinVal: 0, valAxisMaxVal: 110,
-    showLegend: false, showTitle: true, title: "排他率：8km圏の高齢者のうち自院が一番近い人の割合（橙＝50%未満）", titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt", barGapWidthPct: 40,
+    showLegend: false, showTitle: true, title: `排他率：${RK}km圏の高齢者のうち自院が一番近い人の割合（橙＝50%未満）`, titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt", barGapWidthPct: 40,
   });
   const x = 8.8;
   card(s, x, 1.5, W - MX - x, 5.25, "重複の示唆");
@@ -363,7 +394,7 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
 }
 
 {
-  const s = content("CM営業の深さは、自院担当エリアで比べると多摩3院（ひばりが丘・府中・調布）は同水準");
+  const s = content("CM営業の深さは、自院担当エリアで比べると多摩3院（ひばりが丘・府中・調布）はほぼ同水準");
   const sorted = clinics.filter((c) => c.months >= 12).slice().sort((a, b) => b.home_per_cm - a.home_per_cm);
   s.addChart(pres.charts.BAR, [{ name: "CM1か所あたり居宅", labels: sorted.map((c) => c.name), values: sorted.map((c) => c.home_per_cm) }], {
     x: MX, y: 1.4, w: 7.8, h: 5.4, barDir: "bar", chartColors: sorted.map((c) => (["hibarigaoka", "fuchu", "chofu"].includes(c.id) ? HEX.accent2 : HEX.accent1)),
@@ -378,7 +409,7 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
   txt(s, "示唆", { x: x + 0.3, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   const hb = byId.hibarigaoka, mt = byId.mitaka, kj = byId.koenji;
   s.addText(bullets([
-    "8km圏のCM全体で割ると、ひばりが丘は府中の約半分に見える。しかし圏内CMの多くは他のわかさ院のほうが近い",
+    `${RK}km圏のCM全体で割ると、ひばりが丘は府中より少なく見える。しかし圏内CMの多くは他のわかさ院のほうが近い`,
     `担当CMのうち他院と重なる割合：ひばりが丘${pct(hb.cm_contested_share)}・三鷹${pct(mt.cm_contested_share)}・高円寺${pct(kj.cm_contested_share)}`,
     "院別の営業先リスト（CM・訪問看護、係争の印つき）を作成済み",
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
@@ -528,7 +559,9 @@ sectionSlide("5. 出店と立ち上げ", "どこに出すと伸びるか、出�
   img(s, path.join(CONF, "figures/slide/fig_map_underserved.png"), MX + 0.4, 1.25, W - 2 * MX - 0.8, 5.7, 2000, 1440, "未充足度マップ");
 }
 {
-  const s = content("10年後の需要：郊外ほど高齢化が速く、85歳以上は本院・津田沼周辺で約1.5倍に");
+  const g85 = clinics.slice().sort((a, b) => b.e85_growth_25_35 - a.e85_growth_25_35);
+  const avg = (arr) => arr.reduce((a, c) => a + c.e85_growth_25_35, 0) / arr.length;
+  const s = content(`10年後の需要：郊外ほど高齢化が速く、85歳以上は${g85[0].name}周辺で約${g85[0].e85_growth_25_35.toFixed(1)}倍に`);
   const sorted = clinics.slice().sort((a, b) => b.e85_growth_25_35 - a.e85_growth_25_35);
   s.addChart(pres.charts.BAR, [{ name: "85歳以上の伸び", labels: sorted.map((c) => c.name), values: sorted.map((c) => Math.round((c.e85_growth_25_35 - 1) * 100)) }], {
     x: MX, y: 1.4, w: 7.8, h: 5.4, barDir: "bar", chartColors: sorted.map((c) => (c.pref === "東京都" ? HEX.accent1 : HEX.accent2)),
@@ -536,19 +569,19 @@ sectionSlide("5. 出店と立ち上げ", "どこに出すと伸びるか、出�
     catAxisLabelFontSize: 12, valAxisLabelFontSize: 10, catAxisLabelColor: HEX.dk1, valAxisLabelColor: HEX.accent5,
     catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", catAxisOrientation: "maxMin",
     valGridLine: { color: "E6E5E1", size: 0.75 }, catGridLine: { style: "none" }, valAxisMinVal: 0, valAxisMaxVal: 70,
-    showLegend: false, showTitle: true, title: "8km圏の85歳以上人口の増加率 2025→2035（青＝東京都、橙＝埼玉・千葉）", titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt", barGapWidthPct: 40,
+    showLegend: false, showTitle: true, title: `${RK}km圏の85歳以上人口の増加率 2025→2035（青＝東京都、橙＝埼玉・千葉）`, titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt", barGapWidthPct: 40,
   });
   const x = 8.8;
   card(s, x, 1.5, W - MX - x, 5.25, "将来需要の示唆");
   txt(s, "示唆", { x: x + 0.3, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   s.addText(bullets([
-    "居宅需要の中心は85歳以上。どの院の圏域も10年で2〜6割増える",
-    "埼玉・千葉の院は平均+48%、都内の院は平均+29%と、郊外ほど速く増える",
+    `居宅需要の中心は85歳以上。どの院の圏域も10年で${Math.round(10 * (g85[g85.length - 1].e85_growth_25_35 - 1))}〜${Math.round(10 * (g85[0].e85_growth_25_35 - 1))}割増える`,
+    `埼玉・千葉の院は平均+${Math.round(100 * (avg(clinics.filter((c) => c.pref !== "東京都")) - 1))}%、都内の院は平均+${Math.round(100 * (avg(clinics.filter((c) => c.pref === "東京都")) - 1))}%と、郊外ほど速く増える`,
     "出店スコアにも「10年後の伸び」を2割反映した",
   ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 {
-  const s = content("出店候補：上位は埼玉東部〜千葉北西部、既存院から16km以上離れ、10年で需要も大きく伸びる");
+  const s = content(`出店候補：上位は埼玉東部〜千葉北西部、既存院から${Math.floor(Math.min(...D.top_sites.map((t) => t.nearest_clinic_km)))}km以上離れ、10年で需要も大きく伸びる`);
   img(s, path.join(CONF, "figures/slide/fig_map_site_score.png"), MX, 1.25, W - 2 * MX, 5.75, 2520, 1440, "立地スコアマップ");
 }
 // ---------------------------------------------------------------- 7. 活用提案

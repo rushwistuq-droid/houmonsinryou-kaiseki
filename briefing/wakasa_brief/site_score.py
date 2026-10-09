@@ -13,11 +13,11 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from .engine import RADIUS_KM, Engine, haversine_km
+from .engine import Engine, haversine_km
 from .model import GrowthModel, reach_target
 
 TARGET_PREFS = ("11", "12", "13", "14")
-MIN_ELDERLY_65 = 30_000  # 8km圏の65歳以上がこれ未満の地点は対象外
+MIN_ELDERLY_65_PER_KM2 = 150  # 診療圏の65歳以上の密度（人/km²）がこれ未満の地点は対象外（旧: 8km圏で3万人）
 HORIZON_MONTHS = 36
 
 
@@ -43,8 +43,9 @@ class SiteScorer:
         d = np.vstack([haversine_km(c.lat, c.lon, ma["lat"], ma["lon"]) for c in engine.clinics])
         self._d_exist = d.min(axis=0)
 
-    def exclusive_ratio(self, lat: float, lon: float, radius_km: float = RADIUS_KM) -> float:
-        """新院の8km圏の高齢者のうち、新院が既存院より近い（＝新たに担当する）割合。"""
+    def exclusive_ratio(self, lat: float, lon: float, radius_km: float | None = None) -> float:
+        """新院の診療圏の高齢者のうち、新院が既存院より近い（＝新たに担当する）割合。"""
+        radius_km = self.E.radius_km if radius_km is None else radius_km
         ma = self.E._mesh_arr
         d = haversine_km(lat, lon, ma["lat"], ma["lon"])
         inside = d <= radius_km
@@ -52,7 +53,8 @@ class SiteScorer:
         own = ma["e"][inside & (d < self._d_exist), 0].sum()
         return float(own / tot) if tot else float("nan")
 
-    def evaluate(self, lat: float, lon: float, radius_km: float = RADIUS_KM) -> dict:
+    def evaluate(self, lat: float, lon: float, radius_km: float | None = None) -> dict:
+        radius_km = self.E.radius_km if radius_km is None else radius_km
         p = self.E.point(lat, lon, radius_km)
         if not p:
             return {}
@@ -78,7 +80,7 @@ class SiteScorer:
         pts = grid_points(self.E, step_km)
         rows = [r for r in (self.evaluate(a, b) for a, b in zip(pts.lat, pts.lon)) if r]
         df = pd.DataFrame(rows)
-        df = df[df.pref.isin(TARGET_PREFS) & (df.elderly_65 >= MIN_ELDERLY_65)].reset_index(drop=True)
+        df = df[df.pref.isin(TARGET_PREFS) & (df.elderly_65 >= MIN_ELDERLY_65_PER_KM2 * np.pi * self.E.radius_km ** 2)].reset_index(drop=True)
         return add_scores(df, self.E)
 
 

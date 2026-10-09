@@ -17,6 +17,8 @@ import pandas as pd  # noqa: E402
 from matplotlib import font_manager  # noqa: E402
 from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 
+from .engine import RADIUS_KM  # noqa: E402
+
 for f in ("/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf", "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf"):
     if Path(f).exists():
         font_manager.fontManager.addfont(f)
@@ -95,7 +97,7 @@ def map_underserved(grid: pd.DataFrame, clinics, path: Path):
     cb.set_label("未充足度（潜在需要 ÷ 顕在需要）", color=TEXT2, fontsize=9)
     cb.outline.set_visible(False)
     cb.ax.tick_params(colors=TEXT2, labelsize=8)
-    _title(fig, "在宅医療の未充足度（各地点の半径8km）",
+    _title(fig, f"在宅医療の未充足度（各地点の半径{RADIUS_KM:g}km）",
            "東京都並みに訪問診療が普及した場合の居宅需要が、現在の何倍か。濃いほど「まだ取られていない需要」が大きい。●＝わかさ各院")
     _source(fig, "出典: 国勢調査メッシュ(2020)・社人研推計(2025)・NDBオープンデータ第10回(2022年度)・介護サービス情報公表 から算出")
     _save(fig, path)

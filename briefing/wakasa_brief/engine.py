@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -34,7 +35,9 @@ from home_visit_demand.precision import MESH_HALF_DIAG_KM  # noqa: E402
 
 BANDS = ("65-74", "75-84", "85-94", "95+")
 
-RADIUS_KM = 8.0
+# 診療圏の半径。2026-10-09 に8km→6kmへ変更（本院の実際の訪問範囲が約6kmとの院内知見）。
+# 環境変数 WAKASA_RADIUS_KM で上書きできる（感度分析用）。
+RADIUS_KM = float(os.environ.get("WAKASA_RADIUS_KM", 6.0))
 SIBLING_RADIUS_KM = 16.0
 # 1都3県＋隣接県（圏域が県境をまたぐ院のため）
 MESH_PREFS = (8, 9, 10, 11, 12, 13, 14, 19)
@@ -105,8 +108,9 @@ def load_clinics(path: Path | None = None) -> list[Clinic]:
 class Engine:
     """データを一度だけ読み込み、地点ごとの指標を返す。"""
 
-    def __init__(self, clinics: list[Clinic] | None = None):
+    def __init__(self, clinics: list[Clinic] | None = None, radius_km: float | None = None):
         self.clinics = clinics if clinics is not None else load_clinics()
+        self.radius_km = float(radius_km if radius_km is not None else RADIUS_KM)
 
     # ------------------------------------------------------------------ data
     @cached_property
@@ -351,8 +355,9 @@ class Engine:
             "pref": m.pref.values,
         }
 
-    def point(self, lat: float, lon: float, radius_km: float = RADIUS_KM, *, single_pref: bool = False) -> dict:
+    def point(self, lat: float, lon: float, radius_km: float | None = None, *, single_pref: bool = False) -> dict:
         """1地点の全指標。single_pref=True は系統Bと同じ「最多県の受療率を圏全体に適用」（検証用）。"""
+        radius_km = self.radius_km if radius_km is None else radius_km
         ma = self._mesh_arr
         q = _project([lat], [lon])[0]
         idx = np.asarray(self.mesh_tree.query_ball_point(q, radius_km + 0.8), dtype=int)
@@ -444,9 +449,10 @@ class Engine:
         }
 
     # ------------------------------------------------------------ group overlap
-    def mesh_owner(self, clinics: list[Clinic] | None = None, radius_km: float = RADIUS_KM) -> pd.DataFrame:
+    def mesh_owner(self, clinics: list[Clinic] | None = None, radius_km: float | None = None) -> pd.DataFrame:
         """各メッシュを最寄りの自院に割り当てる（半径内のみ）。"""
         clinics = clinics or self.clinics
+        radius_km = self.radius_km if radius_km is None else radius_km
         m = self.mesh
         lat, lon = m.lat.values, m.lon.values
         dist = np.vstack([haversine_km(c.lat, c.lon, lat, lon) for c in clinics])  # (n_clinic, n_mesh)
@@ -455,9 +461,10 @@ class Engine:
         owner = np.where(n_cover > 0, dist.argmin(axis=0), -1)
         return pd.DataFrame({"owner": owner, "n_cover": n_cover, "elderly_65": m.elderly_65.values})
 
-    def exclusive_share(self, clinics: list[Clinic] | None = None, radius_km: float = RADIUS_KM) -> dict[str, dict]:
+    def exclusive_share(self, clinics: list[Clinic] | None = None, radius_km: float | None = None) -> dict[str, dict]:
         """院ごとの 圏内高齢者のうち自院が最寄りの割合（排他率）と重複院数。"""
         clinics = clinics or self.clinics
+        radius_km = self.radius_km if radius_km is None else radius_km
         own = self.mesh_owner(clinics, radius_km)
         m = self.mesh
         out = {}
@@ -467,14 +474,14 @@ class Engine:
             tot = own.elderly_65.values[inside].sum()
             excl = own.elderly_65.values[inside & (own.owner.values == i)].sum()
             contested = own.elderly_65.values[inside & (own.n_cover.values >= 2)].sum()
-            sib8 = sum(1 for o in clinics if o.id != c.id and haversine_km(c.lat, c.lon, o.lat, o.lon) <= radius_km)
+            sib_r = sum(1 for o in clinics if o.id != c.id and haversine_km(c.lat, c.lon, o.lat, o.lon) <= radius_km)
             sib16 = sum(
                 1 for o in clinics if o.id != c.id and haversine_km(c.lat, c.lon, o.lat, o.lon) <= SIBLING_RADIUS_KM
             )
             out[c.id] = {
                 "exclusive_ratio": excl / tot if tot else float("nan"),
                 "contested_ratio": contested / tot if tot else float("nan"),
-                "siblings_8km": sib8,
+                "siblings_in_radius": sib_r,
                 "siblings_16km": sib16,
             }
         return out
