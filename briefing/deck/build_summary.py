@@ -71,9 +71,22 @@ G85_OUT = round(100 * (sum(c["e85_growth_25_35"] for c in clinics if c["pref"] !
 G85_TKY = round(100 * (sum(c["e85_growth_25_35"] for c in clinics if c["pref"] == "東京都") / sum(1 for c in clinics if c["pref"] == "東京都") - 1))
 MIN_KM = int(min(t["nearest_clinic_km"] for t in D["top_sites"]))
 
+_by = {c["id"]: c for c in clinics}
+_slow = [c for c in (_by.get("urawa"), _by.get("ichikawa")) if c and c["perf"] < 0.85]
+LAUNCH_ITEM = "<li><b>立ち上げ</b>: " + "、".join(f"{c['name']}は{c['months']}か月で居宅{c['home']}人（地域条件からの基準の約{c['perf']:.0%}）" for c in _slow) + "。立ち上げ支援が必要</li>" if _slow else ""
+EL = D.get("era_launch") or {}
+if EL.get("石神井公園"):
+    LAUNCH_ITEM += (f"<li><b>立ち上げ方針の検証（2022年からの月次）</b>: 開院12か月時点の居宅は、施設重視期の石神井公園{EL['石神井公園']['h12']}人・ひばりが丘{EL['ひばりが丘']['h12']}人に対し、"
+                    f"転換期の都内の院は{min(EL[n]['h12'] for n in ('府中','調布','三軒茶屋','西日暮里','高円寺'))}〜{max(EL[n]['h12'] for n in ('府中','調布','三軒茶屋','西日暮里','高円寺'))}人。"
+                    f"三鷹は2年目まで並みでその後に失速（重複エリアの影響が主とみられる）</li>")
+CD = D.get("candidates") or []
+CAND_ITEM = ("<li><b>出店候補（駅近）</b>: " + "。".join(
+    f"{c['name']}：未充足度{c['underserved_ratio']:.2f}・競合密度{c['competition_density']:.1f}・格子{c['n_grid']}点中{c['rank']}位。3年後の居宅 約{c['low_36']:.0f}〜{c['std_36']:.0f}人（既存院への影響：{c['overlap_effect']}）"
+    for c in CD) + "</li>") if CD else ""
+
 page = f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
 @page {{ size: A4; margin: 14mm 14mm 12mm; }}
-body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:8.9pt; line-height:1.4; }}
+body {{ font-family: 'IPAPGothic','IPAGothic','Yu Gothic','Meiryo',sans-serif; color:#1a1a1a; font-size:8.5pt; line-height:1.35; }}
 h1 {{ font-size:15pt; color:#0f2d4a; margin:0 0 2mm; }}
 h2 {{ font-size:11pt; color:#0f2d4a; margin:5mm 0 1.5mm; }}
 .meta {{ color:#6b6a66; font-size:8.5pt; margin-bottom:3mm; }}
@@ -103,12 +116,13 @@ td.v {{ text-align:left; white-space:normal; }}
 <ul>
 {FLOW_ITEMS}
 <li><b>背景</b>: 診療報酬改定ごとに施設を抑える方針。施設型で立ち上げた院ほど居宅の獲得の仕組みが育っておらず（同条件で居宅が約{round((1-__import__('math').exp(M['coef']['d_facility_era']))*100)}%少ない）、施設の伸びが止まると全体も止まる</li>
-<li><b>比較の基準</b>: 本院は先行者のため除外し、同じ地域タイプの上位院（都市型: {html.escape('・'.join(P['都市型']['members']))}、未充足型: {html.escape('・'.join(P['未充足型']['members']))}）と比べた。医師数は患者に合わせて増やす運用のため、原因ではなく増員時期の目安として扱う</li>
-<li><b>浦和</b>: {[c for c in clinics if c['id']=='urawa'][0]['months']}か月で居宅{[c for c in clinics if c['id']=='urawa'][0]['home']}人。地域条件からの基準の約{[c for c in clinics if c['id']=='urawa'][0]['perf']:.0%}で、立ち上げ支援が必要</li>
+
+{LAUNCH_ITEM}
 <li><b>データ補正（確認済み）</b>: 2025年4月の石神井公園・三鷹→高円寺の施設移管、2025年8月の報告値の修正を除いた実態ベースで評価。居宅は全院・全期間でがん医総を含めて統一（市川も）。本院の施設減は補正せず</li>
-<li><b>院の評価</b>は「年数・地域補正後の実力」（実績÷モデル期待値）で。都心と郊外を同じ物差しで比べられる。{below_text}</li>
+
 <li><b>10年後</b>: 85歳以上は2035年までに各院の圏域で{G85_LO}〜{G85_HI}割増。埼玉・千葉の院（平均+{G85_OUT}%）は都内の院（+{G85_TKY}%）より速い</li>
 <li><b>出店</b>: 埼玉東部・千葉北西部が上位（未充足度2倍超・競合が薄い・既存院と{MIN_KM}km以上離れる）。新規院は居宅重視で立ち上げる（施設重視型は約4割少ない）</li>
+{CAND_ITEM}
 </ul>
 <h2>院別の診断</h2>
 <table><thead><tr><th>院</th><th>在宅月数</th><th>居宅</th><th>施設</th><th>居宅比</th><th>地域タイプ</th><th>実力</th><th>上位院比</th><th>判定</th></tr></thead>

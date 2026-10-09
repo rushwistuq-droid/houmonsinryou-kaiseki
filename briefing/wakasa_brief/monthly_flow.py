@@ -24,7 +24,9 @@ import pandas as pd
 FLOW_COLS = ["new_home", "end_home", "new_facility", "end_facility"]
 FLOW_LABELS = {"施設新規": "new_facility", "居宅新規": "new_home", "施設終了": "end_facility", "居宅終了": "end_home"}
 STOCK_LABELS = {"施設": "facility_patients", "居宅": "home_reported", "居宅(がん医総)": "home_cancer_patients", "総数": "total_patients"}
-HOME_INCLUDES_CANCER_FROM = "2026-04"  # この月から院の「居宅」欄にがん医総が含まれる
+HOME_INCLUDES_CANCER_FROM = "2026-04"
+COMBINED_FLOW_BEFORE = "2024-01"  # これより前の新規・終了は居宅・施設の合計のみ（施設の欄に記入）
+STOCK_GAP_TOL = 5  # この月から院の「居宅」欄にがん医総が含まれる
 CLINIC_ALIAS = {"石神井": "石神井公園"}
 
 WINDOW = 12  # 率を出す期間（直近12か月。季節の偏りをならす）
@@ -87,16 +89,31 @@ def parse_upload(path) -> tuple[pd.DataFrame, pd.DataFrame]:
     stock["facility_patients"] = stock.facility_patients.fillna(0)  # 総数があり施設が空欄＝施設0人
     stock["home_cancer_patients"] = stock.home_cancer_patients.where(stock.home_cancer_patients >= 0)  # 負の値は入力の誤り
     stock["home_patients"] = stock.total_patients - stock.facility_patients
+    # 総数が内訳（施設＋居宅＋がん医総）より大きい月は、差を施設とみなす（2022年9月以前の本院・所沢。
+    # 翌月に施設がほぼ同じ人数だけ増えており、施設の一部が別区分で数えられていたため）
+    before = stock.month < pd.Period(HOME_INCLUDES_CANCER_FROM, freq="M")
+    comp_home = stock.home_reported + stock.home_cancer_patients.fillna(0).where(before, 0)
+    gap = stock.total_patients - stock.facility_patients - comp_home
+    fix = before & stock.home_reported.notna() & (gap > STOCK_GAP_TOL)
+    stock.loc[fix, "home_patients"] = comp_home[fix]
+    stock.loc[fix, "facility_patients"] = (stock.total_patients - comp_home)[fix]
     stock = stock[["clinic", "month", "home_patients", "facility_patients", "home_cancer_patients", "total_patients"]]
     flow = _wide(frows)
     # 開院前（全項目が空か0）の月は落とす
     flow = flow[flow[FLOW_COLS].fillna(0).sum(axis=1) > 0].copy()
+    # 居宅・施設の内訳が無い古い月（居宅の欄が空欄）は、施設の欄に合計が入っている
+    combined = flow.new_home.isna() & flow.end_home.isna() & (flow.month < pd.Period(COMBINED_FLOW_BEFORE, freq="M"))
+    flow["new_total"] = flow.new_home.fillna(0) + flow.new_facility.fillna(0)
+    flow["end_total"] = flow.end_home.fillna(0) + flow.end_facility.fillna(0)
+    flow.loc[combined, ["new_facility", "end_facility"]] = np.nan
+    flow["split"] = ~combined
     # 新規・終了の片方だけ空欄の月は、空欄＝0人と読む（両方空欄の月は不明のまま）
     for kind in ("home", "facility"):
         n, e = f"new_{kind}", f"end_{kind}"
-        flow.loc[flow[n].isna() & flow[e].notna(), n] = 0
-        flow.loc[flow[e].isna() & flow[n].notna(), e] = 0
-    return stock.reset_index(drop=True), flow[["clinic", "month", *FLOW_COLS]].reset_index(drop=True)
+        k = flow.split
+        flow.loc[k & flow[n].isna() & flow[e].notna(), n] = 0
+        flow.loc[k & flow[e].isna() & flow[n].notna(), e] = 0
+    return stock.reset_index(drop=True), flow[["clinic", "month", *FLOW_COLS, "new_total", "end_total", "split"]].reset_index(drop=True)
 
 
 def _num(x):
@@ -323,7 +340,10 @@ def _note(r, tags) -> str:
 
 
 def group_flow(flow: pd.DataFrame) -> pd.DataFrame:
-    """グループ全体の月次の新規・終了（補正後）。"""
+    """グループ全体の月次の新規・終了（補正後）。居宅・施設の内訳がそろっている月だけ。"""
+    if "split" in flow:
+        ok = flow.groupby("month").split.transform("all").astype(bool)
+        flow = flow[ok]
     g = flow.groupby("month")[FLOW_COLS].sum(min_count=1)
     g["net_home"] = g.new_home - g.end_home
     g["net_facility"] = g.new_facility - g.end_facility

@@ -37,6 +37,7 @@ from briefing.wakasa_brief.sales_lists import write_sales_lists  # noqa: E402
 from briefing.wakasa_brief.site_score import SiteScorer, add_scores, top_sites  # noqa: E402
 
 PUB = ROOT / "briefing/output"
+GROUP_FROM = "2023-12"
 CONF = ROOT / "analysis/confidential/briefing"
 
 # 公開表に出す列（実績を含まない地域指数）
@@ -108,6 +109,8 @@ def main() -> None:
         # 分析は補正後（移管・集計修正の段差を除いた実態ベース）。グループ合計は集計修正のみ補正
         mdf = ma.apply_adjustments(mdf_raw, events)
         mdf_group = ma.apply_adjustments(mdf_raw, events, kinds=("集計修正",))
+        # グループ合計は全既存院がそろう2023年12月から（それ以前は開院前の院が多く、伸び率が過大に見える）
+        mdf_group = mdf_group[mdf_group.month >= pd.Period(GROUP_FROM, freq="M")]
         if events:
             print(f"補正イベント {len(events)}件を適用（analysis/confidential/monthly_events.yaml）")
         gtab = ma.growth_table(mdf)
@@ -173,6 +176,17 @@ def main() -> None:
         scorer = SiteScorer(E, model, bench)
         grid = scorer.score_grid(2.0)
         grid[SITE_COLS].round(4).to_csv(grid_csv, index=False, encoding="utf-8-sig")
+    cand_path = ROOT / "analysis/confidential/candidate_sites.yaml"
+    if cand_path.exists():
+        import yaml
+
+        from briefing.wakasa_brief.candidates import evaluate_candidates
+
+        cands = evaluate_candidates(E, model, bench, diag, grid, yaml.safe_load(cand_path.read_text(encoding="utf-8"))["candidates"])
+        cands.round(4).to_csv(CONF / "出店候補_個別評価.csv", index=False, encoding="utf-8-sig")
+        print("出店候補（個別）:")
+        print(cands[["name", "score", "rank", "underserved_ratio", "competition_density", "reach_target", "plateau_tsudanuma_share",
+                     "std_12", "std_36", "low_12", "low_36", "model_36", "overlap_effect"]].round(2).to_string(index=False))
     top = top_sites(grid, 30)
     top[SITE_COLS].round(3).to_csv(PUB / "site_top30.csv", index=False, encoding="utf-8-sig")
     print(f"出店候補 上位30: {PUB / 'site_top30.csv'}")
@@ -195,7 +209,7 @@ def main() -> None:
             ),
             "月次_12か月見通し": ma.forecast_12m(mdf, model),
             "月次_グループ合計": ma.group_totals(mdf_group),
-            "月次_グループ合計（補正前）": ma.group_totals(mdf_raw),
+            "月次_グループ合計（補正前）": ma.group_totals(mdf_raw[mdf_raw.month >= pd.Period(GROUP_FROM, freq="M")]),
             "月次_補正イベント": pd.DataFrame(events),
         }
         for name, t in {**monthly_sheets, **{f"月次_{k}": v for k, v in flow_sheets.items()}}.items():
@@ -249,6 +263,9 @@ def main() -> None:
             charts.clinic_small_multiples(mdf, order, d / "fig_m_clinics.png")
             charts.launch_curves(mdf, launch, us, model, d / "fig_m_launch.png")
             charts.forecast_bars(monthly_sheets["月次_12か月見通し"], order, d / "fig_m_forecast.png")
+            charts.era_launch(mdf_raw, E.clinics, d / "fig_m_era_launch.png")
+            if cand_path.exists():
+                charts.candidate_paths(cands, model, mdf_raw, d / "fig_candidates.png")
             if fcls is not None:
                 charts.group_flow(flow_sheets["新規終了_グループ"], d / "fig_m_group_flow.png")
                 charts.flow_balance(fcls, order, d / "fig_m_flow_balance.png")

@@ -143,8 +143,11 @@ def diagnose(df: pd.DataFrame, model: GrowthModel, monthly: pd.DataFrame | None 
         for col in ("home_curve_status", "home_slope_6m", "home_trend", "facility_trend", "facility_from_peak"):
             out[col] = mm[col].values if col in mm else np.nan
     out["expected_home"] = model.predict(out.months_open, out.underserved_ratio, out.era == "施設重視期")
-    out["performance_index"] = out.home / out.expected_home
+    # 実力＝実績÷期待値。期待値は「その院を除いた9〜10院で推定した式」で出す（自院を含めると式が自院に寄り、
+    # 好調な院は低め・不調な院は高めに出るため）。推定に使っていない院（本院・開院直後）は全院の式の値
+    out["performance_index_insample"] = out.home / out.expected_home
     out["performance_index_loo"] = pd.Series(model.residuals)
+    out["performance_index"] = out.performance_index_loo.fillna(out.performance_index_insample)
     bench = peer_benchmarks(out)
     out["area_type"] = area_type(out.underserved_ratio)
     out["territory_share"] = out.home / out.exclusive_latent_home

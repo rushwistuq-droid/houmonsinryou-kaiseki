@@ -41,6 +41,9 @@ def load_model() -> tuple[GrowthModel, dict]:
         underserved_range=tuple(m["underserved_range"]),
     )
     bench = {t: {"share": v} for t, v in m["peer_benchmark_share"].items()}
+    conf = ROOT / "analysis/confidential/briefing/peer_benchmarks.json"  # 丸める前の値（あれば）
+    if conf.exists():
+        bench = json.loads(conf.read_text(encoding="utf-8"))
     return model, bench
 
 

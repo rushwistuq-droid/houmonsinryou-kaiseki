@@ -88,8 +88,10 @@ def add_scores(df: pd.DataFrame, engine: Engine) -> pd.DataFrame:
     df = df.copy()
     # 3年後の純増 40% + 到達目安 40% + 10年後の需要の伸び（85歳以上 2025→2035）20%
     growth = df.e85_growth_25_35.rank(pct=True) if "e85_growth_25_35" in df else 0.5
+    # 人数は整数に丸めてから順位を付ける。未充足度が実績範囲を超える地点は予測が上限値でそろう（同点）ため、
+    # 小数点以下の差で順位が大きく動かないようにする（同点は平均順位）
     df["score"] = 100 * (
-        0.4 * df.pred_home_36m_group_net.rank(pct=True) + 0.4 * df.reach_target.rank(pct=True) + 0.2 * growth
+        0.4 * df.pred_home_36m_group_net.round(0).rank(pct=True) + 0.4 * df.reach_target.round(0).rank(pct=True) + 0.2 * growth
     )
     mu = engine.munis
     names = []

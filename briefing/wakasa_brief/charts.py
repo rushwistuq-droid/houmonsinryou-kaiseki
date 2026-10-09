@@ -138,7 +138,9 @@ def map_site_score(grid: pd.DataFrame, top: pd.DataFrame, clinics, path: Path):
 
 
 def model_fit(diag: pd.DataFrame, model, path: Path):
-    d = diag[diag.months_open >= 6]
+    d = diag[diag.months_open >= 6].copy()
+    # 横軸は「その院を除いた残りの院で作った式」による予測（自院に合わせにいかない、本番と同じ条件の予測）
+    d["expected_home"] = d.home / d.performance_index
     fig, ax = plt.subplots(figsize=(8.6, 6.4))
     fig.subplots_adjust(left=0.1, right=0.97, top=_top(0.84), bottom=0.12)
     _style(ax, grid_axis="both")
@@ -160,8 +162,8 @@ def model_fit(diag: pd.DataFrame, model, path: Path):
     ax.set_xticks(ticks, [str(t) for t in ticks])
     ax.set_yticks(ticks, [str(t) for t in ticks])
     ax.minorticks_off()
-    ax.set_xlabel("モデルが予測する居宅患者数（人）", color=TEXT2, fontsize=9.5)
-    ax.set_ylabel("実際の居宅患者数（人, 2026-07）", color=TEXT2, fontsize=9.5)
+    ax.set_xlabel("モデルが予測する居宅患者数（人、その院を除いた残りの院で作った式）", color=TEXT2, fontsize=9.5)
+    ax.set_ylabel("実際の居宅患者数（人、最新月）", color=TEXT2, fontsize=9.5)
     leg = ax.legend(loc="upper left", frameon=False, fontsize=9)
     for t in leg.get_texts():
         t.set_color(TEXT)
@@ -441,4 +443,91 @@ def flow_balance(cls: pd.DataFrame, order: list[str], path: Path):
     _title(fig, "今の新規ペースが続くと、居宅患者はどこで落ち着くか",
            "直近12か月の月間新規と終了率から。◆が棒の先と重なる院は、新規を増やさない限り横ばいが続く")
     _source(fig, "A＝担当エリアを取り切った／B＝新規が少ない（エリアの大きさ比）／C＝終了が多い。院内月次データ（機密）")
+    _save(fig, path)
+
+
+def era_launch(df: pd.DataFrame, clinics, path: Path, max_months: int = 48):
+    """立ち上げ方針の検証：在宅開始から同じ月数で居宅患者数を比べる（左＝都市型、右＝未充足型）。"""
+    era = {c.name: c.era for c in clinics}
+    us = {c.name: c for c in clinics}
+    groups = (("都市型（未充足度1.0〜1.1、都内）", ["石神井公園", "ひばりが丘", "三鷹", "府中", "調布", "三軒茶屋", "西日暮里", "高円寺"]),
+              ("未充足型（埼玉・千葉）", ["所沢", "津田沼", "市川", "浦和"]))
+    fig, axes = plt.subplots(1, 2, figsize=(11, 6.2), sharey=False, gridspec_kw={"width_ratios": [1.5, 1]})
+    fig.subplots_adjust(left=0.07, right=0.97, top=_top(0.8), bottom=0.11, wspace=0.18)
+    for ax, (title, names) in zip(axes, groups):
+        _style(ax, grid_axis="y")
+        ends = []
+        for n in names:
+            g = df[df.clinic == n].sort_values("months_open")
+            g = g[(g.months_open >= 0) & (g.months_open <= max_months)]
+            if g.empty or n not in us:
+                continue
+            color = S2 if era[n] == "施設重視期" else S1
+            ax.plot(g.months_open, g.home_patients, color=color, linewidth=2.2 if era[n] == "施設重視期" else 1.6)
+            ends.append([g.months_open.iloc[-1], g.home_patients.iloc[-1], n, color])
+        ends.sort(key=lambda e: e[1])
+        ymax = max(e[1] for e in ends) if ends else 1
+        placed: list[tuple[float, float]] = []
+        for e in ends:  # ラベルの重なりを避ける（線の終点が近い月どうしだけ上下にずらす）
+            y = e[1]
+            gap = 0.05 * ymax * 1.15
+            for px, py in placed:
+                if abs(px - e[0]) < 8 and abs(py - y) < gap:
+                    y = py + gap
+            ax.annotate(e[2], (e[0], e[1]), xytext=(e[0] + 0.8, y), textcoords="data", fontsize=9, color=e[3], va="center")
+            placed.append((e[0], y))
+        ax.set_xlim(0, max_months + 9)
+        ax.set_ylim(0, ymax * 1.15)
+        ax.set_xticks(range(0, max_months + 1, 12))
+        ax.set_xlabel("在宅開始からの月数", color=TEXT2, fontsize=9.5)
+        ax.set_title(title, loc="left", fontsize=11.5, color=TEXT, weight="bold")
+    axes[0].set_ylabel("居宅患者数（人、月末）", color=TEXT2, fontsize=9.5)
+    from matplotlib.lines import Line2D
+
+    handles = [Line2D([], [], color=S2, linewidth=2.2, label="施設重視期に開院"), Line2D([], [], color=S1, linewidth=1.6, label="転換期（居宅重視）に開院")]
+    leg = axes[0].legend(handles=handles, loc="upper left", frameon=False, fontsize=9)
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    _title(fig, "立ち上げ方針の検証：在宅開始から同じ月数で比べた居宅患者数",
+           "施設重視期の石神井公園・ひばりが丘は開院直後から居宅の伸びが遅い。三鷹は2年目まで並み、その後に失速")
+    _source(fig, "院内月次データ（機密、補正前）。所沢は在宅開始を2021-06と仮置きし、2022-01（7か月目）から。本院は在宅開始が2014年でデータ外")
+    _save(fig, path)
+
+
+def candidate_paths(cands: pd.DataFrame, model, df: pd.DataFrame, path: Path, refs=("津田沼", "市川", "浦和")):
+    """出店候補の開院後の見込み（標準・慎重の幅）と、未充足型の既存院の実績。"""
+    months = np.arange(1, 37)
+    fig, axes = plt.subplots(1, len(cands), figsize=(11, 6.0), sharey=True)
+    axes = np.atleast_1d(axes)
+    fig.subplots_adjust(left=0.07, right=0.97, top=_top(0.8), bottom=0.12, wspace=0.08)
+    ymax = 0
+    for ax, (_, c) in zip(axes, cands.iterrows()):
+        _style(ax, grid_axis="y")
+        pred = np.array([float(model.predict(m, c.underserved_ratio, False)) for m in months])
+        std = np.minimum(pred, c.plateau_tsudanuma_share)
+        low = np.minimum(pred * c.cautious_factor, c.plateau_tsudanuma_share)
+        for n in refs:
+            g = df[(df.clinic == n) & (df.months_open >= 0) & (df.months_open <= 36)].sort_values("months_open")
+            if len(g):
+                ax.plot(g.months_open, g.home_patients, color=MUTED, linewidth=1.2, alpha=0.8)
+                ax.annotate(n, (g.months_open.iloc[-1], g.home_patients.iloc[-1]), xytext=(3, 0), textcoords="offset points",
+                            fontsize=8.5, color=MUTED, va="center")
+        ax.fill_between(months, low, std, color="#cde2fb", linewidth=0)
+        ax.plot(months, std, color=S1, linewidth=2.4)
+        ax.plot(months, low, color=S1, linewidth=1.4, linestyle=(0, (4, 3)))
+        ax.plot(months, pred, color=S1, linewidth=1, alpha=0.5, linestyle=(0, (1, 2)))
+        ax.axhline(c.plateau_tsudanuma_share, color=TEXT2, linewidth=0.8)
+        ax.annotate(f"津田沼の現在の取り込み率なら {c.plateau_tsudanuma_share:.0f}人", (1, c.plateau_tsudanuma_share), xytext=(0, 4),
+                    textcoords="offset points", fontsize=8.5, color=TEXT2)
+        ax.annotate(f"標準 {std[-1]:.0f}人", (36, std[-1]), xytext=(4, 6), textcoords="offset points", fontsize=9.5, color=S1, ha="right")
+        ax.annotate(f"慎重 {low[-1]:.0f}人", (36, low[-1]), xytext=(4, -12), textcoords="offset points", fontsize=9.5, color=S1, ha="right")
+        ax.set_title(f"{c.label}", loc="left", fontsize=11.5, color=TEXT, weight="bold")
+        ax.set_xticks([0, 6, 12, 24, 36])
+        ax.set_xlabel("開院からの月数", color=TEXT2, fontsize=9.5)
+        ymax = max(ymax, pred.max(), c.plateau_tsudanuma_share)
+    axes[0].set_ylim(0, 420)
+    axes[0].set_ylabel("居宅患者数（人）", color=TEXT2, fontsize=9.5)
+    _title(fig, "出店候補の開院後の見込み（居宅患者）",
+           "実線＝標準（モデルの伸び。津田沼の現在の取り込み率に達したら横ばいと仮定）、破線＝慎重（市川の実力並み）、点線＝モデルのみ。灰色＝既存院の実績")
+    _source(fig, "駅の座標を中心に半径6km。転換期型（居宅重視）で立ち上げる前提。津田沼自身は今も伸びているため、横ばいの水準は今後上がりうる。院内月次データ（機密）")
     _save(fig, path)

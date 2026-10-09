@@ -120,6 +120,23 @@ muni = []
 mpath = CONF / "検証_市区町村の実数.csv"
 if mpath.exists():
     muni = pd.read_csv(mpath).round(3).to_dict(orient="records")
+cands = []
+cpath = CONF / "出店候補_個別評価.csv"
+if cpath.exists():
+    cands = pd.read_csv(cpath).round(4).fillna("").to_dict(orient="records")
+# 立ち上げ方針の検証: 在宅開始から同じ月数の居宅患者数
+era_launch = {}
+mp = ROOT / "analysis/confidential/monthly_patients.csv"
+if mp.exists():
+    import yaml
+
+    st = pd.read_csv(mp)
+    starts = {c["name"]: c for c in yaml.safe_load((ROOT / "briefing/data/clinics.yaml").read_text(encoding="utf-8"))["clinics"]}
+    st["m"] = [(pd.Period(mo, "M") - pd.Period(starts[c]["home_start"], "M")).n for c, mo in zip(st.clinic, st.month)]
+    for c, g in st.groupby("clinic"):
+        g = g.set_index("m")
+        era_launch[c] = {"era": starts[c]["era"], **{f"h{k}": (int(g.home_patients[k]) if k in g.index else None) for k in (6, 12, 24, 36)},
+                         **{f"f{k}": (int(g.facility_patients[k]) if k in g.index else None) for k in (12, 24)}}
 peer = json.loads((CONF / "peer_benchmarks.json").read_text(encoding="utf-8"))
 out = {
     "as_of": "2026-07",
@@ -129,6 +146,8 @@ out = {
     "monthly": monthly,
     "flow": flow,
     "muni_check": muni,
+    "candidates": cands,
+    "era_launch": era_launch,
     "peer": peer,
     "top_sites": top.head(10)[["area", "score", "underserved_ratio", "competition_density", "pred_home_36m_group_net", "reach_target", "nearest_clinic", "nearest_clinic_km"]].round(2).to_dict(orient="records"),
 }
