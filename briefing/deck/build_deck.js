@@ -155,16 +155,16 @@ pres.addSection({ title: "要旨" });
   const cw = (W - 2 * MX - 3 * 0.3) / 4;
   items.forEach(([big, label], i) => {
     const x = MX + i * (cw + 0.3);
-    card(s, x, 1.55, cw, 3.3, `要旨カード${i + 1}`);
-    txt(s, big, { x: x + 0.3, y: 1.85, w: cw - 0.6, h: 1.0, fontSize: 40, bold: true, color: i >= 2 ? C.accent2 : C.accent1, fontFace: "Yu Gothic" });
-    txt(s, label, { x: x + 0.3, y: 3.0, w: cw - 0.6, h: 1.75, fontSize: 14 });
+    card(s, x, 1.45, cw, 2.95, `要旨カード${i + 1}`);
+    txt(s, big, { x: x + 0.3, y: 1.65, w: cw - 0.6, h: 0.9, fontSize: 38, bold: true, color: i >= 2 ? C.accent2 : C.accent1, fontFace: "Yu Gothic" });
+    txt(s, label, { x: x + 0.3, y: 2.65, w: cw - 0.6, h: 1.65, fontSize: 13.5 });
   });
-  txt(s, "ご提案", { x: MX, y: 5.2, w: 2, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+  txt(s, "ご提案", { x: MX, y: 4.6, w: 2, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   s.addText(bullets([
     `停滞院は2つに分けて対応：エリアを取り切りつつある院（${names(stalledFull)}）は担当エリアの再設定・隣接地域の開拓、エリア内に余地がある院（${names(stalledRoom)}）は紹介経路の強化`,
     `施設を抑える方針の下では、施設型で立ち上げた院ほど居宅の獲得の仕組みづくりが急務（施設重視期に開院した院は同条件で居宅が約${eraPct}%少ない）`,
-    `次の出店は埼玉東部・千葉北西部を軸に。${names(["urawa", "ichikawa"].map((id) => byId[id]).filter((c) => c && c.perf < 0.85))}は立ち上げが基準を下回っており、早期の支援が必要`,
-  ]), { x: MX, y: 5.55, w: W - 2 * MX, h: 1.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+    `次の出店は埼玉東部・千葉北西部を軸に${D.candidates && D.candidates.length ? `（候補：${D.candidates.map((c) => `${c.name} 3年後 約${fmt(Math.round(c.low_36 / 10) * 10)}${Math.abs(c.std_36 - c.low_36) < 5 ? "" : `〜${fmt(Math.round(c.std_36 / 10) * 10)}`}人`).join("、")}）` : ""}。${names(["urawa", "ichikawa"].map((id) => byId[id]).filter((c) => c && c.perf < 0.85))}は立ち上げが基準を下回り、早期の支援が必要`,
+  ]), { x: MX, y: 5.0, w: W - 2 * MX, h: 1.9, fontSize: 13.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
 }
 
 // ---------------------------------------------------------------- 3. データ
@@ -226,6 +226,26 @@ sectionSlide("1. 現在保有しているデータ", "公的統計11種＋院内
 // ---------------------------------------------------------------- 4. 予測指数
 sectionSlide("2. 患者獲得の予測指数", "13種類の候補を、12院の実績で比べました");
 {
+  const s = content("この資料で使う主な指数の意味（以降のスライドの読み方）");
+  const tsu = byId.tsudanuma, hb = byId.hibarigaoka;
+  const rows = [
+    ["未充足度", "東京都並みに訪問診療が普及した場合の居宅需要 ÷ 今の利用率での居宅需要", `津田沼${tsu.underserved.toFixed(1)}：今の需要${fmt(tsu.market_home)}人が、東京並みなら${fmt(tsu.latent_home)}人。大きいほど未開拓（利用率は県単位のため都内はほぼ1.0）`],
+    ["在宅月数", "訪問診療を始めてからの月数（ほとんどの院は開院月と同じ）", "本院は2014年4月、所沢は2021年6月を仮置き"],
+    [`予測誤差（±${Math.round(D.model.loo_error_pct)}%）`, "1院を除いた残りの院で式を作り、除いた院の今の居宅患者数を当てたときの平均的なずれ", "新しい院に当てはめたときの外れ幅の目安"],
+    ["実力", "実績 ÷ 期待値。期待値は「同じ年数・未充足度・立ち上げ方針の院なら何人か」を、その院を除いた式で計算", "1.15以上＝期待以上、0.85以下＝期待以下"],
+    ["排他率", `診療圏（半径${RK}km）の高齢者のうち、自院が一番近い人の割合`, `低いほど他のわかさ院と重なる（ひばりが丘${pct(hb.exclusive_ratio)}）`],
+    ["上位院比（取り込み）", "自院が一番近いエリアの潜在居宅需要のうち、患者にできている割合。同じ地域タイプの上位2院を100%として表す", "100%前後＝エリアを取り切った、低い＝エリア内に余地"],
+    ["競合密度", "75歳以上1万人あたりの在支診・在支病（機能強化型を重く数える）", "都内6〜11、埼玉・千葉4〜7。高いほど取り合いが激しい"],
+    ["均衡患者数", "月間新規 ÷ 終了率。今の新規ペースが続いた場合に患者数が落ち着く水準", "今の患者数と同じなら、新規を増やさない限り横ばい"],
+  ];
+  const head = ["指数", "意味", "例・読み方"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 } } }));
+  s.addTable([head, ...rows.map(([a, b, c]) => [{ text: a, options: { bold: true, color: HEX.dk2 } }, { text: b }, { text: c, options: { color: "52514E" } }])], {
+    x: MX, y: 1.3, w: W - 2 * MX, colW: [2.3, 5.2, 4.63], fontSize: 12, color: HEX.dk1,
+    border: { type: "solid", pt: 0.5, color: "D9DEE5" }, rowH: 0.6, valign: "middle", margin: [0.03, 0.08, 0.03, 0.08], fontFace: "Yu Gothic",
+  });
+  s.addNotes("指数の定義の一覧。未充足度は「今の利用率」と「東京都並みの利用率」で同じ高齢者数から需要を出して比べた値で、大きいほど訪問診療がまだ行き渡っていない地域。上位院比は、3章・4章で繰り返し出てくるので、ここで一度説明しておく。");
+}
+{
   const s = content("「人が多い所」ではなく「まだ取られていない所」が伸びる：未充足度が最も効く指数");
   const sc = D.screen;
   const labels = sc.map((r) => r["モデル"].replace("【採用】", "（採用）"));
@@ -237,18 +257,20 @@ sectionSlide("2. 患者獲得の予測指数", "13種類の候補を、12院の�
     catAxisLabelFontSize: 11, valAxisLabelFontSize: 10, catAxisLabelColor: HEX.dk1, valAxisLabelColor: HEX.accent5,
     catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", dataLabelFontFace: "+mn-lt",
     valGridLine: { color: "E6E5E1", size: 0.75 }, catGridLine: { style: "none" }, valAxisMaxVal: 90, valAxisMinVal: 0,
-    showLegend: false, showTitle: true, title: "1院ずつ抜いて予測したときの誤差（小さいほど良い）", titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt",
+    showLegend: false, showTitle: true, title: "予測の外れ幅：その院を除いた残りの院の式で、その院の今の居宅患者数を当てたときの誤差（小さいほど良い）", titleFontSize: 12, titleColor: HEX.dk1, titleFontFace: "+mn-lt",
     barGapWidthPct: 40,
   });
   const x = 8.6;
   card(s, x, 1.5, W - MX - x, 5.25, "比較の読み方");
   txt(s, "読み方", { x: x + 0.3, y: 1.75, w: 3.8, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
   s.addText(bullets([
+    "外れ幅＝その院を知らない式での予測のずれ。新しい院に当てはめたときの精度の目安",
     "高齢者数・需要・競合の「量」は、多いほど居宅が少ない（都会度を測っているだけ）",
     `未充足度を加えると誤差が±${screenErr("月数のみ")}%→±${screenErr("月数＋未充足度")}%に縮小`,
     `さらに立ち上げ方針（開院時期）を加えると±${Math.round(D.model.loo_error_pct)}%、R²=${D.model.r2.toFixed(2)}`,
     `施設重視期に開院した院は、同じ条件で居宅が約${eraPct}%少ない`,
-  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.3, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.3, fontSize: 13, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  s.addNotes("棒は「候補の指数で居宅患者数を予測したとき、どれくらい外れるか」。1院ずつ外して残りで式を作り、外した院を当てる方法なので、全院で作った式より厳しい（本番に近い）数字。人の多さ・競合の多さは予測に役立たず、未充足度と立ち上げ方針を入れると外れ幅が最も小さくなる。");
 }
 {
   const s = content(`予測モデルの当てはまり：${fitted.length}院中${inBand}院が誤差±${Math.round(D.model.loo_error_pct)}%の帯に入る`);
@@ -262,7 +284,8 @@ sectionSlide("2. 患者獲得の予測指数", "13種類の候補を、12院の�
     `施設重視期に開院した院は約${eraPct}%少ない`,
     above.length ? `斜線より大きく上の院（${above.join("・")}）は、地域と年数の割に多く取れている` : "斜線から大きく外れる院はない",
     "斜線上＝予測どおり。横軸は「その院を除いた残りの院で作った式」の予測で、新しい院に当てはめるのと同じ条件",
-  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 13, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  s.addNotes("縦軸が実際、横軸が予測。斜線（X=Y）に乗れば予測どおり。灰色の帯が外れ幅の目安。斜線より上の院は地域・年数の割に多く取れている（実力が高い）、下の院はその逆。予測は各院を除いた式で出しているため、好調な院ほど上に、不調な院ほど下に素直に出る。");
 }
 if (D.era_launch && D.era_launch["石神井公園"]) {
   const L = D.era_launch;
@@ -280,6 +303,7 @@ if (D.era_launch && D.era_launch["石神井公園"]) {
     `三鷹は2年目まで並み（24か月${L["三鷹"].h24}人）で、その後に失速。重複エリアの影響が主とみられる`,
     "未充足型は所沢（施設重視期）が津田沼より遅いが、市川（転換期）も同程度で、方針だけでは説明できない",
   ]), { x: x + 0.25, y: 2.15, w: W - MX - x - 0.4, h: 4.5, fontSize: 12.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  s.addNotes("立ち上げ方針（開院時期）が本当に原因かの検証。2022年からの月次で、在宅開始から同じ月数の居宅患者数を比べた。石神井・ひばりが丘は最初の1年から遅い＝方針の影響。三鷹は2年目まで並みで後から失速＝エリア重複の影響が主。統計上も、重複・競合・施設数・都内かどうかを加えても差は4〜5割残るが、11院のため重複エリアとは完全には切り分けられない。");
 }
 {
   const s = content("有用な患者獲得予測指数として、次の5つを採用します");
@@ -367,6 +391,35 @@ sectionSlide("3. 既存院の診断", "上限に近いのか、まだ伸ばせ�
     `本院は地域で最初に訪問診療を始めた先行者のため比較対象外（上位院の約${byId.honin.penetration.toFixed(1)}倍）`,
     "上位院も伸び続けているため、100%は上限ではなく「いまの上位水準」",
   ]), { x: x + 0.25, y: 2.25, w: W - MX - x - 0.45, h: 4.4, fontSize: 14, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+}
+{
+  const a = byId.shakujii, b = byId.hibarigaoka;
+  const s = content(`上位院比の計算例：${a.name}と${b.name}は居宅の人数はほぼ同じでも、担当エリアの広さが違う`);
+  const step = (lab, f, unit) => [{ text: lab, options: { bold: true } }, { text: f(a) + unit, options: { align: "right" } }, { text: f(b) + unit, options: { align: "right" } }];
+  const rows = [
+    step(`① 診療圏（${RK}km）の潜在居宅需要`, (c) => fmt(c.latent_home), "人"),
+    step("② うち自院が一番近い割合（排他率）", (c) => pct(c.exclusive_ratio), ""),
+    step("③ 担当エリアの潜在需要（①×②）", (c) => fmt(c.exclusive_latent_home), "人"),
+    step(`④ 上位院の取り込み率（${a.area_type}）`, (c) => (100 * c.reach_share).toFixed(1), "%"),
+    step("⑤ 到達目安（③×④）", (c) => fmt(c.reach_target), "人"),
+    step("⑥ 実際の居宅患者", (c) => fmt(c.home), "人"),
+    step("⑦ 上位院比（⑥÷⑤）", (c) => pct(c.penetration), ""),
+  ];
+  const head = ["", a.name, b.name].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 }, align: "center" } }));
+  s.addTable([head, ...rows], {
+    x: MX, y: 1.45, w: 7.6, colW: [4.4, 1.6, 1.6], fontSize: 14, color: HEX.dk1,
+    border: { type: "solid", pt: 0.5, color: "D9DEE5" }, rowH: 0.58, valign: "middle", margin: [0.03, 0.1, 0.03, 0.1], fontFace: "Yu Gothic",
+  });
+  const x = 8.6;
+  card(s, x, 1.5, W - MX - x, 5.25, "計算例の要点");
+  txt(s, "読み方", { x: x + 0.3, y: 1.75, w: 3, h: 0.4, fontSize: 16, bold: true, color: C.text2 });
+  s.addText(bullets([
+    `居宅は${a.home}人と${b.home}人でほぼ同じ`,
+    `違いは②：${b.name}は圏内の${pct(1 - b.exclusive_ratio)}が別のわかさ院のほうが近く、担当エリアが小さい`,
+    `小さいエリアを上位院並みに取り込んでいるので${b.name}は${pct(b.penetration)}、${a.name}はエリア内にまだ余地があり${pct(a.penetration)}`,
+    "上位院も伸び続けているため、100%は上限ではなく「いまの上位水準」",
+  ]), { x: x + 0.3, y: 2.25, w: W - MX - x - 0.6, h: 4.4, fontSize: 13.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
+  s.addNotes("上位院比の計算の手順。潜在需要の大きさではなく、自院が一番近いエリアの広さ（②）の違いが効いている。ひばりが丘は伸ばすには担当エリアを広げる必要があり、石神井公園は今のエリア内で紹介を増やす余地がある。");
 }
 {
   const s = content("医師1人あたり患者数は「次の増員の時期」の目安（医師は患者に合わせて増やすため、伸び悩みの原因ではない）");
@@ -520,6 +573,7 @@ if (M) {
     });
     if (F) {
       txt(s, `新規の勢い＝担当エリアの大きさ（到達目安）100人あたりの月間新規を、上位4院の平均（${F.ref_inflow.toFixed(1)}人）と比べた値（60%未満を橙）。患者数の取り込み＝3章の上位院比と同じ（自院が一番近いエリアの潜在需要のうち何%を患者にできているか、上位院＝100%）。終了率の比較院中央値は${(100 * F.ref_end_rate).toFixed(1)}%/月。新規・終了は直近12か月（${F.window}）の平均、前年比はその前の12か月との比較。移管・報告値修正の月は終了から除外`, { x: MX, y: 5.55, w: W - 2 * MX, h: 0.7, fontSize: 10, color: C.accent5 });
+      s.addNotes("新規の勢い＝担当エリアの大きさに対して毎月どれだけ新規が来ているか。患者数の取り込み＝3章の上位院比と同じで、今いる患者数がエリアの大きさに対して上位院並みか。両方が上位院並みならA（エリアを取り切った）、新規の勢いが低ければB（紹介不足）。終了率はどの院も他院並み。");
       txt(s, "A（取り切り）はエリアを広げる、B（新規不足）は紹介経路を立て直す。どの院も終了率は他院並みで、終了の多さは原因ではない", { x: MX, y: 6.45, w: W - 2 * MX, h: 0.5, fontSize: 14, bold: true, color: C.text2 });
     } else {
       txt(s, "判定: 直近6か月の居宅の傾きが統計的に0と区別できない、またはS字カーブで頭打ち。上位院比80%以上＝担当エリアを取り切りつつある", { x: MX, y: 5.1, w: W - 2 * MX, h: 0.6, fontSize: 12, color: C.accent5 });
@@ -529,17 +583,19 @@ if (M) {
     const s = content("データの補正（確認済み）：移管と報告値の修正を除いた「実態ベース」で分析しています");
     const tr = (M.transfers || [])[0];
     const rows = [
+      ["2022年9月以前", "本院・所沢で総数が内訳より約210人・80人多い", "翌月に施設が同数増えており、施設の別区分とみなして施設に計上"],
+      ["2023年2月", "本院の居宅 330→220人（がん医総 94→34人）", "数え直し・定義変更（確認済み）。それ以前の値を差し引いて連続に"],
       ["2025年4月", tr ? `施設 ${tr["減少"]}（計${tr["減少合計"]}人）を高円寺へ移管` : "施設の移管", "移管（確認済み）。移管元の過去の施設数を移管分だけ差し引き、自然増減だけを評価"],
-      ["2025年8月", "調布・府中・三軒茶屋・石神井公園・三鷹で施設・居宅が同時に減少", "少しずつずれていた報告値を実態に修正（確認済み）。ずれは徐々に積み上がったとみなし、過去の値を按分して補正"],
       ["2025年4月〜2026年1月", `本院の施設 ${M.clinics["本院"].facility_from_peak}人（ピーク比）`, "契約終了とカウント見直しが混在し分離できないため、補正せずそのまま"],
+      ["2025年8月", "調布・府中・三軒茶屋・石神井公園・三鷹で施設・居宅が同時に減少", "少しずつずれていた報告値を実態に修正（確認済み）。ずれは徐々に積み上がったとみなし、過去の値を按分して補正"],
       ["2026年4月", "居宅にがん医総を含める集計に変更", "全院・全期間を「総数−施設」（がん医総を含む居宅）で統一。市川も同じ定義に揃えた"],
     ];
     const head = ["時期", "データの動き", "扱い"].map((t) => ({ text: t, options: { bold: true, color: HEX.lt1, fill: { color: HEX.dk2 } } }));
     s.addTable([head, ...rows.map((r) => r.map((t) => ({ text: t })))], {
-      x: MX, y: 1.5, w: W - 2 * MX, colW: [2.3, 4.9, 4.93], fontSize: 14, color: HEX.dk1,
-      border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.8, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
+      x: MX, y: 1.4, w: W - 2 * MX, colW: [2.3, 4.9, 4.93], fontSize: 13, color: HEX.dk1,
+      border: { type: "solid", pt: 0.75, color: "D9DEE5" }, rowH: 0.62, valign: "middle", margin: 0.08, fontFace: "Yu Gothic",
     });
-    txt(s, "補正しても直近6〜12か月の判定（停滞5院）は変わらない。補正で変わるのはピークからの落ち幅と過去の推移", { x: MX, y: 5.8, w: W - 2 * MX, h: 0.5, fontSize: 15, bold: true, color: C.text2 });
+    txt(s, "補正しても直近6〜12か月の判定（停滞5院）は変わらない。補正で変わるのはピークからの落ち幅と過去の推移", { x: MX, y: 6.3, w: W - 2 * MX, h: 0.5, fontSize: 15, bold: true, color: C.text2 });
   }
   {
     const launchOk = ["nishinippori", "koenji", "ichikawa"].map((id) => byId[id]).filter((c) => c && c.perf >= 0.85);
@@ -637,11 +693,14 @@ if (D.candidates && D.candidates.length) {
       pts.push(`川越は需要は小さめ（${fmt(kw.latent_home)}人）だが競合が薄く（${kw.competition_density.toFixed(1)}）、高齢化が速い（+${Math.round(100 * (kw.e85_growth_25_35 - 1))}%）。既存院と重ならない`);
       pts.push(`未充足型の既存院は、競合が薄い津田沼・所沢（${tsu.competition_density.toFixed(1)}・${tok.competition_density.toFixed(1)}）が実力1.2前後、厚い市川・浦和（${ich.competition_density.toFixed(1)}・${byId.urawa.competition_density.toFixed(1)}）は伸びが遅い`);
     }
+    s.addNotes("駅を中心に半径6kmで計算。未充足度はどちらも津田沼並みに高い。西千葉は需要が大きいが競合（特に機能強化型）が厚く、85歳以上の伸びはやや緩やか。川越は需要は小さめだが競合が薄く、高齢化が速く、既存院と重ならない。立地スコアは1都3県の2km格子との比較。");
     s.addText(bullets(pts), { x: x + 0.25, y: 2.0, w: W - MX - x - 0.4, h: 4.6, fontSize: 12.5, color: C.text1, margin: 0, isTextBox: true, valign: "top" });
   }
   {
     const rng = (c) => (Math.abs(c.std_36 - c.low_36) < 5 ? `約${fmt(Math.round(c.std_36 / 10) * 10)}人` : `約${fmt(Math.round(c.low_36 / 10) * 10)}〜${fmt(Math.round(c.std_36 / 10) * 10)}人`);
+    const sNotes = "予測式だけだと3年で約410人だが、この式には商圏の大きさが入っていない。そこで、未充足型で最も進んでいる津田沼の今の取り込み率（担当エリアの潜在需要の約11%）に達したら横ばいと仮定した線を標準、最近開院した市川の実力（期待の約6割）で伸びた場合を慎重とした。津田沼自身も伸びているので上振れの余地はある。";
     const s = content(`開院後の見込み：3年後の居宅は${CD.map((c) => `${c.name} ${rng(c)}`).join("、")}（駅近・居宅重視で立ち上げた場合）`);
+    s.addNotes(sNotes);
     const im = img(s, path.join(CONF, "figures/slide/fig_candidates.png"), MX, 1.3, 8.6, 5.6, 2200, 1200, "候補見込み図");
     const x = MX + im.w + 0.3;
     card(s, x, 1.5, W - MX - x, 5.25, "見込みの要点");
@@ -683,13 +742,14 @@ pres.addSection({ title: "お願いと次のステップ" });
   const s = pres.addSlide({ masterName: "CLOSING", sectionTitle: "お願いと次のステップ" });
   s.addText("お願いしたいことと次のステップ", { placeholder: "title" });
   const asks = [
+    ["患者の住所（町丁目まで）", `院ごとの実際の診療圏で計算し直す（今は全院${RK}kmを仮置き）`],
     ["紹介元と終了理由の内訳の記録", `新規不足の院（${F ? Object.entries(F.clinics).filter(([, c]) => (c.stall_cause || "").startsWith("B ")).map(([n]) => n).join("・") : "停滞院"}）から弱い経路を特定`],
-    ["院別の医師FTEの最新値", "増員時期の目安を更新"],
+    ["本院・所沢の在宅開始月、医師FTEの最新値", "年数と増員時期の目安を正確に"],
     ["出店候補物件の住所", "その場で3年後予測・食い合いを比較"],
     ["評価会議での「実力」指数の試行", "四半期ごとに更新（再計算は約40秒）"],
   ];
   asks.forEach(([a, b], i) => {
-    const y = 2.3 + i * 0.95;
+    const y = 2.1 + i * 0.8;
     s.addShape(pres.shapes.OVAL, { x: MX, y: y + 0.08, w: 0.42, h: 0.42, fill: { color: C.accent2 }, line: { type: "none" }, objectName: `お願い${i + 1}` });
     txt(s, String(i + 1), { x: MX, y: y + 0.08, w: 0.42, h: 0.42, fontSize: 14, bold: true, color: C.background1, align: "center", valign: "middle" });
     txt(s, a, { x: MX + 0.65, y: y + 0.05, w: 5.4, h: 0.5, fontSize: 18, bold: true, color: C.background1, valign: "middle" });
